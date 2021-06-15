@@ -115,16 +115,10 @@ export default NextAuth({
     // async redirect(url, baseUrl) { return baseUrl },
     // async session(session, user) { return session },
     async jwt(token, user, account, profile, isNewUser) {
-        // if (profile) { token.profile = profile}
-        // if (user) {token.user = user}
-        // if (account) {token.account }
         return Promise.resolve(token)
     },
     session: async (session, user) => {
-        // session.user.id = user.id
         session.user.id = user.sub;
-        // session.user.name = user.user.username;
-        // session.user.image = user.user.avatar
         return Promise.resolve(session)
       }
   },
