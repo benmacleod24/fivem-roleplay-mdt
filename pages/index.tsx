@@ -2,8 +2,16 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Layout from '../components/layout'
+import useSWR from 'swr'
+
+const fetcher = (...args) => fetch(...args).then(res => res.json())
 
 export default function Home() {
+  const { data, error } = useSWR('/api/characters?cursor=500&limit=20', fetcher)
+  // if (error) return <div>An error occured.</div>
+  // if (!data) return <div>Loading ...</div>
+  console.log(data)
+
   return (
     <Layout>
     <div className={styles.container}>

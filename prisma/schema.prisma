@@ -1,0 +1,448 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model fivem_account_transactions {
+  transactionid Int       @id @default(autoincrement())
+  sender_id     String?   @db.VarChar(255)
+  receiver_id   String?   @db.VarChar(255)
+  amount        Int?
+  description   String?   @db.VarChar(255)
+  date          DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([sender_id], name: "FK__fivem_account_transactions__fivem_accounts_accountid")
+  @@index([receiver_id], name: "FK__fivem_account_transactions__fivem_accounts_accountid_sender")
+  @@map("_fivem_account_transactions")
+}
+
+model fivem_account_types {
+  typeid         Int              @id @default(autoincrement())
+  type_name      String?          @db.VarChar(255)
+  fivem_accounts fivem_accounts[] @relation("fivem_account_typesTo_fivem_accounts")
+
+  @@map("_fivem_account_types")
+}
+
+model fivem_accounts {
+  accountid             Int                     @id @default(autoincrement())
+  account_routing       Int?
+  account_name          String?                 @db.VarChar(255)
+  account_type          Int?
+  account_amount        Decimal?                @default(5000.00) @db.Decimal(30, 2)
+  fivem_account_types   fivem_account_types?    @relation("fivem_account_typesTo_fivem_accounts", fields: [account_type], references: [typeid])
+  fivem_accounts_access fivem_accounts_access[] @relation("fivem_accountsTo_fivem_accounts_access")
+
+  @@index([account_type], name: "FK__fivem_accounts__fivem_account_types")
+  @@map("_fivem_accounts")
+}
+
+model fivem_accounts_access {
+  accessid         Int               @id @default(autoincrement())
+  character_id     Int?
+  account_id       Int?
+  access_level     Int?
+  fivem_accounts   fivem_accounts?   @relation("fivem_accountsTo_fivem_accounts_access", fields: [account_id], references: [accountid])
+  fivem_characters fivem_characters? @relation("fivem_accounts_accessTo_fivem_characters", fields: [character_id], references: [id])
+
+  @@index([character_id], name: "FK__fivem_accounts_access__fivem_characters_id")
+  @@index([account_id], name: "FK__fivem_accounts_access_account_id")
+  @@map("_fivem_accounts_access")
+}
+
+model fivem_apartments {
+  id               Int               @id @default(autoincrement())
+  cid              Int?
+  stash            Decimal?          @default(0.00) @db.Decimal(20, 2)
+  outfits          String            @default("{}") @db.Text
+  fivem_characters fivem_characters? @relation("fivem_apartmentsTo_fivem_characters", fields: [cid], references: [id])
+
+  @@index([cid], name: "FK_apartments_characters")
+  @@map("_fivem_apartments")
+}
+
+model fivem_characters {
+  id                              Int                               @id @default(autoincrement())
+  uId                             Int?
+  cuid                            String?                           @db.VarChar(255)
+  first_name                      String?                           @db.VarChar(255)
+  last_name                       String?                           @db.VarChar(255)
+  dob                             String?                           @db.VarChar(255)
+  cash                            Decimal                           @default(500.00) @db.Decimal(20, 2)
+  payslip                         Decimal                           @default(0.00) @db.Decimal(20, 2)
+  gender                          Boolean?                          @default(false)
+  deleted                         Boolean?                          @default(false)
+  ammo                            String?                           @db.MediumText
+  fivem_users                     fivem_users?                      @relation("fivem_charactersTo_fivem_users", fields: [uId], references: [id])
+  fivem_accounts_access           fivem_accounts_access[]           @relation("fivem_accounts_accessTo_fivem_characters")
+  fivem_apartments                fivem_apartments[]                @relation("fivem_apartmentsTo_fivem_characters")
+  fivem_characters_details        fivem_characters_details[]        @relation("fivem_charactersTo_fivem_characters_details")
+  fivem_emotes                    fivem_emotes[]                    @relation("fivem_charactersTo_fivem_emotes")
+  fivem_jail                      fivem_jail[]                      @relation("fivem_charactersTo_fivem_jail")
+  fivem_licenses                  fivem_licenses[]                  @relation("fivem_charactersTo_fivem_licenses")
+  fivem_phones                    fivem_phones[]                    @relation("fivem_charactersTo_fivem_phones")
+  fivem_properties                fivem_properties[]                @relation("fivem_charactersTo_fivem_properties")
+  fivem_vehicles                  fivem_vehicles[]                  @relation("fivem_charactersTo_fivem_vehicles")
+  fivem_whitelist_characters_jobs fivem_whitelist_characters_jobs[] @relation("fivem_charactersTo_fivem_whitelist_characters_jobs")
+
+  @@index([uId], name: "FK_characters_uId")
+  @@map("_fivem_characters")
+}
+
+model fivem_characters_details {
+  id               Int               @id @default(autoincrement())
+  cid              Int?
+  model            String?           @db.VarChar(255)
+  clothing         String?           @db.Text
+  face_blend       String?           @db.Text
+  tattoos          String?           @db.Text
+  stats            String?           @default("{\"health\":200,\"armor\":0,\"thirst\":100.00,\"hunger\":100.00}") @db.VarChar(255)
+  stress           Int?              @default(0)
+  bones            String?           @db.Text
+  fivem_characters fivem_characters? @relation("fivem_charactersTo_fivem_characters_details", fields: [cid], references: [id])
+
+  @@index([cid], name: "FK_character_details_characters_id")
+  @@map("_fivem_characters_details")
+}
+
+model fivem_emotes {
+  id               Int               @id @default(autoincrement())
+  cid              Int?
+  emote1           String            @default("handsup") @db.VarChar(50)
+  emote2           String            @default("surrender") @db.VarChar(50)
+  emote3           String            @default("crossarms") @db.VarChar(50)
+  emote4           String            @default("crossarms2") @db.VarChar(50)
+  emote5           String            @default("lean") @db.VarChar(50)
+  emote6           String            @default("investigate") @db.VarChar(50)
+  emote7           String            @default("dancesilly9") @db.VarChar(50)
+  emote8           String            @default("winnerspov") @db.VarChar(50)
+  emote9           String            @default("cop") @db.VarChar(50)
+  emote10          String            @default("dab") @db.VarChar(50)
+  emote11          String            @default("facepalm") @db.VarChar(50)
+  emote12          String            @default("filmshocking") @db.VarChar(50)
+  emote13          String            @default("passout3") @db.VarChar(50)
+  emote14          String            @default("passout") @db.VarChar(50)
+  emote15          String            @default("gangsign") @db.VarChar(50)
+  emote16          String            @default("gangsign2") @db.VarChar(50)
+  emote17          String            @default("wait") @db.VarChar(50)
+  emote18          String            @default("wait2") @db.VarChar(50)
+  walk             String            @default("default") @db.VarChar(50)
+  mood             String            @default("default") @db.VarChar(50)
+  fivem_characters fivem_characters? @relation("fivem_charactersTo_fivem_emotes", fields: [cid], references: [id])
+
+  @@index([cid], name: "FK_emotes_characters_id")
+  @@map("_fivem_emotes")
+}
+
+model fivem_inventories {
+  id           Int    @id @default(autoincrement())
+  name         String @default("0") @db.VarChar(500)
+  inventory    String @default("0") @db.VarChar(255)
+  data         String @default("{}") @db.VarChar(500)
+  slot         Int    @default(0) @db.SmallInt
+  creationDate BigInt @default(0)
+
+  @@map("_fivem_inventories")
+}
+
+model fivem_jail {
+  id               Int               @id @default(autoincrement())
+  cid              Int?
+  jail_time        BigInt?
+  fivem_characters fivem_characters? @relation("fivem_charactersTo_fivem_jail", fields: [cid], references: [id])
+
+  @@index([cid], name: "FK_character_details_characters_id")
+  @@map("_fivem_jail")
+}
+
+model fivem_licenses {
+  id               Int               @id @default(autoincrement())
+  cid              Int?
+  drivers          Int?              @default(0)
+  pilots           Int?
+  weapons          Int?
+  hunting          Int?
+  fishing          Int?
+  fivem_characters fivem_characters? @relation("fivem_charactersTo_fivem_licenses", fields: [cid], references: [id])
+
+  @@index([cid], name: "cid")
+  @@map("_fivem_licenses")
+}
+
+model fivem_phones {
+  phoneid               Int                     @id @default(autoincrement())
+  phone_owner           Int?
+  phone_number          String?                 @unique @db.VarChar(255)
+  fivem_characters      fivem_characters?       @relation("fivem_charactersTo_fivem_phones", fields: [phone_owner], references: [id])
+  fivem_phones_contacts fivem_phones_contacts[] @relation("fivem_phonesTo_fivem_phones_contacts")
+
+  @@index([phone_owner], name: "FK__fivem_phones_phone_owner")
+  @@map("_fivem_phones")
+}
+
+model fivem_phones_contacts {
+  contactid      Int           @id @default(autoincrement())
+  contact_owner  Int?
+  contact_name   String?       @db.VarChar(255)
+  contact_number String?       @db.VarChar(255)
+  fivem_phones   fivem_phones? @relation("fivem_phonesTo_fivem_phones_contacts", fields: [contact_owner], references: [phoneid])
+
+  @@index([contact_owner], name: "FK__fivem_phones_contacts_contact_owner")
+  @@map("_fivem_phones_contacts")
+}
+
+model fivem_phones_conversations {
+  conversationid        Int                     @id @default(autoincrement())
+  owner_number          String?                 @db.VarChar(50)
+  conversation_number   String?                 @db.VarChar(255)
+  read                  Boolean?                @default(false)
+  last_message          DateTime?               @default(now()) @db.Timestamp(0)
+  fivem_phones_messages fivem_phones_messages[] @relation("fivem_phones_conversationsTo_fivem_phones_messages")
+
+  @@index([owner_number], name: "FK__fivem_phones_conversations_conversation_owner")
+  @@map("_fivem_phones_conversations")
+}
+
+model fivem_phones_messages {
+  messageid                  Int                         @id @default(autoincrement())
+  conversationid             Int?
+  message_sender             String?                     @db.VarChar(255)
+  message_content            String?                     @db.MediumText
+  message_timestamp          DateTime?                   @default(now()) @db.Timestamp(0)
+  fivem_phones_conversations fivem_phones_conversations? @relation("fivem_phones_conversationsTo_fivem_phones_messages", fields: [conversationid], references: [conversationid])
+
+  @@index([conversationid], name: "FK__fivem_phones_messages_conversation_id")
+  @@map("_fivem_phones_messages")
+}
+
+model fivem_properties {
+  id                         Int                          @id @default(autoincrement())
+  property_id                Int?
+  ownerid                    Int?
+  street                     String?                      @db.VarChar(255)
+  interior                   Int?                         @default(1)
+  disabled                   Boolean?                     @default(false)
+  repo                       Boolean?                     @default(false)
+  fivem_characters           fivem_characters?            @relation("fivem_charactersTo_fivem_properties", fields: [ownerid], references: [id])
+  fivem_properties_details   fivem_properties_details[]   @relation("fivem_propertiesTo_fivem_properties_details")
+  fivem_properties_furniture fivem_properties_furniture[] @relation("fivem_propertiesTo_fivem_properties_furniture")
+  fivem_properties_keys      fivem_properties_keys[]      @relation("fivem_propertiesTo_fivem_properties_keys")
+  fivem_properties_positions fivem_properties_positions[] @relation("fivem_propertiesTo_fivem_properties_positions")
+
+  @@index([property_id], name: "property_id")
+  @@index([ownerid], name: "property_owner")
+  @@map("_fivem_properties")
+}
+
+model fivem_properties_details {
+  detailsid        Int               @id @default(autoincrement())
+  property_id      Int?
+  stash            Decimal           @default(0.00) @db.Decimal(20, 2)
+  finance          String?           @db.Text
+  fivem_properties fivem_properties? @relation("fivem_propertiesTo_fivem_properties_details", fields: [property_id], references: [property_id])
+
+  @@index([property_id], name: "property_id")
+  @@map("_fivem_properties_details")
+}
+
+model fivem_properties_furniture {
+  furnitureid      Int               @id @default(autoincrement())
+  property_id      Int?
+  object           String?           @db.VarChar(255)
+  coords           String?           @db.VarChar(255)
+  rotation         String?           @db.VarChar(255)
+  fivem_properties fivem_properties? @relation("fivem_propertiesTo_fivem_properties_furniture", fields: [property_id], references: [property_id])
+
+  @@index([property_id], name: "property_id")
+  @@map("_fivem_properties_furniture")
+}
+
+model fivem_properties_keys {
+  keysid           Int               @id @default(autoincrement())
+  property_id      Int?
+  cid              Int?
+  fivem_properties fivem_properties? @relation("fivem_propertiesTo_fivem_properties_keys", fields: [property_id], references: [property_id])
+
+  @@index([property_id], name: "property_id")
+  @@map("_fivem_properties_keys")
+}
+
+model fivem_properties_positions {
+  positionsid      Int               @id @default(autoincrement())
+  property_id      Int?
+  entry            String?           @db.VarChar(255)
+  backdoor         String?           @db.VarChar(255)
+  garage           String?           @db.VarChar(255)
+  exit             String?           @db.VarChar(255)
+  backexit         String?           @db.VarChar(255)
+  stash            String?           @db.VarChar(255)
+  logout           String?           @db.VarChar(255)
+  fivem_properties fivem_properties? @relation("fivem_propertiesTo_fivem_properties_positions", fields: [property_id], references: [property_id])
+
+  @@index([property_id], name: "property_id")
+  @@map("_fivem_properties_positions")
+}
+
+model fivem_users {
+  id               Int                @id @default(autoincrement())
+  uuid             String?            @db.VarChar(255)
+  steamId          String             @default("0") @db.VarChar(255)
+  license          String             @default("0") @db.VarChar(255)
+  discord          String             @default("0") @db.VarChar(255)
+  ip               String             @default("0") @db.VarChar(255)
+  priority         Int?               @default(0)
+  banned           BigInt?
+  banned_reason    String?            @db.VarChar(255)
+  fivem_characters fivem_characters[] @relation("fivem_charactersTo_fivem_users")
+
+  @@map("_fivem_users")
+}
+
+model fivem_vehicles {
+  vehicleid               Int                       @id @default(autoincrement())
+  vehicleuid              String?                   @default(dbgenerated("(uuid())")) @db.VarChar(255)
+  ownerid                 Int?
+  plate                   String?                   @db.VarChar(255)
+  model                   BigInt?
+  name                    String?                   @db.VarChar(255)
+  gov                     String?                   @default("0") @db.Char(1)
+  fivem_characters        fivem_characters?         @relation("fivem_charactersTo_fivem_vehicles", fields: [ownerid], references: [id])
+  fivem_vehicles_details  fivem_vehicles_details[]  @relation("fivem_vehiclesTo_fivem_vehicles_details")
+  fivem_vehicles_illegals fivem_vehicles_illegals[] @relation("fivem_vehiclesTo_fivem_vehicles_illegals")
+  fivem_vehicles_status   fivem_vehicles_status[]   @relation("fivem_vehiclesTo_fivem_vehicles_status")
+
+  @@index([ownerid], name: "FK__fivem_vehicles_characters_id")
+  @@map("_fivem_vehicles")
+}
+
+model fivem_vehicles_details {
+  detailsid      Int             @id @default(autoincrement())
+  vehicleid      Int?
+  details        String?         @db.Text
+  finance        String?         @db.Text
+  body           Int?            @default(1000) @db.SmallInt
+  engine         Int?            @default(1000) @db.SmallInt
+  degradation    String?         @db.Text
+  fivem_vehicles fivem_vehicles? @relation("fivem_vehiclesTo_fivem_vehicles_details", fields: [vehicleid], references: [vehicleid])
+
+  @@index([vehicleid], name: "FK__fivem_vehicles_details_vehicle_id")
+  @@map("_fivem_vehicles_details")
+}
+
+model fivem_vehicles_illegals {
+  illegalsid     Int            @id @default(autoincrement())
+  vehicleid      Int
+  Injectors      Int?           @default(0)
+  Filter         Int?           @default(0)
+  Suspension     Int?           @default(0)
+  Rollbars       Int?           @default(0)
+  Bored          Int?           @default(0)
+  Carbon         Int?           @default(0)
+  Tires          Int?           @default(0)
+  Steering       Int?           @default(0)
+  fivem_vehicles fivem_vehicles @relation("fivem_vehiclesTo_fivem_vehicles_illegals", fields: [vehicleid], references: [vehicleid])
+
+  @@index([vehicleid], name: "vehicleid")
+  @@map("_fivem_vehicles_illegals")
+}
+
+model fivem_vehicles_logs {
+  logid     Int     @id @default(autoincrement())
+  vehicleid Int
+  name      String? @db.VarChar(50)
+  action    String? @db.Char(10)
+  time      String? @db.VarChar(255)
+
+  @@map("_fivem_vehicles_logs")
+}
+
+model fivem_vehicles_status {
+  statusid       Int             @id @default(autoincrement())
+  vehicleid      Int?
+  status         String?         @default("Out") @db.VarChar(50)
+  garage         String?         @default("Garage I") @db.VarChar(255)
+  wanted         Int?            @default(0)
+  wantedr        String?         @db.VarChar(255)
+  impound        String?         @db.Text
+  fivem_vehicles fivem_vehicles? @relation("fivem_vehiclesTo_fivem_vehicles_status", fields: [vehicleid], references: [vehicleid])
+
+  @@index([vehicleid], name: "FK__fivem_vehicles_details_vehicle_id")
+  @@map("_fivem_vehicles_status")
+}
+
+model fivem_whitelist_characters_jobs {
+  whitelistid          Int                   @id @default(autoincrement())
+  job_id               Int?
+  character_id         Int?
+  lvl                  Int?
+  fivem_characters     fivem_characters?     @relation("fivem_charactersTo_fivem_whitelist_characters_jobs", fields: [character_id], references: [id])
+  fivem_whitelist_jobs fivem_whitelist_jobs? @relation("fivem_whitelist_characters_jobsTo_fivem_whitelist_jobs", fields: [job_id], references: [jobid])
+
+  @@index([character_id], name: "FK_whitelist_characters_jobs_characters_id")
+  @@index([job_id], name: "FK_whitelist_characters_jobs_job_id")
+  @@map("_fivem_whitelist_characters_jobs")
+}
+
+model fivem_whitelist_jobs {
+  jobid                           Int                               @id @default(autoincrement())
+  name                            String?                           @db.VarChar(50)
+  displayName                     String?                           @db.VarChar(255)
+  payAmount                       Int?
+  fivem_whitelist_characters_jobs fivem_whitelist_characters_jobs[] @relation("fivem_whitelist_characters_jobsTo_fivem_whitelist_jobs")
+
+  @@map("_fivem_whitelist_jobs")
+}
+
+model Account {
+  id                 String    @id @default(cuid())
+  userId             String
+  providerType       String
+  providerId         String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id])
+
+  @@unique([providerId, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+}
