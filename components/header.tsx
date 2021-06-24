@@ -27,7 +27,7 @@ export default function Header() {
       <Flex justifyContent="center">
         <ButtonGroup variant="outline" spacing="3">
           <Button>
-            <Link href="#">Home</Link>
+            <Link href="/">Home</Link>
           </Button>
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
