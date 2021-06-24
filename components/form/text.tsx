@@ -1,0 +1,1 @@
+// component-ize text

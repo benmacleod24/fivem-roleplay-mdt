@@ -1,0 +1,123 @@
+import Head from 'next/head';
+// import Image from 'next/image';
+import styles from '../styles/Home.module.css';
+import Layout from '../components/layout';
+import React from 'react';
+import {
+  Input,
+  Box,
+  VStack,
+  HStack,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Button,
+  InputProps,
+  NumberInput,
+  NumberInputField,
+} from '@chakra-ui/react';
+import useSWR from 'swr';
+import { SearchIcon } from '@chakra-ui/icons';
+import {
+  Field,
+  FieldAttributes,
+  FieldInputProps,
+  FieldMetaProps,
+  Form,
+  Formik,
+  FormikErrors,
+  FormikProps,
+  FormikState,
+  FormikValues,
+} from 'formik';
+// import useSWR from 'swr';
+
+const initialValues = {
+  firstName: undefined,
+  lastName: undefined,
+  stateId: undefined,
+};
+
+export interface FieldProps<V = any> {
+  field: FieldInputProps<V>;
+  form: FormikProps<V>; // if ppl want to restrict this for a given form, let them.
+  meta: FieldMetaProps<V>;
+}
+export default function Home() {
+  const { data, error } = useSWR('/api/characters?cursor=500&limit=20');
+  // if (error) return <div>An error occured.</div>
+  // if (!data) return <div>Loading ...</div>
+  console.log(data);
+
+  return (
+    <Layout>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={(values, actions) => {
+          setTimeout(() => {
+            alert(JSON.stringify(values, null, 2));
+            actions.setSubmitting(false);
+          }, 500);
+        }}
+      >
+        {(props: FormikValues) => (
+          <Form>
+            <HStack>
+              <Field name="firstName">
+                {({
+                  field,
+                  form,
+                }: {
+                  field: FormikState<typeof initialValues>;
+                  form: FormikState<typeof initialValues>;
+                }) => (
+                  <FormControl isInvalid={Boolean(form.errors.firstName) && form.touched.firstName}>
+                    {/* <FormLabel htmlFor="firstName">First name</FormLabel> */}
+                    <Input {...field} id="firstName" placeholder="First name" />
+                    <FormErrorMessage>{form.errors.firstName}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="lastName">
+                {({
+                  field,
+                  form,
+                }: {
+                  field: FormikState<typeof initialValues>;
+                  form: FormikState<typeof initialValues>;
+                }) => (
+                  <FormControl isInvalid={Boolean(form.errors.lastName) && form.touched.lastName}>
+                    {/* <FormLabel htmlFor="firstName">First name</FormLabel> */}
+                    <Input {...field} id="lastName" placeholder="Last name" />
+                    <FormErrorMessage>{form.errors.lastName}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="stateId">
+                {({
+                  field,
+                  form,
+                }: {
+                  field: FormikState<typeof initialValues>;
+                  form: FormikState<typeof initialValues>;
+                }) => (
+                  <FormControl isInvalid={Boolean(form.errors.stateId) && form.touched.stateId}>
+                    {/* <FormLabel htmlFor="firstName">First name</FormLabel> */}
+                    <NumberInput>
+                      <NumberInputField {...field} id="stateId" placeholder="State ID" />
+                    </NumberInput>
+                    <FormErrorMessage>{form.errors.stateId}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+
+              <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
+                <SearchIcon />
+              </Button>
+            </HStack>
+          </Form>
+        )}
+      </Formik>
+    </Layout>
+  );
+}
