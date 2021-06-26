@@ -1,7 +1,7 @@
 // import Image from 'next/image';
 import Layout from '../components/layout';
-import React from 'react';
-import { HStack, Button } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { HStack, Button, VStack, Box, Image, useColorModeValue, theme } from '@chakra-ui/react';
 import useSWR from 'swr';
 import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
@@ -20,21 +20,61 @@ export interface FieldProps<V = any> {
   form: FormikProps<V>; // if ppl want to restrict this for a given form, let them.
   meta: FieldMetaProps<V>;
 }
+
+function Page({ index, searchValues }) {
+  const searchParams = new URLSearchParams(searchValues).toString();
+  const { data } = useSWR(index !== null ? `/api/characters?page=${index}&${searchParams}` : null);
+  const bgColor = useColorModeValue(theme.colors.gray[200], theme.colors.blue[800]);
+
+  const styles = {
+    picture: '5rem',
+    name: '20rem',
+  };
+  return (
+    <VStack spacing="1rem">
+      {data &&
+        data.map(c => {
+          return (
+            <HStack
+              key={c.id}
+              w="100%"
+              align="stretch"
+              justify="space-between"
+              backgroundColor={bgColor}
+            >
+              <HStack spacing="2rem">
+                <Image
+                  w={styles.picture}
+                  src="https://prepsec.org/wp-content/uploads/2017/09/unknown-person-icon-Image-from.png"
+                />
+                <Box w={styles.name}>{`${c.first_name} ${c.last_name}`}</Box>
+              </HStack>
+
+              <VStack pr="2rem" justify="center">
+                <Box>{c.dob}</Box>
+                <Box> {c.cuid.split('-')[0]}</Box>
+              </VStack>
+            </HStack>
+          );
+        })}
+    </VStack>
+  );
+}
+
 export default function Home() {
-  const { data, error } = useSWR('/api/characters?cursor=500&limit=20');
-  // if (error) return <div>An error occured.</div>
-  // if (!data) return <div>Loading ...</div>
-  console.log(data);
+  const [pageIndex, setPageIndex] = useState(0);
+  console.log(pageIndex);
+  const [searchValues, setSearchValues] = useState({});
 
   return (
     <Layout>
       <Formik
         initialValues={initialValues}
         onSubmit={(values, actions) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            actions.setSubmitting(false);
-          }, 500);
+          console.log(values);
+          setSearchValues(values);
+          setPageIndex(0);
+          actions.setSubmitting(false);
         }}
       >
         {(props: FormikProps<typeof initialValues>) => (
@@ -52,6 +92,15 @@ export default function Home() {
           </FForm>
         )}
       </Formik>
+      <Box>
+        <Page index={pageIndex} searchValues={searchValues} />
+        <Button m="1rem" isDisabled={pageIndex < 1} onClick={() => setPageIndex(pageIndex - 1)}>
+          Previous
+        </Button>
+        <Button m="1rem" onClick={() => setPageIndex(pageIndex + 1)}>
+          Next
+        </Button>
+      </Box>
     </Layout>
   );
 }
