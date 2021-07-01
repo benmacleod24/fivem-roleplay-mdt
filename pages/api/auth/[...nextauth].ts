@@ -143,7 +143,6 @@ export default NextAuth({
       }
 
       session.user.isCop = isCop;
-      console.log('session');
       return Promise.resolve(session);
     },
   },

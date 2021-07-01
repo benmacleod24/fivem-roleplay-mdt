@@ -1,114 +1,108 @@
 import React from 'react';
 import Link from 'next/link';
 import { signIn, signOut, useSession } from 'next-auth/client';
-import styles from './header.module.css';
-import { Box, ButtonGroup, Flex, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
+import {
+  Box,
+  ButtonGroup,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Image,
+  Grid,
+  GridItem,
+} from '@chakra-ui/react';
 import { Button, useColorMode } from '@chakra-ui/react';
 import { ChevronDownIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
-// The approach used in this component shows how to built a sign in and sign out
-// component that works on pages which support both client and server side
-// rendering, and avoids any flash incorrect content on initial page load.
 export default function Header() {
+  const [session, loading] = useSession();
   return (
-    <Box pb="1rem" mb="1rem" borderBottom="1px solid #555">
-      <DiscordAuth />
+    <Box pb="1rem" pt="1rem" mb="1rem" borderBottom="1px solid #555">
+      {/* <DiscordAuth /> */}
+      <Grid templateColumns="repeat(12, 1fr)">
+        <GridItem colSpan={3}>
+          <Flex pl="1rem">
+            {session && session.user && session.user.image && (
+              <Flex>
+                <Image
+                  borderRadius="2rem"
+                  height="2.8rem"
+                  width="2.8rem"
+                  alt="silhouette"
+                  src={session.user.image}
+                />
+                {session.user.name && (
+                  <Flex pl="1rem" flexDir="column">
+                    <small>Signed in as</small>
+                    <strong>{session.user.name}</strong>
+                  </Flex>
+                )}
+              </Flex>
+            )}
+          </Flex>
+        </GridItem>
 
-      <Flex justifyContent="center">
-        <ButtonGroup variant="outline" spacing="3">
-          <Button>
-            <Link href="/" passHref>
-              Home
-            </Link>
-          </Button>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              Databases
-            </MenuButton>
-            <MenuList>
-              <Link href="/citizens">
-                <MenuItem>Citizens</MenuItem>
-              </Link>
-              <MenuItem>Criminals</MenuItem>
-              <MenuItem>Vehicles</MenuItem>
-            </MenuList>
-          </Menu>
-          <Button>
-            <Link href="#">Reports</Link>
-          </Button>
-          <Button>
-            <Link href="#">Warrants</Link>
-          </Button>
-          <Button>
-            <Link href="#">Penal Code</Link>
-          </Button>
-          <Button>
-            <Link href="#">Profile</Link>
-          </Button>
-          <ToggleMode />
-        </ButtonGroup>
-      </Flex>
+        <GridItem colSpan={7}>
+          <Flex justifyContent="center">
+            <ButtonGroup variant="outline" spacing="3">
+              <Button>
+                <Link href="/" passHref>
+                  Home
+                </Link>
+              </Button>
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                  Databases
+                </MenuButton>
+                <MenuList>
+                  <Link href="/citizens" passHref>
+                    <MenuItem>Citizens</MenuItem>
+                  </Link>
+                  <MenuItem>Criminals</MenuItem>
+                  <MenuItem>Vehicles</MenuItem>
+                </MenuList>
+              </Menu>
+              <Button>
+                <Link href="#">Reports</Link>
+              </Button>
+              <Button>
+                <Link href="#">Warrants</Link>
+              </Button>
+              <Button>
+                <Link href="#">Penal Code</Link>
+              </Button>
+              <Button>
+                <Link href="#">Profile</Link>
+              </Button>
+              <ToggleMode />
+            </ButtonGroup>
+          </Flex>
+        </GridItem>
+        <GridItem colSpan={2}>
+          <Flex
+            justifyContent="flex-end"
+            alignItems="flex-end"
+            flexDir="column"
+            alignContent="center"
+            paddingRight="1rem"
+          >
+            <Button
+              colorScheme={session ? 'red' : 'green'}
+              variant="solid"
+              onClick={e => {
+                e.preventDefault();
+                session ? signOut() : signIn('discord');
+              }}
+            >
+              {session ? 'Sign Out ' : 'Sign In'}
+            </Button>
+          </Flex>
+        </GridItem>
+      </Grid>
     </Box>
   );
 }
-
-const DiscordAuth = () => {
-  const [session, loading] = useSession();
-  console.log(session);
-
-  return (
-    <>
-      <header>
-        <noscript>
-          <style>{'.nojs-show { opacity: 1; top: 0; }'}</style>
-        </noscript>
-        <div className={styles.signedInStatus}>
-          <p className={`nojs-show ${!session && loading ? styles.loading : styles.loaded}`}>
-            {!session && (
-              <>
-                <span className={styles.notSignedInText}>You are not signed in</span>
-                <a
-                  href={`/api/auth/signin`}
-                  className={styles.buttonPrimary}
-                  onClick={e => {
-                    e.preventDefault();
-                    signIn();
-                  }}
-                >
-                  Sign in
-                </a>
-              </>
-            )}
-            {session && (
-              <>
-                {session && session.user && session.user.image && (
-                  <span
-                    style={{ backgroundImage: `url(${session.user.image})` }}
-                    className={styles.avatar}
-                  />
-                )}
-                <span className={styles.signedInText}>
-                  <small>Signed in as</small>
-                  <br />
-                  {session.user && <strong>{session.user.name}</strong>}
-                </span>
-                <a
-                  href={`/api/auth/signout`}
-                  className={styles.button}
-                  onClick={e => {
-                    e.preventDefault();
-                    signOut();
-                  }}
-                >
-                  Sign out
-                </a>
-              </>
-            )}
-          </p>
-        </div>
-      </header>
-    </>
-  );
-};
 
 function ToggleMode() {
   const { colorMode, toggleColorMode } = useColorMode();

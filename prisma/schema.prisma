@@ -397,66 +397,250 @@ model fivem_whitelist_jobs {
   @@map("_fivem_whitelist_jobs")
 }
 
-model Account {
-  id                 String    @id @default(cuid())
-  userId             String
-  providerType       String
-  providerId         String
-  providerAccountId  String
-  refreshToken       String?
-  accessToken        String?
-  accessTokenExpires DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  user               User      @relation(fields: [userId], references: [id])
-
-  @@unique([providerId, providerAccountId], name: "Account.providerId_providerAccountId_unique")
-  @@index([userId], name: "userId")
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  userId       String
-  expires      DateTime
-  sessionToken String   @unique
-  accessToken  String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id])
-
-  @@index([userId], name: "userId")
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-}
-
-model VerificationRequest {
-  id         String   @id @default(cuid())
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@unique([identifier, token], name: "VerificationRequest.identifier_token_unique")
-}
-
 model mdt_criminals {
-  criminalid    Int     @id @default(autoincrement())
-  character_uid String? @db.VarChar(255)
-  first_name    String? @db.VarChar(255)
-  last_name     String? @db.VarChar(255)
-  date_of_birth String? @db.VarChar(255)
-  image         String? @db.VarChar(255)
+  criminalid         Int                  @id @default(autoincrement())
+  character_uid      String?              @db.VarChar(255)
+  first_name         String?              @db.VarChar(255)
+  last_name          String?              @db.VarChar(255)
+  date_of_birth      String?              @db.VarChar(255)
+  image              String?              @db.VarChar(255)
+  mdt_bookings       mdt_bookings[]       @relation("mdt_bookingsTo_mdt_criminals")
+  mdt_criminal_flags mdt_criminal_flags[] @relation("mdt_criminal_flagsTo_mdt_criminals")
+  mdt_criminal_notes mdt_criminal_notes[] @relation("mdt_criminal_notesTo_mdt_criminals")
 
   @@map("_mdt_criminals")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model fivem_pdm_vehicles {
+  name     String  @db.VarChar(50)
+  model    String  @db.VarChar(50)
+  costs    Decimal @default(0) @db.Decimal(10, 0)
+  stock    Int     @default(0)
+  category String  @db.VarChar(50)
+
+  @@map("_fivem_pdm_vehicles")
+  @@ignore
+}
+
+model mdt_annoucments {
+  annoucmentid     Int       @id @default(autoincrement())
+  annoucment_title String?   @db.VarChar(255)
+  annocument_body  String?   @db.LongText
+  annoucment_date  DateTime? @default(now()) @db.Timestamp(0)
+
+  @@map("_mdt_annoucments")
+}
+
+model mdt_booked_charges {
+  booked_charge_id Int           @id @default(autoincrement())
+  booking_id       Int?
+  charge_id        Int?
+  charge_count     Int?
+  mdt_bookings     mdt_bookings? @relation("mdt_booked_chargesTo_mdt_bookings", fields: [booking_id], references: [bookingid])
+  mdt_charges      mdt_charges?  @relation("mdt_booked_chargesTo_mdt_charges", fields: [charge_id], references: [chargeid])
+
+  @@index([booking_id], name: "FK__mdt_booked_charges__mdt_bookings_bookingid")
+  @@index([charge_id], name: "FK__mdt_booked_charges__mdt_charges_chargeid")
+  @@map("_mdt_booked_charges")
+}
+
+model mdt_bookings {
+  bookingid          Int                  @id @default(autoincrement())
+  officer_id         Int?
+  criminal_id        Int?
+  report_id          Int?
+  date               DateTime?            @db.DateTime(0)
+  for_warrant        Boolean?
+  booking_plea       String?              @db.VarChar(255)
+  booking_reduction  Int?
+  mdt_criminals      mdt_criminals?       @relation("mdt_bookingsTo_mdt_criminals", fields: [criminal_id], references: [criminalid])
+  mdt_officers       mdt_officers?        @relation("mdt_bookingsTo_mdt_officers", fields: [officer_id], references: [officerid])
+  mdt_booked_charges mdt_booked_charges[] @relation("mdt_booked_chargesTo_mdt_bookings")
+  mdt_warrants       mdt_warrants[]       @relation("mdt_bookingsTo_mdt_warrants")
+
+  @@index([criminal_id], name: "FK__mdt_bookings__mdt_criminals_criminalid")
+  @@index([officer_id], name: "FK__mdt_bookings__mdt_officers_officerid")
+  @@map("_mdt_bookings")
+}
+
+model mdt_charges {
+  chargeid               Int                     @id @default(autoincrement())
+  category_id            Int?
+  name                   String?                 @db.VarChar(500)
+  description            String?                 @db.LongText
+  time                   Int?
+  fine                   Int?
+  class                  String?                 @db.VarChar(255)
+  mdt_charges_categories mdt_charges_categories? @relation("mdt_chargesTo_mdt_charges_categories", fields: [category_id], references: [categoryid])
+  mdt_booked_charges     mdt_booked_charges[]    @relation("mdt_booked_chargesTo_mdt_charges")
+
+  @@index([category_id], name: "FK__mdt_charges_category_id")
+  @@map("_mdt_charges")
+}
+
+model mdt_charges_categories {
+  categoryid  Int           @id @default(autoincrement())
+  name        String?       @db.VarChar(255)
+  mdt_charges mdt_charges[] @relation("mdt_chargesTo_mdt_charges_categories")
+
+  @@map("_mdt_charges_categories")
+}
+
+model mdt_criminal_flags {
+  flagid         Int             @id @default(autoincrement())
+  criminal_id    Int?
+  type_id        Int?
+  mdt_criminals  mdt_criminals?  @relation("mdt_criminal_flagsTo_mdt_criminals", fields: [criminal_id], references: [criminalid])
+  mdt_flag_types mdt_flag_types? @relation("mdt_criminal_flagsTo_mdt_flag_types", fields: [type_id], references: [typeid])
+
+  @@index([criminal_id], name: "FK__mdt_criminal_flags_criminalid")
+  @@index([type_id], name: "FK__mdt_criminal_flags_type_id")
+  @@map("_mdt_criminal_flags")
+}
+
+model mdt_criminal_notes {
+  noteid        Int            @id @default(autoincrement())
+  criminal_id   Int?
+  note_content  String?        @db.LongText
+  note_date     DateTime?      @default(now()) @db.Timestamp(0)
+  note_author   Int?
+  mdt_criminals mdt_criminals? @relation("mdt_criminal_notesTo_mdt_criminals", fields: [criminal_id], references: [criminalid])
+  mdt_officers  mdt_officers?  @relation("mdt_criminal_notesTo_mdt_officers", fields: [note_author], references: [officerid])
+
+  @@index([criminal_id], name: "FK__mdt_criminal_notes_criminal_id")
+  @@index([note_author], name: "FK__mdt_criminal_notes_note_author")
+  @@map("_mdt_criminal_notes")
+}
+
+model mdt_department_members {
+  memberid             Int                   @id @default(autoincrement())
+  department_id        Int?
+  rank_id              Int?
+  officer_id           Int?
+  mdt_departments      mdt_departments?      @relation("mdt_department_membersTo_mdt_departments", fields: [department_id], references: [departmentid])
+  mdt_officers         mdt_officers?         @relation("mdt_department_membersTo_mdt_officers", fields: [officer_id], references: [officerid])
+  mdt_department_ranks mdt_department_ranks? @relation("mdt_department_membersTo_mdt_department_ranks", fields: [rank_id], references: [rankid])
+
+  @@index([department_id], name: "FK__mdt_department_members__mdt_departments_departmentid")
+  @@index([officer_id], name: "FK__mdt_department_members_officer_id")
+  @@index([rank_id], name: "FK__mdt_department_members_rank_id")
+  @@map("_mdt_department_members")
+}
+
+model mdt_department_ranks {
+  rankid                 Int                      @id @default(autoincrement())
+  dept_id                Int?
+  administrator_level    Int?
+  name                   String?                  @db.VarChar(50)
+  mdt_departments        mdt_departments?         @relation("mdt_department_ranksTo_mdt_departments", fields: [dept_id], references: [departmentid])
+  mdt_department_members mdt_department_members[] @relation("mdt_department_membersTo_mdt_department_ranks")
+
+  @@index([dept_id], name: "FK__mdt_department_ranks__mdt_departments_departmentid")
+  @@map("_mdt_department_ranks")
+}
+
+model mdt_departments {
+  departmentid           Int                      @id @default(autoincrement())
+  name                   String?                  @db.VarChar(50)
+  mdt_department_members mdt_department_members[] @relation("mdt_department_membersTo_mdt_departments")
+  mdt_department_ranks   mdt_department_ranks[]   @relation("mdt_department_ranksTo_mdt_departments")
+
+  @@map("_mdt_departments")
+}
+
+model mdt_dispatch {
+  recordid       Int       @id @default(autoincrement())
+  officer_id     Int?
+  clock_in_date  DateTime? @db.DateTime(0)
+  clock_out_date DateTime? @db.DateTime(0)
+
+  @@map("_mdt_dispatch")
+}
+
+model mdt_flag_types {
+  typeid             Int                  @id @default(autoincrement())
+  type_name          String?              @db.VarChar(255)
+  type_color         String?              @db.VarChar(255)
+  mdt_criminal_flags mdt_criminal_flags[] @relation("mdt_criminal_flagsTo_mdt_flag_types")
+
+  @@map("_mdt_flag_types")
+}
+
+model mdt_officers {
+  officerid              Int                      @id @default(autoincrement())
+  officeruid             String?                  @default(dbgenerated("(uuid())")) @db.VarChar(255)
+  character_id           String?                  @db.VarChar(255)
+  username               String?                  @db.VarChar(255)
+  password               String?                  @db.VarChar(255)
+  first_name             String?                  @db.VarChar(255)
+  last_name              String?                  @db.VarChar(255)
+  call_sign              Int?
+  blacklisted            Int?
+  mdt_bookings           mdt_bookings[]           @relation("mdt_bookingsTo_mdt_officers")
+  mdt_criminal_notes     mdt_criminal_notes[]     @relation("mdt_criminal_notesTo_mdt_officers")
+  mdt_department_members mdt_department_members[] @relation("mdt_department_membersTo_mdt_officers")
+  mdt_reports            mdt_reports[]            @relation("mdt_officersTo_mdt_reports")
+  mdt_reports_involved   mdt_reports_involved[]   @relation("mdt_officersTo_mdt_reports_involved")
+  mdt_warrants           mdt_warrants[]           @relation("mdt_officersTo_mdt_warrants")
+
+  @@map("_mdt_officers")
+}
+
+model mdt_reports {
+  reportid             Int                    @id @default(autoincrement())
+  filing_officer_id    Int?
+  title                String?                @db.VarChar(255)
+  content              String?                @db.LongText
+  draft                Boolean?
+  date                 DateTime?              @db.DateTime(0)
+  mdt_officers         mdt_officers?          @relation("mdt_officersTo_mdt_reports", fields: [filing_officer_id], references: [officerid])
+  mdt_reports_images   mdt_reports_images[]   @relation("mdt_reportsTo_mdt_reports_images")
+  mdt_reports_involved mdt_reports_involved[] @relation("mdt_reportsTo_mdt_reports_involved")
+  mdt_warrants         mdt_warrants[]         @relation("mdt_reportsTo_mdt_warrants")
+
+  @@index([filing_officer_id], name: "FK__mdt_reports__mdt_officers_officerid")
+  @@map("_mdt_reports")
+}
+
+model mdt_reports_images {
+  imageid           Int          @id @default(autoincrement())
+  report_id         Int?
+  image_description String?      @db.VarChar(255)
+  image_url         String?      @db.VarChar(500)
+  mdt_reports       mdt_reports? @relation("mdt_reportsTo_mdt_reports_images", fields: [report_id], references: [reportid])
+
+  @@index([report_id], name: "FK__mdt_report_images__mdt_reports_reportid")
+  @@map("_mdt_reports_images")
+}
+
+model mdt_reports_involved {
+  involvedid   Int           @id @default(autoincrement())
+  report_id    Int?
+  officer_id   Int?
+  mdt_officers mdt_officers? @relation("mdt_officersTo_mdt_reports_involved", fields: [officer_id], references: [officerid])
+  mdt_reports  mdt_reports?  @relation("mdt_reportsTo_mdt_reports_involved", fields: [report_id], references: [reportid])
+
+  @@index([officer_id], name: "FK__mdt_report_involved__mdt_officers_officerid")
+  @@index([report_id], name: "FK__mdt_report_involved__mdt_reports_reportid")
+  @@map("_mdt_reports_involved")
+}
+
+model mdt_warrants {
+  warrantid             Int           @id @default(autoincrement())
+  requesting_officer_id Int?
+  report_id             Int?
+  booking_id            Int?
+  approved              Boolean?      @default(false)
+  start                 DateTime?     @db.DateTime(0)
+  end                   DateTime?     @db.DateTime(0)
+  served                Int?          @default(0) @db.TinyInt
+  mdt_bookings          mdt_bookings? @relation("mdt_bookingsTo_mdt_warrants", fields: [booking_id], references: [bookingid])
+  mdt_reports           mdt_reports?  @relation("mdt_reportsTo_mdt_warrants", fields: [report_id], references: [reportid])
+  mdt_officers          mdt_officers? @relation("mdt_officersTo_mdt_warrants", fields: [requesting_officer_id], references: [officerid])
+
+  @@index([booking_id], name: "FK__mdt_warrants__mdt_bookings_bookingid")
+  @@index([requesting_officer_id], name: "FK__mdt_warrants__mdt_officers_officerid")
+  @@index([report_id], name: "FK__mdt_warrants__mdt_reports_reportid")
+  @@map("_mdt_warrants")
 }

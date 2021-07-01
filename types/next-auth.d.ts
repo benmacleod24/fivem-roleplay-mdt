@@ -9,6 +9,8 @@ declare module 'next-auth' {
       /** The user's postal address. */
       id: number;
       isCop: boolean;
+      image?: string;
+      name?: string;
     };
   }
 }

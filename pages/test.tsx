@@ -69,12 +69,9 @@ function Page({ index, searchValues }: { index: number; searchValues: Record<str
 }
 
 export default function Home({ session }: { session: Session }) {
-  console.log(session);
   const [pageIndex, setPageIndex] = useState(0);
-  console.log(pageIndex);
   const [searchValues, setSearchValues] = useState(0);
   const { data } = useSWR(`/api/test?discord=${1929}`);
-  console.log(data);
 
   return (
     <Layout>
@@ -105,6 +102,5 @@ export const getServerSideProps: GetServerSideProps = async (
       return { props: {} };
     }
   }
-  console.log(session);
   return { props: { session } };
 };

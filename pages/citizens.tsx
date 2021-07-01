@@ -1,11 +1,9 @@
-// import Image from 'next/image';
 import Layout from '../components/layout';
 import React, { useState } from 'react';
 import { HStack, Button, VStack, Box, Image, useColorModeValue, theme } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
 import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
-// import useSWR from 'swr';
 import * as Form from '../components/form';
 import { toQuery } from '../utils/query';
 import { fivem_characters } from '@prisma/client';

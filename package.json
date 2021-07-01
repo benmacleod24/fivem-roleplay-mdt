@@ -22,6 +22,7 @@
     "@next-auth/prisma-adapter": "^0.4.4-canary.64",
     "@prisma/client": "^2.25.0",
     "cookie": "^0.4.1",
+    "dayjs": "^1.10.5",
     "formik": "^2.2.9",
     "framer-motion": "^4",
     "jsonwebtoken": "^8.5.1",
