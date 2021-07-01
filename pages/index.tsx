@@ -11,6 +11,7 @@ import {
   Heading,
   Button,
   IconButton,
+  Link,
 } from '@chakra-ui/react';
 import { useSWRInfinite } from 'swr';
 import dayjs from 'dayjs';
@@ -69,6 +70,15 @@ export default function Home() {
             Mobile Data Terminal
           </Text>
         </Flex>
+        <Text maxW="lg" align="center">
+          The mobile data terminal is a large database of all criminals and civillians in the state
+          of san andreas. You can find police reports, criminals histories, and many other things
+          here. Interested in becoming a police officer{' '}
+          <Link target="_blank" href="https://discord.gg/jHSDqpfN2k" color={mdtColor}>
+            Join Here
+          </Link>
+          .
+        </Text>
 
         <Box
           backgroundColor={announcementBG}
@@ -114,7 +124,7 @@ export default function Home() {
                   </Heading>
                   <Text>{a.annocument_body}</Text>
                   {a.annoucment_date && (
-                    <Text align="right" fontSize="xs">
+                    <Text align="right" fontSize="xs" pt="1rem">
                       {dayjs(a.annoucment_date).format('DD/MM/YYYY h:mm a')}
                     </Text>
                   )}
