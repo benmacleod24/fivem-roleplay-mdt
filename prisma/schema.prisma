@@ -410,7 +410,8 @@ model Account {
   updatedAt          DateTime  @updatedAt
   user               User      @relation(fields: [userId], references: [id])
 
-  @@unique([providerId, providerAccountId])
+  @@unique([providerId, providerAccountId], name: "Account.providerId_providerAccountId_unique")
+  @@index([userId], name: "userId")
 }
 
 model Session {
@@ -422,6 +423,8 @@ model Session {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "userId")
 }
 
 model User {
@@ -444,5 +447,16 @@ model VerificationRequest {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@unique([identifier, token])
+  @@unique([identifier, token], name: "VerificationRequest.identifier_token_unique")
+}
+
+model mdt_criminals {
+  criminalid    Int     @id @default(autoincrement())
+  character_uid String? @db.VarChar(255)
+  first_name    String? @db.VarChar(255)
+  last_name     String? @db.VarChar(255)
+  date_of_birth String? @db.VarChar(255)
+  image         String? @db.VarChar(255)
+
+  @@map("_mdt_criminals")
 }

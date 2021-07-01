@@ -12,7 +12,6 @@ export const Text = ({
   type: string;
   placeholder?: string;
 }): ReactElement => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [field, meta, helpers] = useField(props);
   return (
     <>

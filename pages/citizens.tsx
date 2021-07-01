@@ -2,12 +2,13 @@
 import Layout from '../components/layout';
 import React, { useState } from 'react';
 import { HStack, Button, VStack, Box, Image, useColorModeValue, theme } from '@chakra-ui/react';
-import useSWR from 'swr';
+import useSWR, { SWRResponse } from 'swr';
 import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 // import useSWR from 'swr';
 import * as Form from '../components/form';
-import { MyTextField } from '../components/form/text';
+import { toQuery } from '../utils/query';
+import { fivem_characters } from '@prisma/client';
 
 const initialValues = {
   firstName: undefined,
@@ -21,9 +22,11 @@ export interface FieldProps<V = any> {
   meta: FieldMetaProps<V>;
 }
 
-function Page({ index, searchValues }) {
-  const searchParams = new URLSearchParams(searchValues).toString();
-  const { data } = useSWR(index !== null ? `/api/characters?page=${index}&${searchParams}` : null);
+function Page({ index, searchValues }: { index: number; searchValues: Record<string, string> }) {
+  const searchParams = toQuery(searchValues);
+  const { data } = useSWR(
+    index !== null ? `/api/characters?page=${index}&${searchParams}` : null,
+  ) as SWRResponse<fivem_characters[], any>;
   const bgColor = useColorModeValue(theme.colors.gray[200], theme.colors.blue[800]);
 
   const styles = {
@@ -45,6 +48,7 @@ function Page({ index, searchValues }) {
               <HStack spacing="2rem">
                 <Image
                   w={styles.picture}
+                  alt="silhouette"
                   src="https://prepsec.org/wp-content/uploads/2017/09/unknown-person-icon-Image-from.png"
                 />
                 <Box w={styles.name}>{`${c.first_name} ${c.last_name}`}</Box>
@@ -52,7 +56,6 @@ function Page({ index, searchValues }) {
 
               <VStack pr="2rem" justify="center">
                 <Box>{c.dob}</Box>
-                <Box> {c.cuid.split('-')[0]}</Box>
               </VStack>
             </HStack>
           );

@@ -2,18 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { signIn, signOut, useSession } from 'next-auth/client';
 import styles from './header.module.css';
-import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  ButtonGroup,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-} from '@chakra-ui/react';
+import { Box, ButtonGroup, Flex, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { Button, useColorMode } from '@chakra-ui/react';
 import { ChevronDownIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 // The approach used in this component shows how to built a sign in and sign out
@@ -27,7 +16,9 @@ export default function Header() {
       <Flex justifyContent="center">
         <ButtonGroup variant="outline" spacing="3">
           <Button>
-            <Link href="/">Home</Link>
+            <Link href="/" passHref>
+              Home
+            </Link>
           </Button>
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
@@ -89,7 +80,7 @@ const DiscordAuth = () => {
             )}
             {session && (
               <>
-                {session.user.image && (
+                {session && session.user && session.user.image && (
                   <span
                     style={{ backgroundImage: `url(${session.user.image})` }}
                     className={styles.avatar}
@@ -98,7 +89,7 @@ const DiscordAuth = () => {
                 <span className={styles.signedInText}>
                   <small>Signed in as</small>
                   <br />
-                  <strong>{session.user.name}</strong>
+                  {session.user && <strong>{session.user.name}</strong>}
                 </span>
                 <a
                   href={`/api/auth/signout`}
