@@ -1,5 +1,8 @@
-import NextAuth from 'next-auth';
+import NextAuth, { Session } from 'next-auth';
 import Providers from 'next-auth/providers';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -32,7 +35,7 @@ export default NextAuth({
     Providers.Discord({
       clientId: process.env.DISCORD_CLIENT_ID,
       clientSecret: process.env.DISCORD_CLIENT_SECRET,
-      scope: 'identify email guilds connections guilds rpc',
+      scope: 'identify',
     }),
     // Providers.GitHub({
     //   clientId: process.env.GITHUB_ID,
@@ -122,11 +125,25 @@ export default NextAuth({
       // if (account) {token.account }
       return Promise.resolve(token);
     },
-    session: async (session, user) => {
-      // session.user.id = user.id
-      session.user.id = user.sub;
-      // session.user.name = user.user.username;
-      // session.user.image = user.user.avatar
+    session: async (session: Session, user) => {
+      const discord = user.sub ?? undefined;
+      session.user.id = discord as number;
+      let isCop = false;
+      try {
+        const copList =
+          await prisma.$queryRaw(`select u.id, u.discord, c.first_name, c.last_name, c.id, ucj.job_id, wlj.displayName from _fivem_users as u 
+      left join _fivem_characters as c on u.id=c.uId
+      left join _fivem_whitelist_characters_jobs as ucj on c.id = ucj.character_id
+      left join _fivem_whitelist_jobs as wlj on wlj.jobid = ucj.job_id
+        where wlj.displayName = 'Police Officer'
+        and u.discord = ${discord};`);
+        isCop = (copList && copList.length > 0) ?? false;
+      } catch (e) {
+        console.error('some shit blew up', e);
+      }
+
+      session.user.isCop = isCop;
+      console.log('session');
       return Promise.resolve(session);
     },
   },

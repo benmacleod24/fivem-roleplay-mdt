@@ -1,15 +1,26 @@
 import Head from 'next/head';
-// import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import Layout from '../components/layout';
-import React from 'react';
-// import useSWR from 'swr';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/dist/client/router';
+import { useToast } from '@chakra-ui/react';
 
 export default function Home() {
-  // const { data, error } = useSWR('/api/characters?cursor=500&limit=20', fetcher);
-  // if (error) return <div>An error occured.</div>
-  // if (!data) return <div>Loading ...</div>
-  // console.log(data);
+  const router = useRouter();
+  const toast = useToast();
+  console.log(router.query);
+
+  useEffect(() => {
+    if (router.query.l && router.query.l === 't') {
+      toast({
+        description: 'Please log in to view authorized pages.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      router.push({ pathname: '/' }, undefined, { shallow: true });
+    }
+  }, [router, router.query.l, toast]);
 
   return (
     <Layout>

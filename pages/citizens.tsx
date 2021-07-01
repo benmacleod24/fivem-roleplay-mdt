@@ -25,7 +25,7 @@ export interface FieldProps<V = any> {
 function Page({ index, searchValues }: { index: number; searchValues: Record<string, string> }) {
   const searchParams = toQuery(searchValues);
   const { data } = useSWR(
-    index !== null ? `/api/characters?page=${index}&${searchParams}` : null,
+    index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
   ) as SWRResponse<fivem_characters[], any>;
   const bgColor = useColorModeValue(theme.colors.gray[200], theme.colors.blue[800]);
 
