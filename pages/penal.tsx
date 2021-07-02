@@ -86,7 +86,7 @@ export default function Home() {
   );
 }
 
-const SoftBubble = ({ text, color }: { text: string | null; color: string | null }) => {
+const SoftBubble = ({ text, color }: { text: string | null; color?: string | null }) => {
   if (!text) return <></>;
   return (
     <Box borderWidth="2px" borderRadius="lg" padding=".2rem" backgroundColor={color ?? 'gray800'}>
