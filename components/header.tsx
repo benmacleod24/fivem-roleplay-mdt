@@ -70,7 +70,7 @@ export default function Header() {
                 <Link href="#">Warrants</Link>
               </Button>
               <Button>
-                <Link href="#">Penal Code</Link>
+                <Link href="/penal">Penal Code</Link>
               </Button>
               <Button>
                 <Link href="#">Profile</Link>
