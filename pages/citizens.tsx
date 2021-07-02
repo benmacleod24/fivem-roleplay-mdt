@@ -7,6 +7,8 @@ import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } f
 import * as Form from '../components/form';
 import { toQuery } from '../utils/query';
 import { fivem_characters } from '@prisma/client';
+import { useSession } from 'next-auth/client';
+import Link from 'next/link';
 
 const initialValues = {
   firstName: undefined,
@@ -26,7 +28,7 @@ function Page({ index, searchValues }: { index: number; searchValues: Record<str
     index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
   ) as SWRResponse<fivem_characters[], any>;
   const bgColor = useColorModeValue(theme.colors.gray[200], theme.colors.blue[800]);
-
+  const [session, loading] = useSession();
   const styles = {
     picture: '5rem',
     name: '20rem',
@@ -52,9 +54,14 @@ function Page({ index, searchValues }: { index: number; searchValues: Record<str
                 <Box w={styles.name}>{`${c.first_name} ${c.last_name}`}</Box>
               </HStack>
 
-              <VStack pr="2rem" justify="center">
+              <HStack pr="2rem" justify="center">
                 <Box>{c.dob}</Box>
-              </VStack>
+                {session && session.user.isCop && (
+                  <Link href="#" passHref>
+                    <Button>Process</Button>
+                  </Link>
+                )}
+              </HStack>
             </HStack>
           );
         })}
