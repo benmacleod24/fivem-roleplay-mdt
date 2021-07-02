@@ -1,9 +1,6 @@
 import Layout from '../components/layout';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement } from 'react';
 import { HStack, Box, Flex, Stack, Text, Heading } from '@chakra-ui/react';
-import useSWR, { SWRResponse } from 'swr';
-import { FieldInputProps, FieldMetaProps, FormikProps } from 'formik';
-import { mdt_charges, mdt_charges_categories } from '@prisma/client';
 import {
   Accordion,
   AccordionItem,
@@ -11,27 +8,10 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from '@chakra-ui/react';
-const initialValues = {
-  firstName: undefined,
-  lastName: undefined,
-  stateId: undefined,
-};
-
-export interface FieldProps<V = any> {
-  field: FieldInputProps<V>;
-  form: FormikProps<V>; // if ppl want to restrict this for a given form, let them.
-  meta: FieldMetaProps<V>;
-}
-
-interface mdtCharges {
-  mdt_charges: mdt_charges[];
-}
+import usePenal from '../components/hooks/api/usePenal';
 
 export default function Home() {
-  const { data: category } = useSWR('/api/penal') as SWRResponse<
-    Array<mdt_charges_categories & mdtCharges>,
-    any
-  >;
+  const { category, error } = usePenal();
 
   return (
     <Layout>
@@ -69,7 +49,7 @@ export default function Home() {
                             <Text>{c.description}</Text>
                             <HStack>
                               <SoftBubble text={`Penalty: ${c.fine}`} />
-                              <SoftBubble text={`Time to be served: ${c.time}`} />
+                              <SoftBubble text={`Time to be served: ${c.time} Month(s)`} />
                               <PClass penalClass={c.class} />
                             </HStack>
                           </Flex>

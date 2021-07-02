@@ -129,6 +129,7 @@ export default NextAuth({
       const discord = user.sub ?? undefined;
       session.user.id = discord as number;
       let isCop = false;
+      let copName;
       try {
         const copList =
           await prisma.$queryRaw(`select u.id, u.discord, c.first_name, c.last_name, c.id, ucj.job_id, wlj.displayName from _fivem_users as u 
@@ -138,11 +139,15 @@ export default NextAuth({
         where wlj.displayName = 'Police Officer'
         and u.discord = ${discord};`);
         isCop = (copList && copList.length > 0) ?? false;
+        copName =
+          (copList && copList.length > 0 && `${copList[0].first_name} ${copList[0].last_name}`) ??
+          undefined;
       } catch (e) {
         console.error('some shit blew up', e);
       }
 
       session.user.isCop = isCop;
+      session.user.copName = copName;
       return Promise.resolve(session);
     },
   },

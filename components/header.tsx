@@ -35,7 +35,7 @@ export default function Header() {
                 {session.user.name && (
                   <Flex pl="1rem" flexDir="column">
                     <small>Signed in as</small>
-                    <strong>{session.user.name}</strong>
+                    <strong>{session.user.copName ?? session.user.name}</strong>
                   </Flex>
                 )}
               </Flex>

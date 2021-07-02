@@ -11,6 +11,7 @@ declare module 'next-auth' {
       isCop: boolean;
       image?: string;
       name?: string;
+      copName?: string;
     };
   }
 }
