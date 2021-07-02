@@ -5,6 +5,7 @@ import { Provider } from 'next-auth/client';
 import type { AppProps } from 'next/app';
 import { ChakraProvider } from '@chakra-ui/react';
 import { SWRConfig } from 'swr';
+import theme from '../components/theme';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -28,7 +29,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }}
       session={pageProps.session}
     >
-      <ChakraProvider>
+      <ChakraProvider theme={theme}>
         <SWRConfig
           value={{
             fetcher: (resource, init) => fetch(resource, init).then(res => res.json()),

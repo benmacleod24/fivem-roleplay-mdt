@@ -12,103 +12,172 @@ import {
   Image,
   Grid,
   GridItem,
+  useColorModeValue,
+  Text,
+  Skeleton,
+  IconButton,
+  MenuDivider
 } from '@chakra-ui/react';
 import { Button, useColorMode } from '@chakra-ui/react';
-import { ChevronDownIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
-export default function Header() {
+import { ChevronDownIcon, MoonIcon, SunIcon, InfoIcon } from '@chakra-ui/icons';
+import { BsFillPersonLinesFill } from "react-icons/bs"
+import { BiExit } from "react-icons/bi"
+
+export interface HeaderProps {
+
+}
+
+const Header: React.SFC<HeaderProps> = ({ }) => {
+
+  // Session Data
   const [session, loading] = useSession();
-  return (
-    <Box pb="1rem" pt="1rem" mb="1rem" borderBottom="1px solid #555">
-      {/* <DiscordAuth /> */}
-      <Grid templateColumns="repeat(12, 1fr)">
-        <GridItem colSpan={3}>
-          <Flex pl="1rem">
-            {session && session.user && session.user.image && (
-              <Flex>
-                <Image
-                  borderRadius="2rem"
-                  height="2.8rem"
-                  width="2.8rem"
-                  alt="silhouette"
-                  src={session.user.image}
-                />
-                {session.user.name && (
-                  <Flex pl="1rem" flexDir="column">
-                    <small>Signed in as</small>
-                    <strong>{session.user.name}</strong>
-                  </Flex>
-                )}
-              </Flex>
-            )}
-          </Flex>
-        </GridItem>
 
-        <GridItem colSpan={7}>
-          <Flex justifyContent="center">
-            <ButtonGroup variant="outline" spacing="3">
-              <Button>
-                <Link href="/" passHref>
-                  Home
-                </Link>
-              </Button>
-              <Menu>
-                <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                  Databases
-                </MenuButton>
-                <MenuList>
-                  <Link href="/citizens" passHref>
-                    <MenuItem>Citizens</MenuItem>
-                  </Link>
-                  <MenuItem>Criminals</MenuItem>
-                  <MenuItem>Vehicles</MenuItem>
-                </MenuList>
-              </Menu>
-              <Button>
-                <Link href="#">Reports</Link>
-              </Button>
-              <Button>
-                <Link href="#">Warrants</Link>
-              </Button>
-              <Button>
-                <Link href="#">Penal Code</Link>
-              </Button>
-              <Button>
-                <Link href="#">Profile</Link>
-              </Button>
-              <ToggleMode />
-            </ButtonGroup>
-          </Flex>
-        </GridItem>
-        <GridItem colSpan={2}>
-          <Flex
-            justifyContent="flex-end"
-            alignItems="flex-end"
-            flexDir="column"
-            alignContent="center"
-            paddingRight="1rem"
-          >
-            <Button
-              colorScheme={session ? 'red' : 'green'}
-              variant="solid"
-              onClick={e => {
-                e.preventDefault();
-                session ? signOut() : signIn('discord');
-              }}
-            >
-              {session ? 'Sign Out ' : 'Sign In'}
-            </Button>
-          </Flex>
-        </GridItem>
-      </Grid>
-    </Box>
-  );
-}
 
-function ToggleMode() {
+  // Chakra Colors
+  const headerColor = useColorModeValue("gray.50", "gray.700")
   const { colorMode, toggleColorMode } = useColorMode();
+
+
   return (
-    <Button marginLeft="3rem" onClick={toggleColorMode}>
-      {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-    </Button>
+    <Flex pl="6.5%" pr="6.5%" width="100%" height="8vh" mb="1rem" background={headerColor} justifyContent={"space-between"}>
+      {/* Profile Picture & Name */}
+      <Flex boxSizing="border-box" height="100%" minWidth="20%" alignItems="center">
+      </Flex>
+
+      {/* Menu Buttons */}
+      <Flex boxSizing="border-box" height="100%" minWidth="60%" alignItems="center" justifyContent="center">
+        <ButtonGroup>
+          <Button variant="solid" colorScheme="yellow" ml="1%" mr="1%" size="md">Home</Button>
+          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Databases</Button>
+          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Reports</Button>
+          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Warrants</Button>
+          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Penal Code</Button>
+        </ButtonGroup>
+      </Flex>
+
+      {/* Sign in & Sign Out Buttons */}
+      <Flex boxSizing="border-box" height="100%" minWidth="20%" justifyContent="flex-end" alignItems="center">
+        {session ?
+          <Flex width="3.3rem" height="3.3rem" position="relative">
+            <Image src={session?.user.image} alt="silhouette" width="100%" height="100%" borderRadius="full" />
+            <Menu closeOnSelect={false}>
+              <MenuButton as={IconButton} icon={<ChevronDownIcon />} position="absolute" bottom="-8%" right="-8%" size="xs" colorScheme="blue" opacity="0.9" borderRadius="full" />
+              <MenuList>
+                <MenuItem icon={<BsFillPersonLinesFill />}>Profile</MenuItem>
+                <MenuItem onClick={toggleColorMode} icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}>{colorMode === "light" ? "Dark" : "Light"} Mode</MenuItem>
+                <MenuDivider />
+                <MenuItem onClick={() => signOut()} icon={<BiExit />}>Sign Out</MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex> :
+          !loading ? <Button onClick={() => signIn("discord")} size="sm" variant="outline" colorScheme="blue">Sign In</Button> : ""
+        }
+        {loading ? <Skeleton width="3.3rem" height="3.3rem" borderRadius="full" /> : ""}
+      </Flex>
+    </Flex>
   );
 }
+
+export default Header;
+
+// export default function Header() {
+//   const [session, loading] = useSession();
+
+//   const headerColor = useColorModeValue("gray.50", "gray.700")
+
+//   return (
+//     <Box pl="5%" pr="5%" width="100%" height="8vh" mb="1rem" background={headerColor} display="flex" alignItems="center" justifyContent="space-between">
+//       {/* <DiscordAuth /> */}
+//       <Grid templateColumns="repeat(12, 1fr)" width="100%">
+//         <GridItem colSpan={3}>
+//           <Flex pl="1rem">
+//             {session && session.user && session.user.image && (
+//               <Flex>
+//                 <Image
+//                   borderRadius="0.5rem"
+//                   height="2.8rem"
+//                   width="2.8rem"
+//                   alt="silhouette"
+//                   src={session.user.image}
+//                 />
+//                 {session.user.name && (
+//                   <Flex pl="1rem" flexDir="column">
+//                     <small>Welcome!</small>
+//                     <strong>{session.user.name}</strong>
+//                   </Flex>
+//                 )}
+//               </Flex>
+//             )}
+//           </Flex>
+//         </GridItem>
+
+//         <GridItem colSpan={7}>
+//           <Flex justifyContent="center">
+//             <ButtonGroup variant="outline" spacing="3" isAttached>
+//               <Button>
+//                 <Link href="/" passHref>
+//                   Home
+//                 </Link>
+//               </Button>
+//               <Menu>
+//                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+//                   Databases
+//                 </MenuButton>
+//                 <MenuList>
+//                   <Link href="/citizens" passHref>
+//                     <MenuItem>Citizens</MenuItem>
+//                   </Link>
+//                   <MenuItem>Criminals</MenuItem>
+//                   <MenuItem>Vehicles</MenuItem>
+//                 </MenuList>
+//               </Menu>
+//               <Button>
+//                 <Link href="#">Reports</Link>
+//               </Button>
+//               <Button>
+//                 <Link href="#">Warrants</Link>
+//               </Button>
+//               <Button>
+//                 <Link href="#">Penal Code</Link>
+//               </Button>
+//               <Button>
+//                 <Link href="#">Profile</Link>
+//               </Button>
+//               <ToggleMode />
+//             </ButtonGroup>
+//           </Flex>
+//         </GridItem>
+//         <GridItem colSpan={2}>
+//           <Flex
+//             justifyContent="flex-end"
+//             alignItems="flex-end"
+//             flexDir="column"
+//             alignContent="center"
+//             paddingRight="1rem"
+//           >
+//             <Button
+//               colorScheme={session ? 'red' : 'green'}
+//               variant="solid"
+//               onClick={e => {
+//                 e.preventDefault();
+//                 session ? signOut() : signIn('discord');
+//               }}
+//               size="sm"
+//             >
+//               {session ? 'Sign Out ' : 'Sign In'}
+//             </Button>
+//           </Flex>
+//         </GridItem>
+//       </Grid>
+//     </Box>
+//   );
+// }
+
+// function ToggleMode() {
+//   const { colorMode, toggleColorMode } = useColorMode();
+//   return (
+//     <Button onClick={toggleColorMode}>
+//       {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+//     </Button>
+//   );
+// }

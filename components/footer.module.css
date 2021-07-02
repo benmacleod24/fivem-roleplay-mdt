@@ -1,6 +1,9 @@
-.footer {
+/* .footer {
   margin-top: 2rem;
-}
+  height: 7.2vh;
+  border: none !important;
+  border: 1px solid rgba(255, 255, 255, 0);
+} */
 
 .navItems {
   margin-bottom: 1rem;
@@ -9,6 +12,6 @@
 }
 
 .navItem {
-  display: inline-block;
+  /* display: inline-block; */
   margin-right: 1rem;
 }
