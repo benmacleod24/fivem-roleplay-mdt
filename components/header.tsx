@@ -59,7 +59,9 @@ export default function Header() {
                   <Link href="/citizens" passHref>
                     <MenuItem>Citizens</MenuItem>
                   </Link>
-                  <MenuItem>Criminals</MenuItem>
+                  <Link passHref href="/criminals">
+                    <MenuItem>Criminals</MenuItem>
+                  </Link>
                   <MenuItem>Vehicles</MenuItem>
                 </MenuList>
               </Menu>
