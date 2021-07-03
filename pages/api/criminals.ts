@@ -21,8 +21,7 @@ export default async function Criminals(
   res: NextApiResponse,
 ): Promise<void> {
   const session = await getSession({ req });
-  console.log(session);
-  throw new Error('eat shit');
+  // throw new Error('test shit');
   switch (req.method) {
     case 'GET':
       return GET(req, res);

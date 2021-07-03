@@ -92,8 +92,6 @@ export const getServerSideProps: GetServerSideProps = async (
   ctx: GetServerSidePropsContext<ParsedUrlQuery>,
 ) => {
   const session = await getSession(ctx);
-  console.log('env: ', process.env.APP_URI);
-  console.log('redi: ', process.env.DISCORD_REDIRECT);
   if (!session || !session.user || !session.user.isCop) {
     const res = ctx.res;
     if (res) {
