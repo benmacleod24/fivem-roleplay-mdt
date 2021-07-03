@@ -68,7 +68,7 @@ model fivem_apartments {
 model fivem_characters {
   id                              Int                               @id @default(autoincrement())
   uId                             Int?
-  cuid                            String?                           @db.VarChar(255)
+  cuid                            String                            @unique @db.VarChar(255)
   first_name                      String?                           @db.VarChar(255)
   last_name                       String?                           @db.VarChar(255)
   dob                             String?                           @db.VarChar(255)
@@ -88,8 +88,10 @@ model fivem_characters {
   fivem_properties                fivem_properties[]                @relation("fivem_charactersTo_fivem_properties")
   fivem_vehicles                  fivem_vehicles[]                  @relation("fivem_charactersTo_fivem_vehicles")
   fivem_whitelist_characters_jobs fivem_whitelist_characters_jobs[] @relation("fivem_charactersTo_fivem_whitelist_characters_jobs")
+  mdt_criminals                   mdt_criminals[]                   @relation("fivem_charactersTo_mdt_criminals")
 
   @@index([uId], name: "FK_characters_uId")
+  @@index([cuid], name: "cuid")
   @@map("_fivem_characters")
 }
 
@@ -399,15 +401,17 @@ model fivem_whitelist_jobs {
 
 model mdt_criminals {
   criminalid         Int                  @id @default(autoincrement())
-  character_uid      String?              @db.VarChar(255)
+  character_uid      String               @db.VarChar(255)
   first_name         String?              @db.VarChar(255)
   last_name          String?              @db.VarChar(255)
   date_of_birth      String?              @db.VarChar(255)
   image              String?              @db.VarChar(255)
+  fivem_characters   fivem_characters     @relation("fivem_charactersTo_mdt_criminals", fields: [character_uid], references: [cuid])
   mdt_bookings       mdt_bookings[]       @relation("mdt_bookingsTo_mdt_criminals")
   mdt_criminal_flags mdt_criminal_flags[] @relation("mdt_criminal_flagsTo_mdt_criminals")
   mdt_criminal_notes mdt_criminal_notes[] @relation("mdt_criminal_notesTo_mdt_criminals")
 
+  @@index([character_uid], name: "character_uid")
   @@map("_mdt_criminals")
 }
 
