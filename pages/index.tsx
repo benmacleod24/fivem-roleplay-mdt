@@ -57,6 +57,7 @@ export default function Home() {
 
   return (
     <Layout>
+      <title>Raze MDT</title>
       {/* <Flex flexDir="column" justifyContent="center" alignContent="center" alignItems="center">
         <title>Raze MDT</title>
         <Flex>

@@ -1,4 +1,4 @@
-import Layout from '../components/layout';
+import Layout from '../../components/layout';
 import React, { ReactElement } from 'react';
 import { HStack, Box, Flex, Stack, Text, Heading } from '@chakra-ui/react';
 import {
@@ -8,7 +8,7 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from '@chakra-ui/react';
-import usePenal from '../components/hooks/api/usePenal';
+import usePenal from '../../components/hooks/api/usePenal';
 
 export default function Home() {
   const { category, error } = usePenal();
@@ -80,9 +80,9 @@ const PClass = ({ penalClass }: { penalClass: string | null }): ReactElement => 
     penalClass === 'misdemeanor'
       ? 'orange'
       : penalClass === 'infraction'
-      ? 'blue'
-      : penalClass === 'felony'
-      ? 'red'
-      : 'cyan';
+        ? 'blue'
+        : penalClass === 'felony'
+          ? 'red'
+          : 'cyan';
   return <SoftBubble text={penalClass} color={color} />;
 };

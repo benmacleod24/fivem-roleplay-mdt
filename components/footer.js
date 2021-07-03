@@ -19,7 +19,7 @@ export default function Footer() {
       border="none"
       alignItems="center"
       justifyContent="space-between"
-      mt="1.5%"
+      mt="1rem"
     >
       <Flex>
         <Link href="https://www.raze.community/forum/index.php" target="_blank">
