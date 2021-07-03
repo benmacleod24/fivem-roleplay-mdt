@@ -57,8 +57,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <title>Raze MDT</title>
-      {/* <Flex flexDir="column" justifyContent="center" alignContent="center" alignItems="center">
+      <Flex flexDir="column" justifyContent="center" alignContent="center" alignItems="center">
         <title>Raze MDT</title>
         <Flex>
           <Text fontSize={fontSize}>Welcome to the &nbsp;</Text>
@@ -138,7 +137,7 @@ export default function Home() {
             </Button>
           </Flex>
         </Box>
-      </Flex> */}
+      </Flex>
     </Layout>
   );
 }

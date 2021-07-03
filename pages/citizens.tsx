@@ -43,7 +43,7 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
       {data && data.map(c => {
         return (
           <Flex boxSizing="border-box" p="1%" pr="3%" borderRadius="md" overflow="hidden" width="100%" background={cardBackground} alignItems="center">
-            <Image border="1px solid #4A5568" mr="2.5%" width="5.5rem" borderRadius="md" src="https://i.imgur.com/MtrDeB8.png" alt="blank_profile_picture" />
+            <Image border="1px solid #4A5568" mr="2.5%" width="5.5rem" borderRadius="md" src="https://i.imgur.com/tdi3NGah.jpg" alt="blank_profile_picture" />
             <Heading flex={1} size="md">{c.first_name} {c.last_name}</Heading>
             <Button size="sm" colorScheme="yellow">View Profile</Button>
           </Flex>
@@ -52,48 +52,6 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
     </VStack>
   );
 }
-
-// function Page({ index, searchValues }: { index: number; searchValues: Record<string, string> }) {
-//   const searchParams = toQuery(searchValues);
-//   const { data } = useSWR(
-//     index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
-//   ) as SWRResponse<fivem_characters[], any>;
-//   const bgColor = useColorModeValue(theme.colors.gray[200], theme.colors.blue[800]);
-
-//   const styles = {
-//     picture: '5rem',
-//     name: '20rem',
-//   };
-//   return (
-//     <VStack spacing="1rem">
-//       {data &&
-//         data.map(c => {
-//           return (
-//             <HStack
-//               key={c.id}
-//               w="100%"
-//               align="stretch"
-//               justify="space-between"
-//               backgroundColor={bgColor}
-//             >
-//               <HStack spacing="2rem">
-//                 <Image
-//                   w={styles.picture}
-//                   alt="silhouette"
-//                   src="https://prepsec.org/wp-content/uploads/2017/09/unknown-person-icon-Image-from.png"
-//                 />
-//                 <Box w={styles.name}>{`${c.first_name} ${c.last_name}`}</Box>
-//               </HStack>
-
-//               <VStack pr="2rem" justify="center">
-//                 <Box>{c.dob}</Box>
-//               </VStack>
-//             </HStack>
-//           );
-//         })}
-//     </VStack>
-//   );
-// }
 
 export default function Home() {
   const [pageIndex, setPageIndex] = useState(0);
@@ -136,51 +94,3 @@ export default function Home() {
     </Layout>
   );
 }
-
-// <Field name="firstName">
-//                 {({
-//                   field,
-//                   form,
-//                 }: {
-//                   field: FormikState<typeof initialValues>;
-//                   form: FormikState<typeof initialValues>;
-//                 }) => (
-//                   <FormControl isInvalid={Boolean(form.errors.firstName) && form.touched.firstName}>
-//                     {/* <FormLabel htmlFor="firstName">First name</FormLabel> */}
-//                     <Input {...field} id="firstName" placeholder="First name" />
-//                     <FormErrorMessage>{form.errors.firstName}</FormErrorMessage>
-//                   </FormControl>
-//                 )}
-//               </Field>
-//               <Field name="lastName">
-//                 {({
-//                   field,
-//                   form,
-//                 }: {
-//                   field: FormikState<typeof initialValues>;
-//                   form: FormikState<typeof initialValues>;
-//                 }) => (
-//                   <FormControl isInvalid={Boolean(form.errors.lastName) && form.touched.lastName}>
-//                     {/* <FormLabel htmlFor="firstName">First name</FormLabel> */}
-//                     <Input {...field} id="lastName" placeholder="Last name" />
-//                     <FormErrorMessage>{form.errors.lastName}</FormErrorMessage>
-//                   </FormControl>
-//                 )}
-//               </Field>
-//               <Field name="stateId">
-//                 {({
-//                   field,
-//                   form,
-//                 }: {
-//                   field: FormikState<typeof initialValues>;
-//                   form: FormikState<typeof initialValues>;
-//                 }) => (
-//                   <FormControl isInvalid={Boolean(form.errors.stateId) && form.touched.stateId}>
-//                     {/* <FormLabel htmlFor="firstName">First name</FormLabel> */}
-//                     <NumberInput>
-//                       <NumberInputField {...field} id="stateId" placeholder="State ID" />
-//                     </NumberInput>
-//                     <FormErrorMessage>{form.errors.stateId}</FormErrorMessage>
-//                   </FormControl>
-//                 )}
-//               </Field>
