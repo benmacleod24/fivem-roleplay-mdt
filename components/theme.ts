@@ -9,11 +9,14 @@ const config: ThemeConfig = {
 
 // 3. extend the theme
 const theme = extendTheme({
-  initalColorMode: 'dark',
-  useSystemColorMode: false,
-  colors: {
-    gray: {
-      700: '#232c3d',
+  ...{ config },
+  ...{
+    initalColorMode: 'dark',
+    useSystemColorMode: false,
+    colors: {
+      gray: {
+        700: '#232c3d',
+      },
     },
   },
 });

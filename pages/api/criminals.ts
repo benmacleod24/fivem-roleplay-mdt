@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, mdt_charges } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession, useSession } from 'next-auth/client';
 import { string, z } from 'zod';

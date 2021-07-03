@@ -1,6 +1,6 @@
 import styles from './footer.module.css';
 import React from 'react';
-import { useColorModeValue, Flex, Text, Link } from '@chakra-ui/react';
+import { useColorModeValue, Flex, Text, Link, theme } from '@chakra-ui/react';
 
 // I was redoing the layout in flex form
 
@@ -27,7 +27,12 @@ export default function Footer() {
         </Link>
       </Flex>
       <Flex>
-        <Text fontStyle="italic">Developed by Chips & Ben</Text>
+        <Text fontStyle="italic">
+          {`Developed by `}
+          <Link href="https://github.com/knames" target="_blank" color={theme.colors.blue[400]}>{`Chips`}</Link>
+          {` & `}
+          <Link href="https://github.com/twotap02" target="_blank" color={theme.colors.blue[400]}>{`Ben`}</Link>
+        </Text>
       </Flex>
       <Flex>
         <Text>Change Logs</Text>
