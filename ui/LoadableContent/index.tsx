@@ -59,7 +59,7 @@ const isLoaded = <T extends Props>(data: T): data is MakeRequired<T> => {
 
 export const LoadableContentSafe = <T extends Props>({
   data,
-  homeUrl = '/', // We should have a Manager/Resident context so we can just look at that context and redirect to the correct dashboard (maybe - might want more than just 3 homeUrl options)
+  homeUrl = '/',
   errorMessage = 'Sorry, there was a problem loading this content. Please try reloading your browser, or contact us for help.',
   children,
   loaderHeight = '25vh',

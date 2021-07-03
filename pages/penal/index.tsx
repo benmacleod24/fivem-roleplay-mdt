@@ -2,20 +2,25 @@ import { Flex, Heading, Skeleton, Text, VStack } from '@chakra-ui/react';
 import * as React from 'react';
 import usePenal from '../../components/hooks/api/usePenal';
 import Layout from '../../components/layout';
+import { LoadableContentSafe } from '../../ui/LoadableContent';
 import PCodeAccordian from './components/accordian';
 
-export interface PenalCodeProps {}
-
-const PenalCode: React.SFC<PenalCodeProps> = ({}) => {
+const PenalCode = () => {
   const { category, error } = usePenal();
 
-  const loading = !category && !error;
   return (
     <Layout>
       <Flex pt="1%" width="100%" height="100%" direction="column">
         <PCodeHeader />
-        {loading ? <PCodeLoading /> : ''}
-        {category && category.length ? <PCodeAccordian category={category} /> : ''}
+        <LoadableContentSafe data={{ category }} errors={[error]} loader={<PCodeLoading />}>
+          {({ category }) => {
+            return (
+              <>
+                <PCodeAccordian category={category} />
+              </>
+            );
+          }}
+        </LoadableContentSafe>
       </Flex>
     </Layout>
   );
@@ -23,10 +28,7 @@ const PenalCode: React.SFC<PenalCodeProps> = ({}) => {
 
 export default PenalCode;
 
-// Header Component for Penal Code
-export interface PCodeHeaderProps {}
-
-const PCodeHeader: React.SFC<PCodeHeaderProps> = ({}) => {
+const PCodeHeader = () => {
   return (
     <Flex direction="column">
       <Heading mb="2" size="md">
@@ -42,10 +44,7 @@ const PCodeHeader: React.SFC<PCodeHeaderProps> = ({}) => {
   );
 };
 
-// Penal Code Loading Skelton
-export interface PCodeLoadingProps {}
-
-const PCodeLoading: React.SFC<PCodeLoadingProps> = props => {
+const PCodeLoading = () => {
   return (
     <VStack spacing="4" mt="5">
       <Skeleton speed={1} width="full" height="10" />

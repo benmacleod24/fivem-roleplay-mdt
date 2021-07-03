@@ -10,7 +10,7 @@ export const usePenal = (): {
   error: any;
 } => {
   const { data: category, error } = useSWR('/api/penal') as SWRResponse<
-    Array<mdt_charges_categories & mdtCharges>,
+    Array<mdt_charges_categories & mdtCharges> | undefined,
     any
   >;
 

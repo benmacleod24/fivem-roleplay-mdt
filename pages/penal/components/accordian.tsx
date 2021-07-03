@@ -16,32 +16,29 @@ import { mdt_charges, mdt_charges_categories } from '@prisma/client';
 import * as React from 'react';
 import { mdtCharges } from '../../../components/hooks/api/usePenal';
 
-export interface PCodeAccordianProps {
-  category: (mdt_charges_categories & mdtCharges)[];
-}
-
-const PCodeAccordian: React.SFC<PCodeAccordianProps> = ({ category }) => {
+const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdtCharges)[] }) => {
   return (
     <Accordion mt="8" defaultIndex={[0]} allowMultiple w="100%">
-      {category.map(c => {
-        return (
-          <AccordionItem key={c.categoryid}>
-            <AccordionButton>
-              <Box w="100%" textAlign="left">
-                {c.name}
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-              <VStack spacing={3}>
-                {c.mdt_charges.map(ch => (
-                  <PCodeChargeWrapper key={ch.chargeid} charge={ch} />
-                ))}
-              </VStack>
-            </AccordionPanel>
-          </AccordionItem>
-        );
-      })}
+      {category &&
+        category.map(c => {
+          return (
+            <AccordionItem key={c.categoryid}>
+              <AccordionButton>
+                <Box w="100%" textAlign="left">
+                  {c.name}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+              <AccordionPanel>
+                <VStack spacing={3}>
+                  {c.mdt_charges.map(ch => (
+                    <PCodeChargeWrapper key={ch.chargeid} charge={ch} />
+                  ))}
+                </VStack>
+              </AccordionPanel>
+            </AccordionItem>
+          );
+        })}
     </Accordion>
   );
 };
