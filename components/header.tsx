@@ -88,7 +88,9 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
             <Menu closeOnSelect={false}>
               <MenuButton as={IconButton} icon={<ChevronDownIcon />} position="absolute" bottom="-8%" right="-8%" size="xs" colorScheme="blue" opacity="0.9" borderRadius="full" />
               <MenuList>
-                <MenuItem icon={<BsFillPersonLinesFill />}>Profile</MenuItem>
+                <Link href="/profile" passHref>
+                  <MenuItem icon={<BsFillPersonLinesFill />}>Profile</MenuItem>
+                </Link>
                 <MenuItem onClick={toggleColorMode} icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}>{colorMode === "light" ? "Dark" : "Light"} Mode</MenuItem>
                 <MenuDivider />
                 <MenuItem onClick={() => signOut()} icon={<BiExit />}>Sign Out</MenuItem>
