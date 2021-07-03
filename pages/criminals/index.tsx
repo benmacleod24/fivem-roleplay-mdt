@@ -1,12 +1,12 @@
-import Layout from '../components/layout';
+import Layout from '../../components/layout';
 import React, { useState } from 'react';
 import { HStack, Button, VStack, Box, Image, useColorModeValue, theme } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
 import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
-import * as Form from '../components/form';
-import { toQuery } from '../utils/query';
-import { fivem_characters } from '@prisma/client';
+import * as Form from '../../components/form';
+import { toQuery } from '../../utils/query';
+import { fivem_characters, mdt_criminals } from '@prisma/client';
 import { useSession } from 'next-auth/client';
 import Link from 'next/link';
 
@@ -25,8 +25,8 @@ export interface FieldProps<V = any> {
 function Page({ index, searchValues }: { index: number; searchValues: Record<string, string> }) {
   const searchParams = toQuery(searchValues);
   const { data } = useSWR(
-    index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
-  ) as SWRResponse<fivem_characters[], any>;
+    index !== null ? `/api/criminals?page=${index}&${searchParams}` : null,
+  ) as SWRResponse<mdt_criminals[], any>;
   const bgColor = useColorModeValue(theme.colors.gray[200], theme.colors.blue[800]);
   const [session, loading] = useSession();
   const styles = {
@@ -39,7 +39,7 @@ function Page({ index, searchValues }: { index: number; searchValues: Record<str
         data.map(c => {
           return (
             <HStack
-              key={c.id}
+              key={c.criminalid}
               w="100%"
               align="stretch"
               justify="space-between"
@@ -49,16 +49,16 @@ function Page({ index, searchValues }: { index: number; searchValues: Record<str
                 <Image
                   w={styles.picture}
                   alt="silhouette"
-                  src="https://prepsec.org/wp-content/uploads/2017/09/unknown-person-icon-Image-from.png"
+                  src={c.image ?? "https://prepsec.org/wp-content/uploads/2017/09/unknown-person-icon-Image-from.png"}
                 />
                 <Box w={styles.name}>{`${c.first_name} ${c.last_name}`}</Box>
               </HStack>
 
               <HStack pr="2rem" justify="center">
-                <Box>{c.dob}</Box>
+                <Box>{c.date_of_birth}</Box>
                 {session && session.user.isCop && (
-                  <Link href="#" passHref>
-                    <Button>Process</Button>
+                  <Link href={`/criminals/${c.criminalid}/profile`} passHref>
+                    <Button colorScheme="yellow">Profile</Button>
                   </Link>
                 )}
               </HStack>
