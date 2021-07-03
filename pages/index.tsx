@@ -57,8 +57,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <title>Raze MDT</title>
-      {/* <Flex flexDir="column" justifyContent="center" alignContent="center" alignItems="center">
+      <Flex flexDir="column" justifyContent="center" alignContent="center" alignItems="center">
         <title>Raze MDT</title>
         <Flex>
           <Text fontSize={fontSize}>Welcome to the &nbsp;</Text>
@@ -89,9 +88,15 @@ export default function Home() {
           overflowY="auto"
           maxW="xl"
           maxH="lg"
-
         >
-          <Flex justifyContent="space-between" pl="1rem" pr="1rem" pt=".5rem" alignItems="center" border="none !important">
+          <Flex
+            justifyContent="space-between"
+            pl="1rem"
+            pr="1rem"
+            pt=".5rem"
+            alignItems="center"
+            border="none !important"
+          >
             <Text color={sanAndreasColor} fontSize="lg">
               Law Enforcement Announcements
             </Text>
@@ -138,7 +143,7 @@ export default function Home() {
             </Button>
           </Flex>
         </Box>
-      </Flex> */}
+      </Flex>
     </Layout>
   );
 }
