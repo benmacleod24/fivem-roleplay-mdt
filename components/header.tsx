@@ -16,7 +16,8 @@ import {
   Text,
   Skeleton,
   IconButton,
-  MenuDivider
+  MenuDivider,
+  Heading
 } from '@chakra-ui/react';
 import { Button, useColorMode } from '@chakra-ui/react';
 import { ChevronDownIcon, MoonIcon, SunIcon, InfoIcon } from '@chakra-ui/icons';
@@ -35,20 +36,42 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
 
   // Chakra Colors
   const headerColor = useColorModeValue("gray.50", "gray.700")
+  const mdtText = useColorModeValue("gray.800", "gray.200")
+  const saText = useColorModeValue("blue.500", "blue.300")
   const { colorMode, toggleColorMode } = useColorMode();
 
 
   return (
     <Flex pl="6.5%" pr="6.5%" width="100%" height="8vh" mb="1rem" background={headerColor} justifyContent={"space-between"}>
-      {/* Profile Picture & Name */}
+      {/* Police Branding */}
       <Flex boxSizing="border-box" height="100%" minWidth="20%" alignItems="center">
+        <Image width="3.5rem" mr="5%" src={"https://i.imgur.com/AHFKtEZ.png"} alt="Police Badge" />
+        <Flex direction="column" width="100%">
+          <Heading fontStyle="italic" fontWeight="normal" size="sm" color={saText}>San Andreas</Heading>
+          <Heading size="md" color={mdtText}>Mobile Data Terminal</Heading>
+        </Flex>
       </Flex>
 
       {/* Menu Buttons */}
       <Flex boxSizing="border-box" height="100%" minWidth="60%" alignItems="center" justifyContent="center">
         <ButtonGroup>
-          <Button variant="solid" colorScheme="yellow" ml="1%" mr="1%" size="md">Home</Button>
-          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Databases</Button>
+          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
+            <Link href="/" passHref>
+              Home
+            </Link>
+          </Button>
+          <Menu>
+            <MenuButton variant="outline" colorScheme="yellow" as={Button} rightIcon={<ChevronDownIcon />}>
+              Databases
+            </MenuButton>
+            <MenuList>
+              <Link href="/citizens" passHref>
+                <MenuItem>Citizens</MenuItem>
+              </Link>
+              <MenuItem>Criminals</MenuItem>
+              <MenuItem>Vehicles</MenuItem>
+            </MenuList>
+          </Menu>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Reports</Button>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Warrants</Button>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Penal Code</Button>
