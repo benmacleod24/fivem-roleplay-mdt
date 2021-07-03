@@ -13,10 +13,13 @@ export default function Footer() {
       pr="6.5%"
       width="100%"
       height="8vh"
+      minHeight="8vh"
+      maxHeight="8vh"
       background={headerColor}
       border="none"
       alignItems="center"
       justifyContent="space-between"
+      mt="1rem"
     >
       <Flex>
         <Link href="https://www.raze.community/forum/index.php" target="_blank">

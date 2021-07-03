@@ -7,7 +7,7 @@ export default function Layout({ children }) {
   return (
     <Flex direction="column" height="100vh" width="100vw">
       <Header />
-      <Container minH="82.5vh" justifyContent="normal" maxW="container.xl">
+      <Container justifyContent="normal" maxW="container.xl" flexGrow={1} boxSizing="border-box">
         {children}{' '}
       </Container>
       <Footer />
