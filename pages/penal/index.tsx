@@ -14,11 +14,7 @@ const PenalCode = () => {
         <PCodeHeader />
         <LoadableContentSafe data={{ category }} errors={[error]} loader={<PCodeLoading />}>
           {({ category }) => {
-            return (
-              <>
-                <PCodeAccordian category={category} />
-              </>
-            );
+            return <PCodeAccordian category={category} />;
           }}
         </LoadableContentSafe>
       </Flex>
