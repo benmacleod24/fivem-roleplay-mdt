@@ -42,7 +42,7 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
 
 
   return (
-    <Flex pl="6.5%" pr="6.5%" width="100%" height="8vh" mb="1rem" background={headerColor} justifyContent={"space-between"}>
+    <Flex minHeight="8vh" maxHeight="8vh" pl="6.5%" pr="6.5%" width="100%" height="8vh" mb="1rem" background={headerColor} justifyContent={"space-between"}>
       {/* Police Branding */}
       <Flex boxSizing="border-box" height="100%" minWidth="20%" alignItems="center">
         <Image width="3.5rem" mr="5%" src={"https://i.imgur.com/AHFKtEZ.png"} alt="Police Badge" />
@@ -74,7 +74,9 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
           </Menu>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Reports</Button>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Warrants</Button>
-          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Penal Code</Button>
+          <Link href="/penal" passHref>
+            <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">Penal Code</Button>
+          </Link>
         </ButtonGroup>
       </Flex>
 

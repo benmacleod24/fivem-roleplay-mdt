@@ -31,7 +31,6 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
 
   // Params & Data
   const searchParams = toQuery(searchValues);
-<<<<<<< HEAD
   const { data } = useSWR(index !== null ? `/api/citizens?page=${index}&${searchParams}` : null) as SWRResponse<fivem_characters[], any>;
 
   // Chakra Color Modes
@@ -50,49 +49,6 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
           </Flex>
         );
       })}
-=======
-  const { data } = useSWR(
-    index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
-  ) as SWRResponse<fivem_characters[], any>;
-  const bgColor = useColorModeValue(theme.colors.gray[200], theme.colors.blue[800]);
-  const [session, loading] = useSession();
-  const styles = {
-    picture: '5rem',
-    name: '20rem',
-  };
-  return (
-    <VStack spacing="1rem">
-      {data &&
-        data.map(c => {
-          return (
-            <HStack
-              key={c.id}
-              w="100%"
-              align="stretch"
-              justify="space-between"
-              backgroundColor={bgColor}
-            >
-              <HStack spacing="2rem">
-                <Image
-                  w={styles.picture}
-                  alt="silhouette"
-                  src="https://prepsec.org/wp-content/uploads/2017/09/unknown-person-icon-Image-from.png"
-                />
-                <Box w={styles.name}>{`${c.first_name} ${c.last_name}`}</Box>
-              </HStack>
-
-              <HStack pr="2rem" justify="center">
-                <Box>{c.dob}</Box>
-                {session && session.user.isCop && (
-                  <Link href="#" passHref>
-                    <Button>Process</Button>
-                  </Link>
-                )}
-              </HStack>
-            </HStack>
-          );
-        })}
->>>>>>> b230d131636aeb4807629f74f26ce363a09c873f
     </VStack>
   );
 }
