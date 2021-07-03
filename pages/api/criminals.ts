@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getSession, useSession } from 'next-auth/client';
 import { string, z } from 'zod';
 import { stringToNumber } from '../../utils/parse';
 
@@ -19,6 +20,18 @@ export default async function Criminals(
   req: NextApiRequestWithQuery,
   res: NextApiResponse,
 ): Promise<void> {
+  const session = await getSession({ req });
+  console.log(session);
+  throw new Error('eat shit');
+  switch (req.method) {
+    case 'GET':
+      return GET(req, res);
+    default:
+      throw new Error('howd you get here?');
+  }
+}
+
+const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { page, firstName, lastName, stateId, criminalid } = CitizenRequest.parse(req.query);
   let where = {};
   if (firstName) {
@@ -45,4 +58,4 @@ export default async function Criminals(
     });
     res.json(criminals);
   }
-}
+};

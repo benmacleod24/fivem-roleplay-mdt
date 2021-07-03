@@ -91,6 +91,7 @@ export default NextAuth({
   jwt: {
     // A secret to use for key generation (you should set this explicitly)
     // secret: 'INp8IvdIyeMcoGAgFGoA61DdBglwwSqnXJZkgz8PSnw',
+    secret: process.env.JWT_SECRET,
     // Set to true to use encryption (default: false)
     // encryption: true,
     // You can define your own encode/decode functions for signing and encryption
