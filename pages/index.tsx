@@ -88,9 +88,15 @@ export default function Home() {
           overflowY="auto"
           maxW="xl"
           maxH="lg"
-
         >
-          <Flex justifyContent="space-between" pl="1rem" pr="1rem" pt=".5rem" alignItems="center" border="none !important">
+          <Flex
+            justifyContent="space-between"
+            pl="1rem"
+            pr="1rem"
+            pt=".5rem"
+            alignItems="center"
+            border="none !important"
+          >
             <Text color={sanAndreasColor} fontSize="lg">
               Law Enforcement Announcements
             </Text>
