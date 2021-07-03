@@ -50,7 +50,6 @@ export default function Home({ session }: { session: Session }) {
     `/api/criminals/?criminalid=${criminalid}`,
   ) as SWRResponse<mdt_criminals, any>;
 
-  const loading = !criminal && !error;
   const color = useColorModeValue(theme.colors.blue[800], theme.colors.blue[400]);
 
   return (
