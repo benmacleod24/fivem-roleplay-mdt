@@ -16,7 +16,7 @@ import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 import * as Form from '../components/form';
 import { toQuery } from '../utils/query';
-import { fivem_characters } from '@prisma/client';
+import { fivem_characters, mdt_criminals } from '@prisma/client';
 import { useSession } from 'next-auth/client';
 import Link from 'next/link';
 import { LoadableContentSafe } from '../ui/LoadableContent';
@@ -38,12 +38,16 @@ export interface CitizenCardProps {
   searchValues: Record<string, string>;
 }
 
+interface SWRResponseType extends fivem_characters {
+  mdt_criminals: Array<{image: string}>
+}
+
 const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
   // Params & Data
   const searchParams = toQuery(searchValues);
   const { data: citizens, error } = useSWR(
     index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
-  ) as SWRResponse<fivem_characters[], any>;
+  ) as SWRResponse<Array<SWRResponseType>, any>;
 
   // Chakra Color Modes
   const cardBackground = useColorModeValue(theme.colors.gray[200], theme.colors.gray[700]);
@@ -54,7 +58,7 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
         return (
           <VStack spacing="1rem" mt="1%" mb="1%">
             {citizens &&
-              citizens.map(c => {
+              citizens.map((c) => {
                 return (
                   <Flex
                     key={c.id}
@@ -70,9 +74,10 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                     <Image
                       border="1px solid #4A5568"
                       mr="2.5%"
-                      width="5.5rem"
+                      boxSize="5.5rem"
+                      objectFit="fill"
                       borderRadius="md"
-                      src="https://i.imgur.com/tdi3NGah.jpg"
+                      src={c.mdt_criminals && c.mdt_criminals[0] ? c.mdt_criminals[0].image : "https://i.imgur.com/tdi3NGah.jpg"}
                       alt="blank_profile_picture"
                     />
                     <Heading flex={1} size="md">

@@ -35,6 +35,14 @@ export default async function Citizen(
     take: 5,
     skip: page !== undefined && page !== null ? 20 * page : 0,
     orderBy: { id: 'asc' },
+    include: {
+      mdt_criminals: {
+        where,
+        select: {
+          image: true
+        }
+      }
+    }
   });
   res.json(posts);
 }
