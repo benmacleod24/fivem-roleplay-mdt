@@ -15,10 +15,11 @@ import {
 import { mdt_charges, mdt_charges_categories } from '@prisma/client';
 import * as React from 'react';
 import { mdtCharges } from '../../../components/hooks/api/usePenal';
+import { numberWithComma } from '../../../utils';
 
 const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdtCharges)[] }) => {
   return (
-    <Accordion mt="8" defaultIndex={[0]} allowMultiple w="100%">
+    <Accordion mt="8" allowMultiple w="100%">
       {category &&
         category.map(c => {
           return (
@@ -82,7 +83,7 @@ const PCodeChargeWrapper: React.SFC<PCodeChargeWrapperProps> = ({ charge }) => {
       <HStack mt="2">
         {!isHoldUntil() ? (
           <React.Fragment>
-            <Tag size="md">${charge.fine}</Tag>
+            <Tag size="md">${numberWithComma(charge.fine)}</Tag>
             <Tag size="md">{charge.time} month(s)</Tag>
           </React.Fragment>
         ) : (
