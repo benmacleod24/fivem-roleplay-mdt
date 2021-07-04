@@ -47,8 +47,6 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
 
   // Chakra Color Modes
   const cardBackground = useColorModeValue(theme.colors.gray[200], theme.colors.gray[700]);
-  // Real Image: https://i.imgur.com/MtrDeB8.png
-  // Fake Image: https://i.imgur.com/tdi3NGah.jpg
 
   return (
     <LoadableContentSafe data={{ citizens }} errors={[error]}>
