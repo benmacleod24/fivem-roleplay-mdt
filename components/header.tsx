@@ -23,6 +23,7 @@ import { Button, useColorMode } from '@chakra-ui/react';
 import { ChevronDownIcon, MoonIcon, SunIcon, InfoIcon } from '@chakra-ui/icons';
 import { BsFillPersonLinesFill } from 'react-icons/bs';
 import { BiExit } from 'react-icons/bi';
+import {GiRank3} from "react-icons/gi"
 
 export interface HeaderProps { }
 
@@ -140,6 +141,9 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
               <MenuList>
                 <Link href="/profile" passHref>
                   <MenuItem icon={<BsFillPersonLinesFill />}>Profile</MenuItem>
+                </Link>
+                <Link href="/command" passHref>
+                  <MenuItem icon={<GiRank3 />}>Command Managment</MenuItem>
                 </Link>
                 <MenuItem
                   onClick={toggleColorMode}
