@@ -1,4 +1,4 @@
-import Layout from '../components/layout';
+import Layout from '../../components/layout';
 import React, { useState } from 'react';
 import {
   HStack,
@@ -14,12 +14,12 @@ import {
 import useSWR, { SWRResponse } from 'swr';
 import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
-import * as Form from '../components/form';
-import { toQuery } from '../utils/query';
+import * as Form from '../../components/form';
+import { toQuery } from '../../utils/query';
 import { fivem_characters, mdt_criminals } from '@prisma/client';
 import { useSession } from 'next-auth/client';
 import Link from 'next/link';
-import { LoadableContentSafe } from '../ui/LoadableContent';
+import { LoadableContentSafe } from '../../ui/LoadableContent';
 
 const initialValues = {
   firstName: undefined,
@@ -83,9 +83,11 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                     <Heading flex={1} size="md">
                       {c.first_name} {c.last_name}
                     </Heading>
-                    <Button size="sm" colorScheme="yellow">
-                      View Profile
-                    </Button>
+                    <Link href={`/citizens/${c.cuid}/profile`}>
+                      <Button size="sm" colorScheme="yellow">
+                        View Profile
+                      </Button>
+                  </Link>
                   </Flex>
                 );
               })}

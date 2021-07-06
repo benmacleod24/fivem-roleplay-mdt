@@ -84,7 +84,7 @@ const PCodeChargeWrapper: React.SFC<PCodeChargeWrapperProps> = ({ charge }) => {
         {!isHoldUntil() ? (
           <React.Fragment>
             <Tag size="md">${numberWithComma(charge.fine)}</Tag>
-            <Tag size="md">{charge.time} month(s)</Tag>
+            <Tag size="md">{charge.time} Month(s)</Tag>
           </React.Fragment>
         ) : (
           <Tag size="md" colorScheme="yellow">
