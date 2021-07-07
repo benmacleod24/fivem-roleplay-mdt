@@ -41,6 +41,8 @@ export interface CitizenCardProps {
 const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
   // Params & Data
   const searchParams = toQuery(searchValues);
+  const [session, loading] = useSession();
+
   const { data: citizens, error } = useSWR(
     index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
   ) as SWRResponse<fivem_characters[], any>;
@@ -51,8 +53,8 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
   // Fake Image: https://i.imgur.com/tdi3NGah.jpg
 
   return (
-    <LoadableContentSafe data={{ citizens }} errors={[error]}>
-      {({ citizens }) => {
+    <LoadableContentSafe data={{ citizens, session }} errors={[error]}>
+      {({ citizens, session }) => {
         return (
           <VStack spacing="1rem" mt="1%" mb="1%">
             {citizens &&
@@ -80,9 +82,18 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                     <Heading flex={1} size="md">
                       {c.first_name} {c.last_name}
                     </Heading>
-                    <Button size="sm" colorScheme="yellow">
-                      View Profile
-                    </Button>
+                    <VStack>
+                      <Button size="sm" colorScheme="yellow">
+                        View Profile
+                      </Button>
+                      <Link passHref href={`/booking/${c.cuid}`}>
+                        {session.user.isCop && (
+                          <Button size="sm" colorScheme="red">
+                            Process
+                          </Button>
+                        )}
+                      </Link>
+                    </VStack>
                   </Flex>
                 );
               })}

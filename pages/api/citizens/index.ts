@@ -10,6 +10,7 @@ const CitizenRequest = z.object({
   firstName: z.ostring(),
   lastName: z.ostring(),
   stateId: z.ostring().transform(stringToNumber),
+  cuid: z.ostring(),
 });
 
 type NextApiRequestWithQuery = NextApiRequest & z.infer<typeof CitizenRequest>;
@@ -18,8 +19,18 @@ export default async function Citizen(
   req: NextApiRequestWithQuery,
   res: NextApiResponse,
 ): Promise<void> {
-  const { page, firstName, lastName, stateId } = CitizenRequest.parse(req.query);
+  const { page, firstName, lastName, stateId, cuid } = CitizenRequest.parse(req.query);
   let where = {};
+
+  const select = {
+    id: true,
+    uId: true,
+    cuid: true,
+    dob: true,
+    first_name: true,
+    last_name: true,
+    gender: true,
+  };
   if (firstName) {
     where = { ...where, first_name: { contains: firstName } };
   }
@@ -30,11 +41,20 @@ export default async function Citizen(
   if (stateId) {
     where = { ...where, id: stateId };
   }
-  const posts = await prisma.fivem_characters.findMany({
-    where,
-    take: 5,
-    skip: page !== undefined && page !== null ? 20 * page : 0,
-    orderBy: { id: 'asc' },
-  });
-  res.json(posts);
+  if (cuid) {
+    const criminal = await prisma.fivem_characters.findFirst({
+      where: { cuid },
+      select,
+    });
+    res.json(criminal);
+  } else {
+    const posts = await prisma.fivem_characters.findMany({
+      where,
+      select,
+      take: 5,
+      skip: page !== undefined && page !== null ? 20 * page : 0,
+      orderBy: { id: 'asc' },
+    });
+    res.json(posts);
+  }
 }
