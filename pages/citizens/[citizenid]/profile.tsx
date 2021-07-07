@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import useSWR, { SWRResponse } from 'swr';
 import Layout from '../../../components/layout';
+import { stringToNumber } from '../../../utils/parse';
 
 export interface CitizenProfileProps {
     
@@ -24,6 +25,13 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
 
     if (!citizen) return <React.Fragment></React.Fragment>;
 
+    const calcAge = (dob: string | null): string => {
+        if (!dob) return "DoB not found"
+        const birthYear = stringToNumber(dob.split("-")[0])
+        if (!birthYear) return dob;
+        return String(2020 - birthYear)
+    }
+ 
     return ( 
         <Layout>
             <Flex width="full" height="full" direction="column">
@@ -36,6 +44,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
                         <Flex><Text fontWeight="medium" color="blue.400" mr="1">Name:</Text> {citizen.first_name} {citizen.last_name}</Flex>
                         <Flex><Text fontWeight="medium" color="blue.400" mr="1">Date of Birth:</Text> {citizen.dob}</Flex>
                         <Flex><Text fontWeight="medium" color="blue.400" mr="1">Drivers Liscense Ref:</Text> {citizen.cuid.split("-")[0]}</Flex>
+                        <Flex><Text fontWeight="medium" color="blue.400" mr="1">Age:</Text> {calcAge(citizen.dob)}</Flex>
                         <Flex><Text fontWeight="medium" color="blue.400" mr="1">Gender:</Text> {citizen.gender ? "Female" : "Male"}</Flex>
                     </Box>
                 </Flex>
