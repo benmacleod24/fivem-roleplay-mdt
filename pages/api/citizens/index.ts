@@ -41,20 +41,19 @@ export default async function Citizen(
   if (stateId) {
     where = { ...where, id: stateId };
   }
-  if (cuid) {
-    const criminal = await prisma.fivem_characters.findFirst({
-      where: { cuid },
-      select,
-    });
-    res.json(criminal);
-  } else {
-    const posts = await prisma.fivem_characters.findMany({
-      where,
-      select,
-      take: 5,
-      skip: page !== undefined && page !== null ? 20 * page : 0,
-      orderBy: { id: 'asc' },
-    });
-    res.json(posts);
-  }
+  const posts = await prisma.fivem_characters.findMany({
+    where,
+    take: 5,
+    skip: page !== undefined && page !== null ? 20 * page : 0,
+    orderBy: { id: 'asc' },
+    include: {
+      mdt_criminals: {
+        where,
+        select: {
+          image: true
+        }
+      }
+    }
+  });
+  res.json(posts);
 }

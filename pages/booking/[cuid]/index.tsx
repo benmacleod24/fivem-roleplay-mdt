@@ -48,7 +48,13 @@ export interface FieldProps<V = any> {
   meta: FieldMetaProps<V>;
 }
 
-const ChargeBox = ({ charge, addCharge }: { charge: mdt_charges }) => {
+const ChargeBox = ({
+  charge,
+  addCharge,
+}: {
+  charge: mdt_charges;
+  addCharge: (a: mdt_charges) => void;
+}) => {
   const classColor = () => {
     switch (charge.class) {
       case 'infraction':

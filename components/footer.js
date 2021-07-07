@@ -28,9 +28,10 @@ export default function Footer() {
       </Flex>
       <Flex>
         <Text fontStyle="italic">
-          Developed by
-          <Link href="https://github.com/knames" color={theme.colors.blue[400]}>{` Chips`}</Link> &
-          Ben
+          {`Developed by `}
+          <Link href="https://github.com/knames" target="_blank" color={theme.colors.blue[400]}>{`Chips`}</Link>
+          {` & `}
+          <Link href="https://github.com/twotap02" target="_blank" color={theme.colors.blue[400]}>{`Ben`}</Link>
         </Text>
       </Flex>
       <Flex>
