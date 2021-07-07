@@ -39,12 +39,14 @@ export interface CitizenCardProps {
 }
 
 interface SWRResponseType extends fivem_characters {
-  mdt_criminals: Array<{image: string}>
+  mdt_criminals: Array<{ image: string }>;
 }
 
 const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
   // Params & Data
   const searchParams = toQuery(searchValues);
+  const [session, loading] = useSession();
+
   const { data: citizens, error } = useSWR(
     index !== null ? `/api/citizens?page=${index}&${searchParams}` : null,
   ) as SWRResponse<Array<SWRResponseType>, any>;
@@ -53,12 +55,12 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
   const cardBackground = useColorModeValue(theme.colors.gray[200], theme.colors.gray[700]);
 
   return (
-    <LoadableContentSafe data={{ citizens }} errors={[error]}>
-      {({ citizens }) => {
+    <LoadableContentSafe data={{ citizens, session }} errors={[error]}>
+      {({ citizens, session }) => {
         return (
           <VStack spacing="1rem" mt="1%" mb="1%">
             {citizens &&
-              citizens.map((c) => {
+              citizens.map(c => {
                 return (
                   <Flex
                     key={c.id}
@@ -77,17 +79,30 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                       boxSize="5.5rem"
                       objectFit="fill"
                       borderRadius="md"
-                      src={c.mdt_criminals && c.mdt_criminals[0] ? c.mdt_criminals[0].image : "https://i.imgur.com/tdi3NGah.jpg"}
+                      src={
+                        c.mdt_criminals && c.mdt_criminals[0]
+                          ? c.mdt_criminals[0].image
+                          : 'https://i.imgur.com/tdi3NGah.jpg'
+                      }
                       alt="blank_profile_picture"
                     />
                     <Heading flex={1} size="md">
                       {c.first_name} {c.last_name}
                     </Heading>
-                    <Link href={`/citizens/${c.cuid}/profile`}>
-                      <Button size="sm" colorScheme="yellow">
-                        View Profile
-                      </Button>
-                  </Link>
+                    <VStack>
+                      <Link passHref href={`/citizens/${c.cuid}/profile`}>
+                        <Button size="sm" colorScheme="yellow">
+                          View Profile
+                        </Button>
+                      </Link>
+                      <Link passHref href={`/booking/${c.cuid}`}>
+                        {session.user.isCop && (
+                          <Button size="sm" colorScheme="red">
+                            Process
+                          </Button>
+                        )}
+                      </Link>
+                    </VStack>
                   </Flex>
                 );
               })}
