@@ -91,13 +91,13 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                     </Heading>
                     <VStack>
                       <Link passHref href={`/citizens/${c.cuid}/profile`}>
-                        <Button size="sm" colorScheme="yellow">
+                        <Button size="sm" borderRadius="md" width="full" colorScheme="yellow">
                           View Profile
                         </Button>
                       </Link>
                       <Link passHref href={`/booking/${c.cuid}`}>
                         {session.user.isCop && (
-                          <Button size="sm" colorScheme="red">
+                          <Button width="full" borderRadius="md" size="sm" colorScheme="blue">
                             Process
                           </Button>
                         )}
