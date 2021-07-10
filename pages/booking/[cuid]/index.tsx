@@ -16,10 +16,9 @@ import {
   Tooltip,
   Input,
   IconButton,
-  Select,
-  Radio,
-  RadioGroup,
   Stack,
+  RadioGroup,
+  Radio,
 } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
 import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
@@ -35,12 +34,8 @@ import { Session } from 'inspector';
 import { LoadableContentSafe } from '../../../ui/LoadableContent';
 import { useRouter } from 'next/router';
 import usePenal from '../../../components/hooks/api/usePenal';
-
-const initialValues = {
-  firstName: undefined,
-  lastName: undefined,
-  stateId: undefined,
-};
+import { Radio as RadioUI } from '@chakra-ui/react';
+import { Text as TextForm } from '../../../components/form/text';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -115,7 +110,7 @@ export default function Home({ session }: { session: Session }) {
   const { category: penal, error: penalError } = usePenal();
   const { cuid } = router.query;
   const { data: character, error: characterError } = useSWR(
-    `/api/citizens/?cuid=${cuid}`,
+    `/api/citizen/?citizenid=${cuid}`,
   ) as SWRResponse<
     {
       id: number;
@@ -128,8 +123,6 @@ export default function Home({ session }: { session: Session }) {
     },
     any
   >;
-  console.log(character);
-  console.log(penal);
   const [filter, setFilter] = useState('');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
     setFilter(event.target.value.toLowerCase());
@@ -204,7 +197,11 @@ export default function Home({ session }: { session: Session }) {
               </Box>
               <Box w="30%" h="100%">
                 Booking Charges
-                <BookingCharges selectedCharges={selectedCharges} removeCharge={removeCharge} />
+                <BookingCharges
+                  character={character}
+                  selectedCharges={selectedCharges}
+                  removeCharge={removeCharge}
+                />
               </Box>
               {/* </VStack> */}
             </HStack>
@@ -218,9 +215,19 @@ export default function Home({ session }: { session: Session }) {
 const BookingCharges = ({
   selectedCharges,
   removeCharge,
+  character,
 }: {
   selectedCharges: Record<number, chargeAndCount>;
   removeCharge: (a: number) => void;
+  character: {
+    id: number;
+    uId: number | null;
+    cuid: string;
+    first_name: string | null;
+    last_name: string | null;
+    dob: string | null;
+    gender: boolean | null;
+  };
 }) => {
   const timeAndPenalty = Object.values(selectedCharges).reduce(
     (acc, res) => {
@@ -233,79 +240,130 @@ const BookingCharges = ({
       penalty: 0,
     },
   );
+
+  const chargesValues = Object.values(selectedCharges);
+
+  const initialValues = {
+    firstName: character.first_name,
+    lastName: character.last_name,
+    stateId: character.uId,
+    plea: undefined,
+    bookingReduction: '0',
+  };
+
+  console.log(selectedCharges);
+
   return (
-    <Flex flexDir="column">
-      {Object.values(selectedCharges).map(c => {
-        return (
-          <Flex
-            key={`booking-${c.charge.chargeid}`}
-            flexDir="row"
-            justifyContent="space-between"
-            alignItems="center"
-            mb="1rem"
-          >
-            <Text fontSize="xs" fontWeight="bold">
-              {c.charge.name}
-            </Text>
-            <Flex flexDir="row" justifyContent="center" alignItems="center">
-              <Text>{c.counts}</Text>
-              <IconButton
-                ml="1rem"
-                size="sm"
-                aria-label="close"
-                onClick={() => removeCharge(c.charge.chargeid)}
-                icon={<CloseIcon />}
-              />{' '}
-            </Flex>
-          </Flex>
-        );
-      })}
-      <Flex flexDir="row"></Flex>
-      {timeAndPenalty.time < TRIAL ? (
-        <Flex flexDir="column">
-          <Text>time:</Text> <Text>{timeAndPenalty.time} Month(s);</Text>
-        </Flex>
-      ) : (
-        <Flex flexDir="column">
-          <Text>Time:</Text> <Text>Hold Until Trial</Text>
-        </Flex>
-      )}
-      {timeAndPenalty.penalty < TRIAL ? (
-        <Flex flexDir="column">penalty: ${timeAndPenalty.penalty}</Flex>
-      ) : (
-        <Flex flexDir="column">
-          <Text>Penalty:</Text> <Text>Hold Until Trial</Text>
-        </Flex>
-      )}
-
-      {/* todo get proper values here */}
-      <Flex mt="2rem">
-        <Select placeholder="Select plea">
-          <option value="guilty">Plea of guilty</option>
-          <option value="innocense">Plea of innocense</option>
-          <option value="no_contest">Plea of no contest</option>
-        </Select>
+    <>
+      <Flex style={{ visibility: chargesValues.length ? 'hidden' : 'visible' }}>
+        No Charges currently selected.
       </Flex>
+      <Flex style={{ visibility: !chargesValues.length ? 'hidden' : 'visible' }}>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={(values, actions) => {
+            const chargesAndCounts = chargesValues.map(c => ({
+              chargeId: c.charge.chargeid,
+              charge_count: c.counts,
+            }));
+            const submission = Object.assign({
+              ...timeAndPenalty,
+              ...values,
+              ...{ chargesAndCounts },
+            });
 
-      <Flex mt="2rem" flexDir="column">
-        <Text>Booking reduction</Text>
-        <RadioExample />
+            // todo fix the override time to not apply when empty
+            // todo fix booking reduction to show live
+
+            console.log(submission);
+            actions.setSubmitting(false);
+          }}
+        >
+          {(props: FormikProps<typeof initialValues>) => (
+            <FForm>
+              <Flex flexDir="column">
+                {chargesValues.map(c => {
+                  return (
+                    <Flex
+                      key={`booking-${c.charge.chargeid}`}
+                      flexDir="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      mb="1rem"
+                    >
+                      <Text fontSize="xs" fontWeight="bold">
+                        {c.charge.name}
+                      </Text>
+                      <Flex flexDir="row" justifyContent="center" alignItems="center">
+                        <Text>{c.counts}</Text>
+                        <IconButton
+                          ml="1rem"
+                          size="sm"
+                          aria-label="close"
+                          onClick={() => removeCharge(c.charge.chargeid)}
+                          icon={<CloseIcon />}
+                        />{' '}
+                      </Flex>
+                    </Flex>
+                  );
+                })}
+                <Flex flexDir="row"></Flex>
+                {timeAndPenalty.time < TRIAL ? (
+                  <Flex flexDir="column">
+                    <Text>time:</Text> <Text>{timeAndPenalty.time} Month(s);</Text>
+                  </Flex>
+                ) : (
+                  <Flex flexDir="column">
+                    <Text>Time:</Text> <Text>Hold Until Trial</Text>
+                  </Flex>
+                )}
+                {timeAndPenalty.penalty < TRIAL ? (
+                  <Flex flexDir="column">penalty: ${timeAndPenalty.penalty}</Flex>
+                ) : (
+                  <Flex flexDir="column">
+                    <Text>Penalty:</Text> <Text>Hold Until Trial</Text>
+                  </Flex>
+                )}
+
+                <TextForm type="string" label="Override time" name="time" />
+
+                {/* todo get proper values here */}
+                <Flex mt="2rem">
+                  <Form.Select type="string" placeholder="Select plea" label="Yolo" name="plea">
+                    <option value="guilty">Plea of guilty</option>
+                    <option value="innocense">Plea of innocense</option>
+                    <option value="no_contest">Plea of no contest</option>
+                  </Form.Select>
+                </Flex>
+
+                <Flex mt="2rem" flexDir="column">
+                  <Text>Booking reduction</Text>
+                  <RadioGroup
+                    name="bookingReduction"
+                    defaultValue={'0'}
+                    onChange={e => {
+                      props.setFieldValue('bookingReduction', e);
+                    }}
+                  >
+                    <HStack>
+                      <Radio value={'0'} defaultChecked>
+                        0%
+                      </Radio>
+                      <Radio value={'25'}>25%</Radio>
+                      <Radio value={'50'}>50%</Radio>
+                      <Radio value={'75'}>75%</Radio>
+                    </HStack>
+                  </RadioGroup>
+                </Flex>
+                <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
+                  <SearchIcon />
+                </Button>
+              </Flex>
+            </FForm>
+          )}
+        </Formik>
       </Flex>
-    </Flex>
-  );
-};
-
-const RadioExample = () => {
-  const [value, setValue] = React.useState('1');
-  return (
-    <RadioGroup onChange={setValue} value={value}>
-      <Stack direction="row">
-        <Radio value={0}>0%</Radio>
-        <Radio value={25}>25%</Radio>
-        <Radio value={50}>50%</Radio>
-        <Radio value={75}>75%</Radio>
-      </Stack>
-    </RadioGroup>
+    </>
   );
 };
 
