@@ -11,36 +11,53 @@ import {
   Text,
   HStack,
   Tag,
+  Input,
 } from '@chakra-ui/react';
 import { mdt_charges, mdt_charges_categories } from '@prisma/client';
 import * as React from 'react';
+import { useState } from 'react';
 import { mdtCharges } from '../../../components/hooks/api/usePenal';
 import { numberWithComma } from '../../../utils';
 
 const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdtCharges)[] }) => {
+  const [filter, setFilter] = useState('');
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setFilter(event.target.value.toLowerCase());
+
+  const indecies = (category && category?.map(c => c.categoryid)) ?? [];
   return (
-    <Accordion mt="8" allowMultiple w="100%">
-      {category &&
-        category.map(c => {
-          return (
-            <AccordionItem key={c.categoryid}>
-              <AccordionButton>
-                <Box w="100%" textAlign="left">
-                  {c.name}
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-              <AccordionPanel>
-                <VStack spacing={3}>
-                  {c.mdt_charges.map(ch => (
-                    <PCodeChargeWrapper key={ch.chargeid} charge={ch} />
-                  ))}
-                </VStack>
-              </AccordionPanel>
-            </AccordionItem>
-          );
-        })}
-    </Accordion>
+    <>
+      <Input placeholder="filter" value={filter} onChange={e => handleChange(e)} />
+      <Accordion mt="8" allowMultiple w="100%" index={filter ? [0, ...indecies] : undefined}>
+        {category &&
+          category.map(c => {
+            return (
+              <AccordionItem key={c.categoryid}>
+                <AccordionButton>
+                  <Box w="100%" textAlign="left">
+                    {c.name}
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <VStack spacing={3}>
+                    {c.mdt_charges
+                      .filter(c => {
+                        return (
+                          (c.description && c.description.toLowerCase().match(filter)) ||
+                          (c.name && c.name.toLowerCase().match(filter))
+                        );
+                      })
+                      .map(ch => (
+                        <PCodeChargeWrapper key={ch.chargeid} charge={ch} />
+                      ))}
+                  </VStack>
+                </AccordionPanel>
+              </AccordionItem>
+            );
+          })}
+      </Accordion>
+    </>
   );
 };
 
