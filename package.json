@@ -13,7 +13,7 @@
     "schema": "prisma/schema.prisma"
   },
   "engines": {
-    "node": "14.2.0"
+    "node": "14.17.1"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.13",
