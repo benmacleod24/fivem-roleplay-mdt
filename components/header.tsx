@@ -23,11 +23,11 @@ import { Button, useColorMode } from '@chakra-ui/react';
 import { ChevronDownIcon, MoonIcon, SunIcon, InfoIcon } from '@chakra-ui/icons';
 import { BsFillPersonLinesFill } from 'react-icons/bs';
 import { BiExit } from 'react-icons/bi';
-import {GiRank3} from "react-icons/gi"
+import { GiRank3 } from 'react-icons/gi';
 
-export interface HeaderProps { }
+export interface HeaderProps {}
 
-const Header: React.SFC<HeaderProps> = ({ }) => {
+const Header: React.SFC<HeaderProps> = ({}) => {
   // Session Data
   const [session, loading] = useSession();
 
@@ -71,11 +71,11 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
         justifyContent="center"
       >
         <ButtonGroup>
-          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
-            <Link href="/" passHref>
+          <Link href="/" passHref>
+            <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
               Home
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <Menu>
             <MenuButton
               variant="outline"
