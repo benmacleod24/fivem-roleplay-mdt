@@ -462,6 +462,7 @@ model mdt_bookings {
   mdt_officers       mdt_officers?        @relation("mdt_bookingsTo_mdt_officers", fields: [officer_id], references: [officerid])
   mdt_booked_charges mdt_booked_charges[] @relation("mdt_booked_chargesTo_mdt_bookings")
   mdt_warrants       mdt_warrants[]       @relation("mdt_bookingsTo_mdt_warrants")
+  mdt_reports        mdt_reports?         @relation("mdt_bookingsTo_mdt_reports", fields: [report_id], references: [reportid])
 
   @@index([criminal_id], name: "FK__mdt_bookings__mdt_criminals_criminalid")
   @@index([officer_id], name: "FK__mdt_bookings__mdt_officers_officerid")
@@ -602,6 +603,8 @@ model mdt_reports {
   mdt_reports_images   mdt_reports_images[]   @relation("mdt_reportsTo_mdt_reports_images")
   mdt_reports_involved mdt_reports_involved[] @relation("mdt_reportsTo_mdt_reports_involved")
   mdt_warrants         mdt_warrants[]         @relation("mdt_reportsTo_mdt_warrants")
+  mdt_bookings         mdt_bookings?          @relation("mdt_bookingsTo_mdt_reports")
+  // mdt_reports        mdt_reports?         @relation("mdt_bookingsTo_mdt_reports", fields: [report_id], references: [reportid])
 
   @@index([filing_officer_id], name: "FK__mdt_reports__mdt_officers_officerid")
   @@map("_mdt_reports")

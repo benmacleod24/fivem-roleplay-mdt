@@ -6,17 +6,13 @@ import {
   Button,
   VStack,
   Box,
-  Image,
   Text,
-  useColorModeValue,
-  theme,
   Flex,
   Grid,
   GridItem,
   Tooltip,
   Input,
   IconButton,
-  Stack,
   RadioGroup,
   Radio,
 } from '@chakra-ui/react';
@@ -25,17 +21,16 @@ import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 // import useSWR from 'swr';
 import * as Form from '../../../components/form';
-import { toQuery } from '../../../utils/query';
-import { fivem_characters, mdt_charges } from '@prisma/client';
+import { mdt_charges } from '@prisma/client';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import { getSession, useSession } from 'next-auth/client';
+import { getSession } from 'next-auth/client';
 import { Session } from 'inspector';
 import { LoadableContentSafe } from '../../../ui/LoadableContent';
 import { useRouter } from 'next/router';
 import usePenal from '../../../components/hooks/api/usePenal';
-import { Radio as RadioUI } from '@chakra-ui/react';
 import { Text as TextForm } from '../../../components/form/text';
+import * as yup from 'yup';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -212,6 +207,11 @@ export default function Home({ session }: { session: Session }) {
   );
 }
 
+const schema = yup.object().shape({
+  plea: yup.string().required('A plea is required'),
+  chargesAndAccounts: yup.array().min('Must select at least one charge')
+});
+
 const BookingCharges = ({
   selectedCharges,
   removeCharge,
@@ -249,6 +249,7 @@ const BookingCharges = ({
     stateId: character.uId,
     plea: undefined,
     bookingReduction: '0',
+    time: '',
   };
 
   console.log(selectedCharges);
@@ -261,15 +262,22 @@ const BookingCharges = ({
       <Flex style={{ visibility: !chargesValues.length ? 'hidden' : 'visible' }}>
         <Formik
           initialValues={initialValues}
+          validationSchema={schema}
           onSubmit={(values, actions) => {
             const chargesAndCounts = chargesValues.map(c => ({
               chargeId: c.charge.chargeid,
               charge_count: c.counts,
             }));
+
+            const defaultTime =
+              timeAndPenalty.time * (1 - parseFloat(values.bookingReduction) / 100);
+
+            console.log(values);
+
             const submission = Object.assign({
-              ...timeAndPenalty,
               ...values,
               ...{ chargesAndCounts },
+              time: values.time ? parseInt(values.time) : defaultTime,
             });
 
             // todo fix the override time to not apply when empty
@@ -279,7 +287,7 @@ const BookingCharges = ({
             actions.setSubmitting(false);
           }}
         >
-          {(props: FormikProps<typeof initialValues>) => (
+          {(props: FormikProps<typeof initialValues>, errors) => (
             <FForm>
               <Flex flexDir="column">
                 {chargesValues.map(c => {
@@ -310,7 +318,11 @@ const BookingCharges = ({
                 <Flex flexDir="row"></Flex>
                 {timeAndPenalty.time < TRIAL ? (
                   <Flex flexDir="column">
-                    <Text>time:</Text> <Text>{timeAndPenalty.time} Month(s);</Text>
+                    <Text>time:</Text>{' '}
+                    <Text>
+                      {timeAndPenalty.time * (1 - parseFloat(props.values.bookingReduction) / 100)}{' '}
+                      Month(s);
+                    </Text>
                   </Flex>
                 ) : (
                   <Flex flexDir="column">
@@ -325,18 +337,7 @@ const BookingCharges = ({
                   </Flex>
                 )}
 
-                <TextForm type="string" label="Override time" name="time" />
-
-                {/* todo get proper values here */}
-                <Flex mt="2rem">
-                  <Form.Select type="string" placeholder="Select plea" label="Yolo" name="plea">
-                    <option value="guilty">Plea of guilty</option>
-                    <option value="innocense">Plea of innocense</option>
-                    <option value="no_contest">Plea of no contest</option>
-                  </Form.Select>
-                </Flex>
-
-                <Flex mt="2rem" flexDir="column">
+                <Flex mb="1rem" mt="1rem" flexDir="column">
                   <Text>Booking reduction</Text>
                   <RadioGroup
                     name="bookingReduction"
@@ -355,6 +356,18 @@ const BookingCharges = ({
                     </HStack>
                   </RadioGroup>
                 </Flex>
+
+                <TextForm name="time" type="string" label="Override time (months)" />
+
+                {/* todo get proper values here */}
+                <Flex mt="2rem">
+                  <Form.Select type="string" placeholder="Select plea" label="Yolo" name="plea">
+                    <option value="guilty">Plea of guilty</option>
+                    <option value="innocense">Plea of innocense</option>
+                    <option value="no_contest">Plea of no contest</option>
+                  </Form.Select>
+                </Flex>
+
                 <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
                   <SearchIcon />
                 </Button>
