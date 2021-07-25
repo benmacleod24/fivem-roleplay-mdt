@@ -11,6 +11,7 @@ export const Text = ({
   name: string;
   type: string;
   placeholder?: string;
+  isReadOnly?: boolean;
 }): ReactElement => {
   const [field, meta, helpers] = useField(props);
   return (

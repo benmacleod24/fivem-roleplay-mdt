@@ -134,11 +134,17 @@ export default function Home({ session }: { session: Session }) {
                       <FForm>
                         <Flex justifyContent="flex-start">
                           <VStack w="50rem">
-                            <TextForm name="title" type="string" label="Title" />
+                            <TextForm
+                              name="title"
+                              type="string"
+                              label="Title"
+                              isReadOnly={!Boolean(report.draft)}
+                            />
                             <Textarea
                               name="content"
                               placeholder="Here is a sample placeholder"
                               size="sm"
+                              isReadOnly={!Boolean(report.draft)}
                               height="20rem"
                               resize="vertical"
                             />

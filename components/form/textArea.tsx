@@ -10,6 +10,8 @@ export const Textarea = ({
   label?: string;
   name: string;
   size?: string;
+  isDisabled?: boolean;
+  isReadOnly?: boolean;
   height?: string;
   resize?: ResponsiveValue<any> | undefined;
   placeholder?: string;
