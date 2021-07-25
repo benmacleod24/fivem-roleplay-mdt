@@ -1,5 +1,5 @@
 // import Image from 'next/image';
-import Layout from '../../..//components/layout';
+import Layout from '../../../components/layout';
 import React, { useState } from 'react';
 import {
   HStack,
@@ -27,10 +27,11 @@ import { ParsedUrlQuery } from 'querystring';
 import { getSession } from 'next-auth/client';
 import { Session } from 'inspector';
 import { LoadableContentSafe } from '../../../ui/LoadableContent';
-import { useRouter } from 'next/router';
+import router, { useRouter } from 'next/router';
 import usePenal from '../../../components/hooks/api/usePenal';
 import { Text as TextForm } from '../../../components/form/text';
 import * as yup from 'yup';
+import { createBooking } from '../../../components/hooks/api/postBooking';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -99,8 +100,6 @@ interface chargeAndCount {
 const TRIAL = 99999;
 
 export default function Home({ session }: { session: Session }) {
-  const [pageIndex, setPageIndex] = useState(0);
-  const [searchValues, setSearchValues] = useState(0);
   const router = useRouter();
   const { category: penal, error: penalError } = usePenal();
   const { cuid } = router.query;
@@ -164,9 +163,8 @@ export default function Home({ session }: { session: Session }) {
               w="100%"
               spacing="6"
             >
-              {/* <VStack spacing="6" flexDir="row" w="100%"> */}
               <Box w="70%">
-                <Box>
+                <Box mb="2rem">
                   {penal.map(p => {
                     return (
                       <VStack key={p.categoryid}>
@@ -198,7 +196,6 @@ export default function Home({ session }: { session: Session }) {
                   removeCharge={removeCharge}
                 />
               </Box>
-              {/* </VStack> */}
             </HStack>
           );
         }}
@@ -208,8 +205,8 @@ export default function Home({ session }: { session: Session }) {
 }
 
 const schema = yup.object().shape({
-  plea: yup.string().required('A plea is required'),
-  chargesAndAccounts: yup.array().min('Must select at least one charge')
+  bookingPlea: yup.string().required('A plea is required'),
+  chargesAndAccounts: yup.array().min(1, 'Must select at least one charge'),
 });
 
 const BookingCharges = ({
@@ -244,10 +241,7 @@ const BookingCharges = ({
   const chargesValues = Object.values(selectedCharges);
 
   const initialValues = {
-    firstName: character.first_name,
-    lastName: character.last_name,
-    stateId: character.uId,
-    plea: undefined,
+    bookingPlea: undefined,
     bookingReduction: '0',
     time: '',
   };
@@ -263,31 +257,30 @@ const BookingCharges = ({
         <Formik
           initialValues={initialValues}
           validationSchema={schema}
-          onSubmit={(values, actions) => {
+          onSubmit={async (values, actions) => {
             const chargesAndCounts = chargesValues.map(c => ({
               chargeId: c.charge.chargeid,
-              charge_count: c.counts,
+              chargeCount: c.counts,
             }));
 
             const defaultTime =
               timeAndPenalty.time * (1 - parseFloat(values.bookingReduction) / 100);
 
-            console.log(values);
-
             const submission = Object.assign({
               ...values,
-              ...{ chargesAndCounts },
-              time: values.time ? parseInt(values.time) : defaultTime,
+              criminalId: character.id,
+              forWarrant: false, //todo change later
+              bookedCharges: chargesAndCounts,
+              bookingOverride: values.time ? parseInt(values.time) : defaultTime,
             });
 
-            // todo fix the override time to not apply when empty
-            // todo fix booking reduction to show live
-
-            console.log(submission);
+            const res = await createBooking(submission);
+            const {reportId} = res;
+            router.push(`/reports/${reportId}`)
             actions.setSubmitting(false);
           }}
         >
-          {(props: FormikProps<typeof initialValues>, errors) => (
+          {(props: FormikProps<typeof initialValues>) => (
             <FForm>
               <Flex flexDir="column">
                 {chargesValues.map(c => {
@@ -359,9 +352,13 @@ const BookingCharges = ({
 
                 <TextForm name="time" type="string" label="Override time (months)" />
 
-                {/* todo get proper values here */}
                 <Flex mt="2rem">
-                  <Form.Select type="string" placeholder="Select plea" label="Yolo" name="plea">
+                  <Form.Select
+                    type="string"
+                    placeholder="Select plea"
+                    label="Select plea"
+                    name="bookingPlea"
+                  >
                     <option value="guilty">Plea of guilty</option>
                     <option value="innocense">Plea of innocense</option>
                     <option value="no_contest">Plea of no contest</option>
