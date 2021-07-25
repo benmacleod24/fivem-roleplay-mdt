@@ -89,9 +89,9 @@ const Header: React.SFC<HeaderProps> = ({}) => {
               <Link href="/citizens" passHref>
                 <MenuItem>Citizens</MenuItem>
               </Link>
-              <Link href="/criminals" passHref>
+              {/* <Link href="/criminals" passHref>
                 <MenuItem>Criminals</MenuItem>
-              </Link>
+              </Link> */}
               <MenuItem>Vehicles</MenuItem>
             </MenuList>
           </Menu>

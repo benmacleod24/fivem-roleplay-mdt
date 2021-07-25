@@ -1,22 +1,18 @@
 // import Image from 'next/image';
-import Layout from '../../..//components/layout';
+import Layout from '../../../components/layout';
 import React, { useState } from 'react';
 import {
   HStack,
   Button,
   VStack,
   Box,
-  Image,
   Text,
-  useColorModeValue,
-  theme,
   Flex,
   Grid,
   GridItem,
   Tooltip,
   Input,
   IconButton,
-  Stack,
   RadioGroup,
   Radio,
 } from '@chakra-ui/react';
@@ -25,17 +21,17 @@ import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 // import useSWR from 'swr';
 import * as Form from '../../../components/form';
-import { toQuery } from '../../../utils/query';
-import { fivem_characters, mdt_charges } from '@prisma/client';
+import { mdt_charges } from '@prisma/client';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import { getSession, useSession } from 'next-auth/client';
+import { getSession } from 'next-auth/client';
 import { Session } from 'inspector';
 import { LoadableContentSafe } from '../../../ui/LoadableContent';
-import { useRouter } from 'next/router';
+import router, { useRouter } from 'next/router';
 import usePenal from '../../../components/hooks/api/usePenal';
-import { Radio as RadioUI } from '@chakra-ui/react';
 import { Text as TextForm } from '../../../components/form/text';
+import * as yup from 'yup';
+import { createBooking } from '../../../components/hooks/api/postBooking';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -104,8 +100,6 @@ interface chargeAndCount {
 const TRIAL = 99999;
 
 export default function Home({ session }: { session: Session }) {
-  const [pageIndex, setPageIndex] = useState(0);
-  const [searchValues, setSearchValues] = useState(0);
   const router = useRouter();
   const { category: penal, error: penalError } = usePenal();
   const { cuid } = router.query;
@@ -169,9 +163,8 @@ export default function Home({ session }: { session: Session }) {
               w="100%"
               spacing="6"
             >
-              {/* <VStack spacing="6" flexDir="row" w="100%"> */}
               <Box w="70%">
-                <Box>
+                <Box mb="2rem">
                   {penal.map(p => {
                     return (
                       <VStack key={p.categoryid}>
@@ -203,7 +196,6 @@ export default function Home({ session }: { session: Session }) {
                   removeCharge={removeCharge}
                 />
               </Box>
-              {/* </VStack> */}
             </HStack>
           );
         }}
@@ -211,6 +203,11 @@ export default function Home({ session }: { session: Session }) {
     </Layout>
   );
 }
+
+const schema = yup.object().shape({
+  bookingPlea: yup.string().required('A plea is required'),
+  chargesAndAccounts: yup.array().min(1, 'Must select at least one charge'),
+});
 
 const BookingCharges = ({
   selectedCharges,
@@ -244,11 +241,9 @@ const BookingCharges = ({
   const chargesValues = Object.values(selectedCharges);
 
   const initialValues = {
-    firstName: character.first_name,
-    lastName: character.last_name,
-    stateId: character.uId,
-    plea: undefined,
+    bookingPlea: undefined,
     bookingReduction: '0',
+    time: '',
   };
 
   console.log(selectedCharges);
@@ -261,21 +256,27 @@ const BookingCharges = ({
       <Flex style={{ visibility: !chargesValues.length ? 'hidden' : 'visible' }}>
         <Formik
           initialValues={initialValues}
-          onSubmit={(values, actions) => {
+          validationSchema={schema}
+          onSubmit={async (values, actions) => {
             const chargesAndCounts = chargesValues.map(c => ({
               chargeId: c.charge.chargeid,
-              charge_count: c.counts,
+              chargeCount: c.counts,
             }));
+
+            const defaultTime =
+              timeAndPenalty.time * (1 - parseFloat(values.bookingReduction) / 100);
+
             const submission = Object.assign({
-              ...timeAndPenalty,
               ...values,
-              ...{ chargesAndCounts },
+              criminalId: character.id,
+              forWarrant: false, //todo change later
+              bookedCharges: chargesAndCounts,
+              bookingOverride: values.time ? parseInt(values.time) : defaultTime,
             });
 
-            // todo fix the override time to not apply when empty
-            // todo fix booking reduction to show live
-
-            console.log(submission);
+            const res = await createBooking(submission);
+            const {reportId} = res;
+            router.push(`/reports/${reportId}`)
             actions.setSubmitting(false);
           }}
         >
@@ -310,7 +311,11 @@ const BookingCharges = ({
                 <Flex flexDir="row"></Flex>
                 {timeAndPenalty.time < TRIAL ? (
                   <Flex flexDir="column">
-                    <Text>time:</Text> <Text>{timeAndPenalty.time} Month(s);</Text>
+                    <Text>time:</Text>{' '}
+                    <Text>
+                      {timeAndPenalty.time * (1 - parseFloat(props.values.bookingReduction) / 100)}{' '}
+                      Month(s);
+                    </Text>
                   </Flex>
                 ) : (
                   <Flex flexDir="column">
@@ -325,18 +330,7 @@ const BookingCharges = ({
                   </Flex>
                 )}
 
-                <TextForm type="string" label="Override time" name="time" />
-
-                {/* todo get proper values here */}
-                <Flex mt="2rem">
-                  <Form.Select type="string" placeholder="Select plea" label="Yolo" name="plea">
-                    <option value="guilty">Plea of guilty</option>
-                    <option value="innocense">Plea of innocense</option>
-                    <option value="no_contest">Plea of no contest</option>
-                  </Form.Select>
-                </Flex>
-
-                <Flex mt="2rem" flexDir="column">
+                <Flex mb="1rem" mt="1rem" flexDir="column">
                   <Text>Booking reduction</Text>
                   <RadioGroup
                     name="bookingReduction"
@@ -355,6 +349,22 @@ const BookingCharges = ({
                     </HStack>
                   </RadioGroup>
                 </Flex>
+
+                <TextForm name="time" type="string" label="Override time (months)" />
+
+                <Flex mt="2rem">
+                  <Form.Select
+                    type="string"
+                    placeholder="Select plea"
+                    label="Select plea"
+                    name="bookingPlea"
+                  >
+                    <option value="guilty">Plea of guilty</option>
+                    <option value="innocense">Plea of innocense</option>
+                    <option value="no_contest">Plea of no contest</option>
+                  </Form.Select>
+                </Flex>
+
                 <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
                   <SearchIcon />
                 </Button>
