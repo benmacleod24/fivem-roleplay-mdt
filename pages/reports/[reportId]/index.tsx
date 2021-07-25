@@ -1,37 +1,23 @@
 // import Image from 'next/image';
 import Layout from '../../../components/layout';
-import React, { useState } from 'react';
-import {
-  HStack,
-  Button,
-  VStack,
-  Box,
-  Text,
-  Flex,
-  Grid,
-  GridItem,
-  Tooltip,
-  Input,
-  IconButton,
-  RadioGroup,
-  Radio,
-} from '@chakra-ui/react';
+import React, { useMemo } from 'react';
+import { HStack, Button, VStack, Flex, Text, Radio, RadioGroup } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
-import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
+import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 // import useSWR from 'swr';
-import * as Form from '../../../components/form';
-import { mdt_charges } from '@prisma/client';
+import { mdt_booked_charges_new, mdt_bookings_new, mdt_reports_new } from '@prisma/client';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import { getSession } from 'next-auth/client';
 import { Session } from 'inspector';
 import { LoadableContentSafe } from '../../../ui/LoadableContent';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import usePenal from '../../../components/hooks/api/usePenal';
-import { Text as TextForm } from '../../../components/form/text';
+import { Text as TextForm, Textarea } from '../../../components/form';
 import * as yup from 'yup';
-import { createBooking } from '../../../components/hooks/api/postBooking';
+import { patchReport } from '../../../components/hooks/api/patchReport';
+import Reports from '../../api/reports/[reportId]';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -39,112 +25,156 @@ export interface FieldProps<V = any> {
   meta: FieldMetaProps<V>;
 }
 
+const schema = yup.object().shape({});
+
+const defaultReport = `BSCO/LSPD Crime Report
+Date:                               Time:
+
+Synopsis:
+
+Evidence:
+
+Penalty:
+Time:    Fine:    Reduction:
+
+Mirandarized:  Y/N (If Yes, state when the suspect was Mirandarized. Cells, after Pillbox treatment, etc)
+GSR: Positive/Negative or N/A (if positive, include picture in evidence)
+Items seized from suspect: List items or state N/A (if seized items applies, include picture in evidence)
+Identified through: Identification Card
+Requested Attorney: Y/N`;
+
+interface SWRResponseType extends mdt_reports_new {
+  mdt_bookings_new: mdt_bookings_new_with_charges[];
+}
+
+interface mdt_bookings_new_with_charges extends mdt_bookings_new {
+  mdt_booked_charges_new: mdt_booked_charges_new[];
+}
+
 export default function Home({ session }: { session: Session }) {
   const router = useRouter();
   const { category: penal, error: penalError } = usePenal();
-  const { reportId } = router.query;
-  const { data, error } = useSWR(`/api/reports/${reportId}`);
-  console.log('stuff: ', data);
-  // const { data: character, error: characterError } = useSWR(
-  //   `/api/citizen/?citizenid=${id}`,
-  // ) as SWRResponse<
-  //   {
-  //     id: number;
-  //     uId: number | null;
-  //     cuid: string;
-  //     first_name: string | null;
-  //     last_name: string | null;
-  //     dob: string | null;
-  //     gender: boolean | null;
-  //   },
-  //   any
-  // >;
+  const { reportId } = router.query as { reportId: string };
+  const { data: report, error: reportError } = useSWR(`/api/reports/${reportId}`) as SWRResponse<
+    SWRResponseType,
+    any
+  >;
 
-  // console.log(character)
-  // const [filter, setFilter] = useState('');
-  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-  //   setFilter(event.target.value.toLowerCase());
-  // const [selectedCharges, setSelectedCharges] = useState<Record<number, chargeAndCount>>({});
+  const penalByChargeId = useMemo(() => {
+    return new Map(
+      penal
+        ?.map(penal => penal.mdt_charges)
+        .flat()
+        .map(p => [p.chargeid, p]),
+    );
+  }, [penal]);
 
-  // const addCharge = (c: mdt_charges) => {
-  //   if (!selectedCharges[c.chargeid]) {
-  //     const newCharge = {} as Record<number, chargeAndCount>;
-  //     newCharge[c.chargeid] = { counts: 1, charge: c };
-  //     setSelectedCharges({ ...selectedCharges, ...newCharge });
-  //   } else {
-  //     const updatedCharge = Object.assign({}, selectedCharges);
-  //     updatedCharge[c.chargeid].counts = updatedCharge[c.chargeid].counts + 1;
-  //     setSelectedCharges(updatedCharge);
-  //   }
-  // };
+  const charges = report?.mdt_bookings_new[0].mdt_booked_charges_new;
+  const timeAndPenalty = useMemo(() => {
+    return charges?.reduce(
+      (acc, res) => {
+        const penalCharge = penalByChargeId?.get(res.chargeId);
+        acc.time += res.chargeCount * ((penalCharge && penalCharge.time) ?? 0);
+        acc.penalty += res.chargeCount * ((penalCharge && penalCharge.fine) ?? 0);
+        return acc;
+      },
+      {
+        time: 0,
+        penalty: 0,
+      },
+    );
+  }, [charges, penalByChargeId]);
 
-  // const removeCharge = (chargeId: number) => {
-  //   const updatedCharge = Object.assign({}, selectedCharges);
+  console.log(report);
 
-  //   if (selectedCharges[chargeId].counts > 1) {
-  //     updatedCharge[chargeId].counts = updatedCharge[chargeId].counts - 1;
-  //   } else {
-  //     delete updatedCharge[chargeId];
-  //   }
-  //   setSelectedCharges(updatedCharge);
-  // };
-
+  const shittyPrintableBooking = Object.assign({}, report?.mdt_bookings_new)[0];
   return (
     <Layout>
-      hi
-      {/* <Box>
-        Processing {`${character && character.first_name} ${character && character.last_name}`}
-      </Box>
-      <Input placeholder="filter" value={filter} onChange={e => handleChange(e)} />
-      <LoadableContentSafe data={{ character, penal }} errors={[characterError, penalError]}>
-        {({ character, penal }) => {
+      <LoadableContentSafe data={{ report, penal }} errors={[reportError, penalError]}>
+        {({ report, penal }) => {
           return (
-            <HStack
-              flexDir="row"
-              justifyContent="center"
-              alignContent="center"
-              alignItems="center"
-              h="100%"
-              w="100%"
-              spacing="6"
-            >
-              <Box w="70%">
-                <Box mb="2rem">
-                  {penal.map(p => {
+            <Flex w="100%">
+              <HStack flexDir="row" h="100%" w="100%" spacing="6">
+                <Flex w="70%">
+                  <Formik
+                    initialValues={{
+                      content: report.content ? report.content : defaultReport,
+                      title: report.title ? report.title : '',
+                      reportId,
+                      draft: report.draft ? '1' : '0',
+                    }}
+                    validationSchema={schema}
+                    onSubmit={async (values, actions) => {
+                      const res = await patchReport(reportId, values);
+                      actions.setSubmitting(false);
+                    }}
+                  >
+                    {props => (
+                      <FForm>
+                        <Flex justifyContent="flex-start">
+                          <VStack w="50rem">
+                            <TextForm name="title" type="string" label="Title" />
+                            <Textarea
+                              name="content"
+                              placeholder="Here is a sample placeholder"
+                              size="sm"
+                              height="20rem"
+                              resize="vertical"
+                            />
+                            <Flex mb="1rem" mt="1rem" flexDir="column">
+                              <Text>Booking reduction</Text>
+                              <RadioGroup
+                                name="bookingReduction"
+                                defaultValue={report.draft ? '1' : '0'}
+                                onChange={e => {
+                                  props.setFieldValue('bookingReduction', e);
+                                }}
+                              >
+                                <HStack>
+                                  <Radio value={'1'} defaultChecked isDisabled={!report.draft}>
+                                    Draft
+                                  </Radio>
+                                  <Radio value={'0'}>Final Submission</Radio>
+                                </HStack>
+                              </RadioGroup>
+                            </Flex>
+                            <Button
+                              mt={4}
+                              colorScheme="teal"
+                              isLoading={props.isSubmitting}
+                              type="submit"
+                            >
+                              <SearchIcon />
+                            </Button>
+                          </VStack>
+                        </Flex>
+                      </FForm>
+                    )}
+                  </Formik>
+                </Flex>
+                <VStack w="30%" flexDir="column" spacing="6">
+                  {/* <Flex>{JSON.stringify(shittyPrintableBooking, undefined, 2)}</Flex> */}
+                  <Flex>Original Time: {timeAndPenalty?.time}</Flex>
+                  <Flex>Fine: ${timeAndPenalty?.penalty}</Flex>
+                  <Flex>Plea: {shittyPrintableBooking.bookingPlea}</Flex>
+                  <Flex>Booking reduction: {shittyPrintableBooking.bookingReduction}%</Flex>
+                  <Flex>Override time: {shittyPrintableBooking.bookingOverride}</Flex>
+                  <Flex>Officer: {shittyPrintableBooking.filingOfficerId} (todo later)</Flex>
+
+                  {charges?.map(c => {
                     return (
-                      <VStack key={p.categoryid}>
-                        <Box>{p.name}</Box>
-                        <Grid templateColumns="repeat(4, 1fr)" gap={3}>
-                          {p.mdt_charges
-                            .filter(c => {
-                              return (
-                                (c.description && c.description.toLowerCase().match(filter)) ||
-                                (c.name && c.name.toLowerCase().match(filter))
-                              );
-                            })
-                            .map(c => {
-                              return (
-                                <ChargeBox key={c.category_id} charge={c} addCharge={addCharge} />
-                              );
-                            })}
-                        </Grid>
-                      </VStack>
+                      <Flex key={c.chargeId} mt="1rem">
+                        {penalByChargeId.get(c.chargeId)?.name ?? 'failed getting charge'} *{' '}
+                        {c.chargeCount}
+                      </Flex>
                     );
                   })}
-                </Box>
-              </Box>
-              <Box w="30%" h="100%">
-                Booking Charges
-                <BookingCharges
-                  character={character}
-                  selectedCharges={selectedCharges}
-                  removeCharge={removeCharge}
-                />
-              </Box>
-            </HStack>
+                </VStack>
+              </HStack>
+            </Flex>
           );
         }}
-      </LoadableContentSafe> */}
+      </LoadableContentSafe>
     </Layout>
   );
 }

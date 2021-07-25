@@ -10,21 +10,46 @@ const ReportRequest = z.object({
   reportId: z.string().transform(stringToNumber),
 });
 
+const ReportBodyRequest = z.object({
+  content: z.string(),
+  title: z.string(),
+});
+
 type NextApiRequestWithQuery = NextApiRequest & z.infer<typeof ReportRequest>;
 
 const Reports = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
-  console.log('HI');
   switch (req.method) {
     case 'GET':
       return GET(req, res);
     case 'POST':
       return POST(req, res);
+    case 'PATCH':
+      return PATCH(req, res);
     default:
       throw new Error('Not it chief');
   }
 };
 
 export default Reports;
+
+const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
+  const { reportId } = ReportRequest.parse(req.query) as { reportId: number };
+  const { content, title } = ReportBodyRequest.parse(JSON.parse(req.body));
+  console.log('HI');
+
+  const reportRes = await prisma.mdt_reports_new.update({
+    where: {
+      reportid: reportId,
+    },
+    data: {
+      content,
+      title,
+      draft: false,
+    },
+  });
+
+  res.json(reportRes);
+};
 
 const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   throw 'not yet implemented';
@@ -50,8 +75,6 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { reportId } = ReportRequest.parse(req.query);
 
-  console.log('yeet', reportId);
-  console.log('yeet');
   if (!reportId) {
     return res.status(300).json({
       status: 300,

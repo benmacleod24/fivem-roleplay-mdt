@@ -13,7 +13,6 @@ const ReportRequest = z.object({
 type NextApiRequestWithQuery = NextApiRequest & z.infer<typeof ReportRequest>;
 
 const Reports = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
-  console.log('HI');
   switch (req.method) {
     case 'GET':
       return GET(req, res);
