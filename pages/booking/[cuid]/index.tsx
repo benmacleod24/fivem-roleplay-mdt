@@ -17,7 +17,7 @@ import {
   Radio,
 } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
-import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
+import { CheckIcon, CloseIcon, SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 // import useSWR from 'swr';
 import * as Form from '../../../components/form';
@@ -366,7 +366,7 @@ const BookingCharges = ({
                 </Flex>
 
                 <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
-                  <SearchIcon />
+                  <CheckIcon />
                 </Button>
               </Flex>
             </FForm>
