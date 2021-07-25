@@ -1,6 +1,7 @@
 import { mdt_booked_charges, PrismaClient } from '@prisma/client';
 import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getSession } from 'next-auth/client';
 import { string, z } from 'zod';
 import { stringToNumber } from '../../../utils/parse';
 
@@ -13,6 +14,8 @@ const ReportRequest = z.object({
 const ReportBodyRequest = z.object({
   content: z.string(),
   title: z.string(),
+  filingOfficerId: z.number(),
+  draft: z.boolean(),
 });
 
 type NextApiRequestWithQuery = NextApiRequest & z.infer<typeof ReportRequest>;
@@ -34,8 +37,17 @@ export default Reports;
 
 const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { reportId } = ReportRequest.parse(req.query) as { reportId: number };
-  const { content, title } = ReportBodyRequest.parse(JSON.parse(req.body));
-  console.log('HI');
+  const { content, title, filingOfficerId, draft } = ReportBodyRequest.parse(JSON.parse(req.body));
+
+  const session = await getSession({ req });
+  const copId = session?.user.copId;
+  if (!copId) {
+    throw 'Not a cop/not logged in';
+  }
+
+  if (filingOfficerId !== copId) {
+    throw "you're not the officer that wrote this";
+  }
 
   const reportRes = await prisma.mdt_reports_new.update({
     where: {
@@ -44,7 +56,7 @@ const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     data: {
       content,
       title,
-      draft: false,
+      draft: Boolean(draft),
     },
   });
 

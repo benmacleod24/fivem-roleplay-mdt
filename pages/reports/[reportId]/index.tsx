@@ -1,9 +1,9 @@
 // import Image from 'next/image';
 import Layout from '../../../components/layout';
 import React, { useMemo } from 'react';
-import { HStack, Button, VStack, Flex, Text, Radio, RadioGroup } from '@chakra-ui/react';
+import { HStack, Button, VStack, Flex, Text, Radio, RadioGroup, useToast } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
-import { SearchIcon } from '@chakra-ui/icons';
+import { CheckIcon, SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 // import useSWR from 'swr';
 import { mdt_booked_charges_new, mdt_bookings_new, mdt_reports_new } from '@prisma/client';
@@ -55,10 +55,11 @@ export default function Home({ session }: { session: Session }) {
   const router = useRouter();
   const { category: penal, error: penalError } = usePenal();
   const { reportId } = router.query as { reportId: string };
-  const { data: report, error: reportError } = useSWR(`/api/reports/${reportId}`) as SWRResponse<
-    SWRResponseType,
-    any
-  >;
+  const {
+    data: report,
+    error: reportError,
+    mutate: mutateReport,
+  } = useSWR(`/api/reports/${reportId}`) as SWRResponse<SWRResponseType, any>;
 
   const penalByChargeId = useMemo(() => {
     return new Map(
@@ -84,8 +85,7 @@ export default function Home({ session }: { session: Session }) {
       },
     );
   }, [charges, penalByChargeId]);
-
-  console.log(report);
+  const toast = useToast();
 
   const shittyPrintableBooking = Object.assign({}, report?.mdt_bookings_new)[0];
   return (
@@ -102,11 +102,32 @@ export default function Home({ session }: { session: Session }) {
                       title: report.title ? report.title : '',
                       reportId,
                       draft: report.draft ? '1' : '0',
+                      filingOfficerId: report.filingOfficerId,
                     }}
                     validationSchema={schema}
                     onSubmit={async (values, actions) => {
-                      const res = await patchReport(reportId, values);
-                      actions.setSubmitting(false);
+                      try {
+                        console.log(values);
+                        const res = await patchReport(reportId, {
+                          ...values,
+                          draft: values.draft === '1' ? true : false,
+                        });
+                        actions.setSubmitting(false);
+                        toast({
+                          description: 'Saved report!',
+                          status: 'success',
+                          duration: 5000,
+                          isClosable: true,
+                        });
+                      } catch (e) {
+                        toast({
+                          description: 'Something broke...',
+                          status: 'error',
+                          duration: 5000,
+                          isClosable: true,
+                        });
+                      }
+                      mutateReport();
                     }}
                   >
                     {props => (
@@ -122,12 +143,11 @@ export default function Home({ session }: { session: Session }) {
                               resize="vertical"
                             />
                             <Flex mb="1rem" mt="1rem" flexDir="column">
-                              <Text>Booking reduction</Text>
                               <RadioGroup
-                                name="bookingReduction"
+                                name="draft"
                                 defaultValue={report.draft ? '1' : '0'}
                                 onChange={e => {
-                                  props.setFieldValue('bookingReduction', e);
+                                  props.setFieldValue('draft', e);
                                 }}
                               >
                                 <HStack>
@@ -141,10 +161,11 @@ export default function Home({ session }: { session: Session }) {
                             <Button
                               mt={4}
                               colorScheme="teal"
+                              isDisabled={!Boolean(report.draft)}
                               isLoading={props.isSubmitting}
                               type="submit"
                             >
-                              <SearchIcon />
+                              <CheckIcon />
                             </Button>
                           </VStack>
                         </Flex>
