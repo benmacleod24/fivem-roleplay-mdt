@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text, Image, Button, Badge, Tag, TagLabel, TagCloseButton, IconButton, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Image, Button, Badge, Tag, TagLabel, TagCloseButton, IconButton, Menu, MenuButton, MenuList, MenuItem, Icon } from '@chakra-ui/react';
 import { fivem_characters, fivem_vehicles, mdt_criminals, mdt_criminal_flags, mdt_flag_types } from '@prisma/client';
 import { useSession } from 'next-auth/client';
 import Link from 'next/link';
@@ -9,12 +9,13 @@ import useSWR, { SWRResponse } from 'swr';
 import useFlags from '../../../components/hooks/api/useFlags';
 import Layout from '../../../components/layout';
 import { stringToNumber } from '../../../utils/parse';
+import { IoIosCar } from "react-icons/io"
 
 // Images
 const truck = require("../../../imgs/kamacho-gtao-front_orig.png");
 
 export interface CitizenProfileProps {
-    
+
 }
 
 interface SWRResponseType extends fivem_characters {
@@ -22,8 +23,8 @@ interface SWRResponseType extends fivem_characters {
 }
 
 type SWRFlagsResponse = Array<mdt_criminal_flags & mdt_flag_types>
- 
-const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
+
+const CitizenProfile: React.SFC<CitizenProfileProps> = ({ }) => {
 
     // Router Data
     const router = useRouter();
@@ -33,10 +34,10 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
     const [session, loading] = useSession();
 
     // API Data
-    const {data: citizen} = useSWR(`/api/citizen/?citizenid=${citizenid}`) as SWRResponse<SWRResponseType, any>
-    const {data: criminalFlags, error} = useSWR(`/api/citizen/flags?id=${citizen?.mdt_criminals[0] ? citizen.mdt_criminals[0].criminalid : ""}`) as SWRResponse<SWRFlagsResponse, any>
-    const {data: vehicles} = useSWR(`/api/citizen/vehicles?cid=${citizen?.id}`) as SWRResponse<Array<fivem_vehicles>, any>
-    const { flags } = useFlags(); 
+    const { data: citizen } = useSWR(`/api/citizen/?citizenid=${citizenid}`) as SWRResponse<SWRResponseType, any>
+    const { data: criminalFlags, error } = useSWR(`/api/citizen/flags?id=${citizen?.mdt_criminals[0] ? citizen.mdt_criminals[0].criminalid : ""}`) as SWRResponse<SWRFlagsResponse, any>
+    const { data: vehicles } = useSWR(`/api/citizen/vehicles?cid=${citizen?.id}`) as SWRResponse<Array<fivem_vehicles>, any>
+    const { flags } = useFlags();
 
     if (!citizen) return <React.Fragment></React.Fragment>;
 
@@ -54,8 +55,8 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
         if (missingFlags.length <= 0) return <MenuItem>No More Flags</MenuItem>
         return missingFlags.map(f => <MenuItem key={f.typeid}>{f.type_name}</MenuItem>)
     }
- 
-    return ( 
+
+    return (
         <Layout>
             <Flex width="full" height="full" direction="column">
                 <Box width="full" display="flex" alignItems="center" p="3" mb="3" pr="5" background="gray.700" height="fit-content" borderRadius="md">
@@ -64,8 +65,8 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
                         {session?.user.isCop ? <Button size="sm" colorScheme="blue">Process</Button> : ""}
                     </Link>
                 </Box>
-                <Flex width="full" height="30%" maxHeight="30%" mb="3">
-                    <Image mr="3" borderRadius="md" height="auto" width="16%" border="1px solid #4A5568" src={citizen.mdt_criminals && citizen.mdt_criminals[0] && citizen.mdt_criminals[0].image ? citizen.mdt_criminals[0].image : "https://i.imgur.com/tdi3NGah.jpg"} alt="profile-pic"/>
+                <Flex width="full" height="100%" maxHeight="25%" mb="3">
+                    <Image mr="3" borderRadius="md" height="auto" width="16%" border="1px solid #4A5568" src={citizen.mdt_criminals && citizen.mdt_criminals[0] && citizen.mdt_criminals[0].image ? citizen.mdt_criminals[0].image : "https://i.imgur.com/tdi3NGah.jpg"} alt="profile-pic" />
                     <Box p="5" background="gray.700" borderRadius="md" flexGrow={1}>
                         <Flex><Text fontWeight="medium" color="blue.400" mr="1">Name:</Text> {citizen.first_name} {citizen.last_name}</Flex>
                         <Flex><Text fontWeight="medium" color="blue.400" mr="1">Date of Birth:</Text> {citizen.dob}</Flex>
@@ -76,31 +77,37 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
                             {Array.isArray(criminalFlags) ? criminalFlags.map(f => {
                                 return (<Tag key={f.flagid} fontSize="sm" borderRadius="md" p="1" pl="2" pr="2" mr="2" variant="subtle" colorScheme={f.type_color}>
                                     <TagLabel>{f.type_name}</TagLabel>
-                                    {session?.user.isCop ? <TagCloseButton/> : ""}
+                                    {session?.user.isCop ? <TagCloseButton /> : ""}
                                 </Tag>)
                             }) : ""}
                             {session?.user.isCop ? <Menu>
-                                <MenuButton as={IconButton} aria-label="add-flag" icon={<BiPlus/>} size="sm" borderRadius="full"/>
+                                <MenuButton as={IconButton} aria-label="add-flag" icon={<BiPlus />} size="sm" borderRadius="full" />
                                 <MenuList>
-                                {checkFlags()}
+                                    {checkFlags()}
                                 </MenuList>
                             </Menu> : ""}
                         </Flex>
                     </Box>
                 </Flex>
                 <Flex borderRadius="md" p="3" direction="column" width="full" background="gray.700">
-                    <Heading mb="2" size="md">Registered Vehicles</Heading>
+                    <Heading mb="4" size="md">Registered Vehicles</Heading>
                     <Flex width="100%">
                         {vehicles ? vehicles.map(v => {
                             return (
-                                <h1 key={v.vehicleuid}>{v.name}</h1>
+                                <Box background="gray.800" display="flex" alignItems="center" padding="3" mr="3" borderRadius="md">
+                                    <Icon as={IoIosCar} color="lightgreen" fontSize="40" mr="2" />
+                                    <Flex direction="column">
+                                        <Text fontSize="sm">Model: {v.name}</Text>
+                                        <Text fontSize="sm">Plate: {v.plate}</Text>
+                                    </Flex>
+                                </Box>
                             )
                         }) : ""}
                     </Flex>
                 </Flex>
             </Flex>
-        </Layout>
-     );
+        </Layout >
+    );
 }
- 
+
 export default CitizenProfile;

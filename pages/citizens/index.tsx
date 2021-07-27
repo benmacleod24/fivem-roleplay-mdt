@@ -65,7 +65,7 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                   <Flex
                     key={c.id}
                     boxSizing="border-box"
-                    p="1%"
+                    p="0.9%"
                     pr="3%"
                     borderRadius="md"
                     overflow="hidden"
