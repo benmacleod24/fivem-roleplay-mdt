@@ -6,6 +6,7 @@ import type { AppProps } from 'next/app';
 import { ChakraProvider } from '@chakra-ui/react';
 import { SWRConfig } from 'swr';
 import theme from '../components/theme';
+import "focus-visible/dist/focus-visible"
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
