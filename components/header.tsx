@@ -96,6 +96,9 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
             Reports
           </Button>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
+            Dispatch
+          </Button>
+          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
             Warrants
           </Button>
           <Link href="/penal" passHref>
