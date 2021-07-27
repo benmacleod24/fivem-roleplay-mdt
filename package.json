@@ -13,7 +13,7 @@
     "schema": "prisma/schema.prisma"
   },
   "engines": {
-    "node": "16.3.0"
+    "node": "14.17.3"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.13",
@@ -34,6 +34,7 @@
     "react-dom": "^17.0.2",
     "react-icons": "^4.2.0",
     "swr": "^0.5.6",
+    "yup": "^0.32.9",
     "zod": "^3.2.0"
   },
   "devDependencies": {

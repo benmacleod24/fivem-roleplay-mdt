@@ -1,6 +1,6 @@
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/form-control';
 import { Input, Select as SelectUI } from '@chakra-ui/react';
-import { useField } from 'formik';
+import { Form, useField } from 'formik';
 import React, { ReactElement } from 'react';
 
 export const Select = ({
@@ -26,7 +26,7 @@ export const Select = ({
   };
   return (
     <>
-      <FormControl>
+      <FormControl isInvalid={meta.touched && !!meta.error}>
         <FormLabel>
           {label}
           <SelectUI {...field} {...props} placeholder={placeholder} onChange={handleChange}>

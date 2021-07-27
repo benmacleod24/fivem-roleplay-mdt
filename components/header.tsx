@@ -71,11 +71,11 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
         justifyContent="center"
       >
         <ButtonGroup>
-          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
-            <Link href="/" passHref>
+          <Link href="/" passHref>
+            <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
               Home
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <Menu>
             <MenuButton
               variant="outline"

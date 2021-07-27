@@ -1,17 +1,20 @@
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/form-control';
-import { Input } from '@chakra-ui/react';
+import { Input, ResponsiveValue, Textarea as Tarea } from '@chakra-ui/react';
 import { useField } from 'formik';
 import React, { ReactElement } from 'react';
 
-export const Text = ({
+export const Textarea = ({
   label,
   ...props
 }: {
   label?: string;
   name: string;
-  type: string;
-  placeholder?: string;
+  size?: string;
+  isDisabled?: boolean;
   isReadOnly?: boolean;
+  height?: string;
+  resize?: ResponsiveValue<any> | undefined;
+  placeholder?: string;
 }): ReactElement => {
   const [field, meta, helpers] = useField(props);
   return (
@@ -19,7 +22,7 @@ export const Text = ({
       <FormControl>
         <FormLabel>
           {label}
-          <Input {...field} {...props} />
+          <Tarea {...field} {...props} />
         </FormLabel>
         <FormErrorMessage>{meta.touched && meta.error ? meta.error : null}</FormErrorMessage>
       </FormControl>
@@ -27,4 +30,4 @@ export const Text = ({
   );
 };
 
-export default Text;
+export default Textarea;

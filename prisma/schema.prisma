@@ -66,29 +66,32 @@ model fivem_apartments {
 }
 
 model fivem_characters {
-  id                              Int                               @id @default(autoincrement())
-  uId                             Int?
-  cuid                            String                            @unique @db.VarChar(255)
-  first_name                      String?                           @db.VarChar(255)
-  last_name                       String?                           @db.VarChar(255)
-  dob                             String?                           @db.VarChar(255)
-  cash                            Decimal                           @default(500.00) @db.Decimal(20, 2)
-  payslip                         Decimal                           @default(0.00) @db.Decimal(20, 2)
-  gender                          Boolean?                          @default(false)
-  deleted                         Boolean?                          @default(false)
-  ammo                            String?                           @db.MediumText
-  fivem_users                     fivem_users?                      @relation("fivem_charactersTo_fivem_users", fields: [uId], references: [id])
-  fivem_accounts_access           fivem_accounts_access[]           @relation("fivem_accounts_accessTo_fivem_characters")
-  fivem_apartments                fivem_apartments[]                @relation("fivem_apartmentsTo_fivem_characters")
-  fivem_characters_details        fivem_characters_details[]        @relation("fivem_charactersTo_fivem_characters_details")
-  fivem_emotes                    fivem_emotes[]                    @relation("fivem_charactersTo_fivem_emotes")
-  fivem_jail                      fivem_jail[]                      @relation("fivem_charactersTo_fivem_jail")
-  fivem_licenses                  fivem_licenses[]                  @relation("fivem_charactersTo_fivem_licenses")
-  fivem_phones                    fivem_phones[]                    @relation("fivem_charactersTo_fivem_phones")
-  fivem_properties                fivem_properties[]                @relation("fivem_charactersTo_fivem_properties")
-  fivem_vehicles                  fivem_vehicles[]                  @relation("fivem_charactersTo_fivem_vehicles")
-  fivem_whitelist_characters_jobs fivem_whitelist_characters_jobs[] @relation("fivem_charactersTo_fivem_whitelist_characters_jobs")
-  mdt_criminals                   mdt_criminals[]                   @relation("fivem_charactersTo_mdt_criminals")
+  id                                                                   Int                               @id @default(autoincrement())
+  uId                                                                  Int?
+  cuid                                                                 String                            @unique @db.VarChar(255)
+  first_name                                                           String?                           @db.VarChar(255)
+  last_name                                                            String?                           @db.VarChar(255)
+  dob                                                                  String?                           @db.VarChar(255)
+  cash                                                                 Decimal                           @default(500.00) @db.Decimal(20, 2)
+  payslip                                                              Decimal                           @default(0.00) @db.Decimal(20, 2)
+  gender                                                               Boolean?                          @default(false)
+  deleted                                                              Boolean?                          @default(false)
+  ammo                                                                 String?                           @db.MediumText
+  fivem_users                                                          fivem_users?                      @relation("fivem_charactersTo_fivem_users", fields: [uId], references: [id])
+  fivem_accounts_access                                                fivem_accounts_access[]           @relation("fivem_accounts_accessTo_fivem_characters")
+  fivem_apartments                                                     fivem_apartments[]                @relation("fivem_apartmentsTo_fivem_characters")
+  fivem_characters_details                                             fivem_characters_details[]        @relation("fivem_charactersTo_fivem_characters_details")
+  fivem_emotes                                                         fivem_emotes[]                    @relation("fivem_charactersTo_fivem_emotes")
+  fivem_jail                                                           fivem_jail[]                      @relation("fivem_charactersTo_fivem_jail")
+  fivem_licenses                                                       fivem_licenses[]                  @relation("fivem_charactersTo_fivem_licenses")
+  fivem_phones                                                         fivem_phones[]                    @relation("fivem_charactersTo_fivem_phones")
+  fivem_properties                                                     fivem_properties[]                @relation("fivem_charactersTo_fivem_properties")
+  fivem_vehicles                                                       fivem_vehicles[]                  @relation("fivem_charactersTo_fivem_vehicles")
+  fivem_whitelist_characters_jobs                                      fivem_whitelist_characters_jobs[] @relation("fivem_charactersTo_fivem_whitelist_characters_jobs")
+  mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_criminalId      mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_criminalId")
+  mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_filingOfficerId mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId")
+  mdt_criminals                                                        mdt_criminals[]                   @relation("fivem_charactersTo_mdt_criminals")
+  mdt_reports_new                                                      mdt_reports_new[]                 @relation("fivem_charactersTo_mdt_reports_new")
 
   @@index([uId], name: "FK_characters_uId")
   @@index([cuid], name: "cuid")
@@ -179,6 +182,8 @@ model fivem_phones {
   phoneid               Int                     @id @default(autoincrement())
   phone_owner           Int?
   phone_number          String?                 @unique @db.VarChar(255)
+  burner                Int?                    @default(0)
+  burner_number         String?                 @default("0") @db.VarChar(255)
   fivem_characters      fivem_characters?       @relation("fivem_charactersTo_fivem_phones", fields: [phone_owner], references: [id])
   fivem_phones_contacts fivem_phones_contacts[] @relation("fivem_phonesTo_fivem_phones_contacts")
 
@@ -309,7 +314,7 @@ model fivem_vehicles {
   vehicleuid              String?                   @default(dbgenerated("(uuid())")) @db.VarChar(255)
   ownerid                 Int?
   plate                   String?                   @db.VarChar(255)
-  model                   BigInt?
+  model                   Int?
   name                    String?                   @db.VarChar(255)
   gov                     String?                   @default("0") @db.Char(1)
   fivem_characters        fivem_characters?         @relation("fivem_charactersTo_fivem_vehicles", fields: [ownerid], references: [id])
@@ -422,6 +427,7 @@ model fivem_pdm_vehicles {
   costs    Decimal @default(0) @db.Decimal(10, 0)
   stock    Int     @default(0)
   category String  @db.VarChar(50)
+  selling  Int?    @default(1)
 
   @@map("_fivem_pdm_vehicles")
   @@ignore
@@ -469,15 +475,16 @@ model mdt_bookings {
 }
 
 model mdt_charges {
-  chargeid               Int                     @id @default(autoincrement())
+  chargeid               Int                      @id @default(autoincrement())
   category_id            Int?
-  name                   String?                 @db.VarChar(500)
-  description            String?                 @db.LongText
+  name                   String?                  @db.VarChar(500)
+  description            String?                  @db.LongText
   time                   Int?
   fine                   Int?
-  class                  String?                 @db.VarChar(255)
-  mdt_charges_categories mdt_charges_categories? @relation("mdt_chargesTo_mdt_charges_categories", fields: [category_id], references: [categoryid])
-  mdt_booked_charges     mdt_booked_charges[]    @relation("mdt_booked_chargesTo_mdt_charges")
+  class                  String?                  @db.VarChar(255)
+  mdt_charges_categories mdt_charges_categories?  @relation("mdt_chargesTo_mdt_charges_categories", fields: [category_id], references: [categoryid])
+  mdt_booked_charges     mdt_booked_charges[]     @relation("mdt_booked_chargesTo_mdt_charges")
+  mdt_booked_charges_new mdt_booked_charges_new[] @relation("mdt_booked_charges_newTo_mdt_charges")
 
   @@index([category_id], name: "FK__mdt_charges_category_id")
   @@map("_mdt_charges")
@@ -565,7 +572,7 @@ model mdt_dispatch {
 model mdt_flag_types {
   typeid             Int                  @id @default(autoincrement())
   type_name          String?              @db.VarChar(255)
-  type_color         String?              @db.VarChar(255)
+  type_color         String               @db.VarChar(255)
   mdt_criminal_flags mdt_criminal_flags[] @relation("mdt_criminal_flagsTo_mdt_flag_types")
 
   @@map("_mdt_flag_types")
@@ -647,4 +654,52 @@ model mdt_warrants {
   @@index([requesting_officer_id], name: "FK__mdt_warrants__mdt_officers_officerid")
   @@index([report_id], name: "FK__mdt_warrants__mdt_reports_reportid")
   @@map("_mdt_warrants")
+}
+
+model mdt_bookings_new {
+  bookingId                                                            Int                      @id @default(autoincrement())
+  filingOfficerId                                                      Int
+  criminalId                                                           Int
+  reportId                                                             Int
+  date                                                                 DateTime                 @db.DateTime(0)
+  forWarrant                                                           Boolean?
+  bookingPlea                                                          String?                  @db.VarChar(255)
+  bookingReduction                                                     Int?
+  bookingOverride                                                      Int?
+  fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId      fivem_characters         @relation("fivem_charactersTo_mdt_bookings_new_criminalId", fields: [criminalId], references: [id])
+  fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId fivem_characters         @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId", fields: [filingOfficerId], references: [id])
+  mdt_reports_new                                                      mdt_reports_new          @relation("mdt_bookings_newTo_mdt_reports_new", fields: [reportId], references: [reportid])
+  mdt_booked_charges_new                                               mdt_booked_charges_new[] @relation("mdt_booked_charges_newTo_mdt_bookings_new")
+
+  @@index([criminalId], name: "criminalId")
+  @@index([filingOfficerId], name: "filingOfficerId")
+  @@index([reportId], name: "reportId")
+  @@map("_mdt_bookings_new")
+}
+
+model mdt_reports_new {
+  reportid         Int                @id @default(autoincrement())
+  filingOfficerId  Int
+  title            String?            @db.VarChar(255)
+  content          String?            @db.LongText
+  draft            Boolean?
+  date             DateTime?          @default(now()) @db.DateTime(0)
+  fivem_characters fivem_characters   @relation("fivem_charactersTo_mdt_reports_new", fields: [filingOfficerId], references: [id])
+  mdt_bookings_new mdt_bookings_new[] @relation("mdt_bookings_newTo_mdt_reports_new")
+
+  @@index([filingOfficerId], name: "filingOfficerId")
+  @@map("_mdt_reports_new")
+}
+
+model mdt_booked_charges_new {
+  bookedChargeId   Int              @id @default(autoincrement())
+  bookingId        Int
+  chargeId         Int
+  chargeCount      Int
+  mdt_bookings_new mdt_bookings_new @relation("mdt_booked_charges_newTo_mdt_bookings_new", fields: [bookingId], references: [bookingId])
+  mdt_charges      mdt_charges      @relation("mdt_booked_charges_newTo_mdt_charges", fields: [chargeId], references: [chargeid])
+
+  @@index([bookingId], name: "bookingId")
+  @@index([chargeId], name: "chargeId")
+  @@map("_mdt_booked_charges_new")
 }
