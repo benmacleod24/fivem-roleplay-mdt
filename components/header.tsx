@@ -95,9 +95,11 @@ const Header: React.SFC<HeaderProps> = ({}) => {
               <MenuItem>Vehicles</MenuItem>
             </MenuList>
           </Menu>
-          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
-            Reports
-          </Button>
+          <Link href="/reports" passHref>
+            <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
+              Reports
+            </Button>
+          </Link>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
             Warrants
           </Button>
