@@ -61,13 +61,38 @@ const ChargeBox: React.SFC<ChargeBoxProps> = ({ charge, addChagre }) => {
     const isHUT = () => charge.time === 99999 ? true : false
 
     return (
-        <GridItem onClick={() => addChagre(charge)} cursor="pointer" borderRadius="sm" w="full" h="5.5rem" background={chargeColor}>
-            <Flex w="full" h="full" alignItems="center" justifyContent="center" flexDir="column">
-                <Tooltip label={charge.description}>
-                    <Text fontWeight="medium" w="10rem" textAlign="center" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{charge.name}</Text>
-                </Tooltip>
-                {isHUT() ? <Text fontSize="sm" fontStyle="italic" color="gray.100">Hold Until Trial</Text> : <Text fontSize="sm" fontStyle="italic" color="gray.100">${numberWithComma(charge.time)} month(s) {" | "} ${numberWithComma(charge.fine)}</Text>}
-            </Flex>
-        </GridItem>
+      <GridItem
+        onClick={() => addChagre(charge)}
+        cursor="pointer"
+        borderRadius="sm"
+        w="full"
+        h="5.5rem"
+        background={chargeColor}
+        userSelect="none"
+      >
+        <Flex w="full" h="full" alignItems="center" justifyContent="center" flexDir="column">
+          <Tooltip label={charge.description}>
+            <Text
+              fontWeight="medium"
+              w="10rem"
+              textAlign="center"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
+              {charge.name}
+            </Text>
+          </Tooltip>
+          {isHUT() ? (
+            <Text fontSize="sm" fontStyle="italic" color="gray.100">
+              Hold Until Trial
+            </Text>
+          ) : (
+            <Text fontSize="sm" fontStyle="italic" color="gray.100">
+              {numberWithComma(charge.time)} month(s) {' | '} ${numberWithComma(charge.fine)}
+            </Text>
+          )}
+        </Flex>
+      </GridItem>
     );
 }

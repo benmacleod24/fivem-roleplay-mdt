@@ -27,7 +27,7 @@ export const Select = ({
   return (
     <>
       <FormControl isInvalid={meta.touched && !!meta.error}>
-        <FormLabel>
+        <FormLabel mb="2">
           {label}
           <SelectUI {...field} {...props} placeholder={placeholder} onChange={handleChange}>
             {children}
