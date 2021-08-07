@@ -23,6 +23,7 @@ import { useSession } from 'next-auth/client';
 import Link from 'next/link';
 import { LoadableContentSafe } from '../../ui/LoadableContent';
 import { Reportsz } from '../api/reports';
+import dayjs from 'dayjs';
 
 const initialValues = {
   firstName: undefined,
@@ -112,6 +113,7 @@ const ReportCard = ({ index, searchValues }: { index: number; searchValues: any 
                           <Flex>
                             Officer: {`${filingOfficer.first_name} ${filingOfficer.last_name}`}
                           </Flex>
+                          {r.date && <Flex>Date: {`${dayjs(r.date).format('DD/MM/YYYY')}`}</Flex>}
                         </VStack>
                       </GridItem>
                       <GridItem colSpan={2} colStart={10}>
