@@ -65,7 +65,7 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                   <Flex
                     key={c.id}
                     boxSizing="border-box"
-                    p="1%"
+                    p="0.9%"
                     pr="3%"
                     borderRadius="md"
                     overflow="hidden"
@@ -91,13 +91,13 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                     </Heading>
                     <VStack>
                       <Link passHref href={`/citizens/${c.cuid}/profile`}>
-                        <Button size="sm" colorScheme="yellow">
+                        <Button size="sm" borderRadius="md" width="full" colorScheme="yellow">
                           View Profile
                         </Button>
                       </Link>
                       <Link passHref href={`/booking/${c.cuid}`}>
                         {session.user.isCop && (
-                          <Button size="sm" colorScheme="red">
+                          <Button width="full" borderRadius="md" size="sm" colorScheme="blue">
                             Process
                           </Button>
                         )}

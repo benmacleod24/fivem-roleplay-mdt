@@ -23,11 +23,11 @@ import { Button, useColorMode } from '@chakra-ui/react';
 import { ChevronDownIcon, MoonIcon, SunIcon, InfoIcon } from '@chakra-ui/icons';
 import { BsFillPersonLinesFill } from 'react-icons/bs';
 import { BiExit } from 'react-icons/bi';
-import { GiRank3 } from 'react-icons/gi';
+import { GiRank3 } from "react-icons/gi"
 
-export interface HeaderProps {}
+export interface HeaderProps { }
 
-const Header: React.SFC<HeaderProps> = ({}) => {
+const Header: React.SFC<HeaderProps> = ({ }) => {
   // Session Data
   const [session, loading] = useSession();
 
@@ -89,9 +89,6 @@ const Header: React.SFC<HeaderProps> = ({}) => {
               <Link href="/citizens" passHref>
                 <MenuItem>Citizens</MenuItem>
               </Link>
-              {/* <Link href="/criminals" passHref>
-                <MenuItem>Criminals</MenuItem>
-              </Link> */}
               <MenuItem>Vehicles</MenuItem>
             </MenuList>
           </Menu>
@@ -100,6 +97,9 @@ const Header: React.SFC<HeaderProps> = ({}) => {
               Reports
             </Button>
           </Link>
+          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
+            Dispatch
+          </Button>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
             Warrants
           </Button>
