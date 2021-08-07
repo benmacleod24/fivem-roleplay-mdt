@@ -51,84 +51,78 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 
 const ReportRequest = z.object({
   page: z.ostring().transform(stringToNumber),
-  firstName: z.ostring(),
-  lastName: z.ostring(),
-  stateId: z.ostring().transform(stringToNumber),
-  cuid: z.ostring(),
+  suspectFirstName: z.ostring(),
+  suspectLastName: z.ostring(),
+  suspectStateId: z.ostring().transform(stringToNumber),
+  copFirstName: z.ostring(),
+  copLastName: z.ostring(),
 });
 
 export type Reportsz = Prisma.PromiseReturnType<typeof GET>;
 
 const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
-  // throw 'not yet implemnted'
-  // const { reportId } = ReportRequest.parse(req.query);
-
-  // console.log('yeet', reportId);
-  // console.log('yeet');
-  // if (!reportId) {
-  //   return res.status(300).json({
-  //     status: 300,
-  //     message: 'Could not find report id',
-  //   });
-  // }
-
-  const { page, firstName, lastName, stateId, cuid } = ReportRequest.parse(req.query);
+  const { page, suspectFirstName, suspectLastName, suspectStateId, copFirstName, copLastName } =
+    ReportRequest.parse(req.query);
 
   let where = {};
-  if (firstName) {
-    where = { ...where, first_name: { contains: firstName } };
+  if (suspectFirstName) {
+    where = {
+      ...where,
+      fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
+        first_name: { contains: suspectFirstName },
+      },
+    };
   }
-  if (lastName) {
-    where = { ...where, last_name: { contains: lastName } };
+  if (suspectLastName) {
+    where = {
+      ...where,
+      fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
+        last_name: { contains: copLastName },
+      },
+    };
   }
-
-  if (stateId) {
-    where = { ...where, id: stateId };
+  if (suspectStateId) {
+    where = {
+      ...where,
+      fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
+        id: suspectStateId,
+      },
+    };
   }
-
-  // todo just use bookings, less nesting and we can do searches by criminal id easier
-  const whereCriminal = { firstName: 'Lays' };
-  const reports = await prisma.mdt_reports_new.findMany({
-    // where: {
-    //   filingOfficerId: 5892,
-    // },
+  if (copFirstName) {
+    where = {
+      ...where,
+      fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
+        first_name: { contains: copFirstName },
+      },
+    };
+  }
+  if (copLastName) {
+    where = {
+      ...where,
+      fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
+        last_name: { contains: copLastName },
+      },
+    };
+  }
+  // use booking because it has more shit already.
+  const reports = await prisma.mdt_bookings_new.findMany({
     take: 5,
     skip: page !== undefined && page !== null ? 20 * page : 0,
-    orderBy: { reportid: 'desc' },
+    orderBy: { bookingId: 'desc' },
     include: {
-      mdt_bookings_new: {
-        
-        include: {
-          mdt_booked_charges_new: {
-            include: { mdt_charges: true },
-          },
-          fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
-            select: { first_name: true, last_name: true },
-          },
-          fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
-            select: { first_name: true, last_name: true },
-          },
-        },
+      mdt_booked_charges_new: {
+        include: { mdt_charges: true },
       },
+      fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
+        select: { first_name: true, last_name: true },
+      },
+      fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
+        select: { first_name: true, last_name: true },
+      },
+      mdt_reports_new: true,
     },
-    // select: {
-    //   mdt_booked_charges_new: {},
-    // },
-    // include: {
-    //   mdt_bookings_new: {
-    //     include: {
-    //       mdt_booked_charges_new: {
-    //         include: { mdt_charges: true },
-    //       },
-    //       fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
-    //         select: { first_name: true, last_name: true },
-    //       },
-    //       fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
-    //         select: { first_name: true, last_name: true },
-    //       },
-    //     },
-    //   },
-    // },
+    where,
   });
 
   res.json(reports);

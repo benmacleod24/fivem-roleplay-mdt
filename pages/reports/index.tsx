@@ -47,7 +47,7 @@ const ReportCard = ({ index, searchValues }: { index: number; searchValues: any 
   const searchParams = toQuery(searchValues);
   const [session, loading] = useSession();
 
-  const { data: reports, error } = useSWR(
+  const { data: bookings, error } = useSWR(
     index !== null ? `/api/reports?page=${index}&${searchParams}` : null,
   ) as SWRResponse<Reportsz, any>;
 
@@ -55,21 +55,19 @@ const ReportCard = ({ index, searchValues }: { index: number; searchValues: any 
   const cardBackground = useColorModeValue(theme.colors.gray[200], theme.colors.gray[700]);
 
   return (
-    <LoadableContentSafe data={{ reports, session }} errors={[error]}>
-      {({ reports, session }) => {
+    <LoadableContentSafe data={{ bookings, session }} errors={[error]}>
+      {({ bookings, session }) => {
         return (
           <VStack spacing="1rem" mt="1%" mb="1%">
-            {reports &&
-              reports.map(r => {
-                const criminal =
-                  r.mdt_bookings_new[0]
-                    .fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId;
+            {bookings &&
+              bookings.map(b => {
+                const criminal = b.fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId;
                 const filingOfficer =
-                  r.mdt_bookings_new[0]
-                    .fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId;
+                  b.fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId;
+                const report = b.mdt_reports_new;
                 return (
                   <Flex
-                    key={r.reportid}
+                    key={b.mdt_reports_new.reportid}
                     boxSizing="border-box"
                     p="1%"
                     pr="3%"
@@ -97,14 +95,12 @@ const ReportCard = ({ index, searchValues }: { index: number; searchValues: any 
                     >
                       <GridItem colSpan={3} colStart={0} colEnd={3}>
                         <Heading flex={1} size="md">
-                          {r.title ? r.title : 'Untitled report'}
+                          {report.title ? report.title : 'Untitled report'}
                         </Heading>
                       </GridItem>
                       <GridItem colSpan={4} colStart={3} colEnd={8}>
                         <Flex>
-                          {r.mdt_bookings_new[0].mdt_booked_charges_new
-                            .map(c => c.mdt_charges.name)
-                            .join(', ')}
+                          {b.mdt_booked_charges_new.map(c => c.mdt_charges.name).join(', ')}
                         </Flex>
                       </GridItem>
                       <GridItem colSpan={2} colStart={8} colEnd={10}>
@@ -113,14 +109,14 @@ const ReportCard = ({ index, searchValues }: { index: number; searchValues: any 
                           <Flex>
                             Officer: {`${filingOfficer.first_name} ${filingOfficer.last_name}`}
                           </Flex>
-                          {r.date && <Flex>Date: {`${dayjs(r.date).format('DD/MM/YYYY')}`}</Flex>}
+                          {b.date && <Flex>Date: {`${dayjs(b.date).format('DD/MM/YYYY')}`}</Flex>}
                         </VStack>
                       </GridItem>
                       <GridItem colSpan={2} colStart={10}>
                         <Flex>
                           <VStack>
-                            <Link passHref href={`/reports/${r.reportid}`}>
-                              <Button size="sm" colorScheme={r.draft ? 'yellow' : 'green'}>
+                            <Link passHref href={`/reports/${report.reportid}`}>
+                              <Button size="sm" colorScheme={report.draft ? 'yellow' : 'green'}>
                                 View Report
                               </Button>
                             </Link>
@@ -154,16 +150,31 @@ export default function Reports() {
       >
         {(props: FormikProps<typeof initialValues>) => (
           <FForm>
-            <HStack justifyContent="center" alignItems="center">
-              {/* <Form.Text name="firstName" type="text" label="First name" /> */}
-              {/* <Form.Text name="firstName" type="text" label="First Name" placeholder="John" />
-              <Form.Text name="lastName" type="text" label="Last Name" placeholder="Smith" />
-              <Form.Text name="stateId" type="number" label="State ID" placeholder="1234" />
+            <VStack>
+              <HStack justifyContent="center" alignItems="center">
+                <Form.Text name="suspectFirstName" type="text" label="Suspect First Name" placeholder="John" />
+                <Form.Text name="suspectLastName" type="text" label="Suspect Last Name" placeholder="Smith" />
+                <Form.Text name="suspectStateId" type="number" label="State ID" placeholder="1234" />
 
-              <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
-                <SearchIcon />
-              </Button> */}
-            </HStack>
+                <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
+                  <SearchIcon />
+                </Button>
+              </HStack>
+              <HStack justifyContent="center" alignItems="center">
+                <Form.Text
+                  name="copFirstName"
+                  type="text"
+                  label="Cop First Name"
+                  placeholder="Lays"
+                />
+                <Form.Text
+                  name="copLastName"
+                  type="text"
+                  label="Cop Last Name"
+                  placeholder="Kettle"
+                />
+              </HStack>
+            </VStack>
           </FForm>
         )}
       </Formik>
