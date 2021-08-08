@@ -78,7 +78,9 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
 
   const checkFlags = () => {
     if (!flags) return [];
-    const missingFlags = flags.filter(f => !criminalFlags?.find(_f => f.typeid === _f.typeid));
+    const missingFlags = flags.filter(
+      f => !criminalFlags && !criminalFlags?.find(_f => f.typeid === _f.typeid),
+    );
 
     if (missingFlags.length <= 0) return <MenuItem>No More Flags</MenuItem>;
     return missingFlags.map(f => <MenuItem key={f.typeid}>{f.type_name}</MenuItem>);
@@ -119,7 +121,11 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
             width="16%"
             border="1px solid #4A5568"
             src={
-              citizen.mdt_criminals && citizen.mdt_criminals[0] && citizen.mdt_criminals[0].image
+              citizen.image
+                ? citizen.image
+                : citizen.mdt_criminals &&
+                  citizen.mdt_criminals[0] &&
+                  citizen.mdt_criminals[0].image
                 ? citizen.mdt_criminals[0].image
                 : 'https://i.imgur.com/tdi3NGah.jpg'
             }

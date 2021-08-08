@@ -83,7 +83,7 @@ const ReportCard = ({ index, searchValues }: { index: number; searchValues: any 
                       boxSize="5.5rem"
                       objectFit="fill"
                       borderRadius="md"
-                      src={'https://i.imgur.com/tdi3NGah.jpg'} // todo images later
+                      src={criminal.image ? criminal.image : 'https://i.imgur.com/tdi3NGah.jpg'} // todo images later
                       alt="blank_profile_picture"
                     />
                     <Grid
@@ -152,9 +152,24 @@ export default function Reports() {
           <FForm>
             <VStack>
               <HStack justifyContent="center" alignItems="center">
-                <Form.Text name="suspectFirstName" type="text" label="Suspect First Name" placeholder="John" />
-                <Form.Text name="suspectLastName" type="text" label="Suspect Last Name" placeholder="Smith" />
-                <Form.Text name="suspectStateId" type="number" label="State ID" placeholder="1234" />
+                <Form.Text
+                  name="suspectFirstName"
+                  type="text"
+                  label="Suspect First Name"
+                  placeholder="John"
+                />
+                <Form.Text
+                  name="suspectLastName"
+                  type="text"
+                  label="Suspect Last Name"
+                  placeholder="Smith"
+                />
+                <Form.Text
+                  name="suspectStateId"
+                  type="number"
+                  label="State ID"
+                  placeholder="1234"
+                />
 
                 <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
                   <SearchIcon />

@@ -80,7 +80,9 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                       objectFit="fill"
                       borderRadius="md"
                       src={
-                        c.mdt_criminals && c.mdt_criminals[0]
+                        c.image
+                          ? c.image
+                          : c.mdt_criminals && c.mdt_criminals[0]
                           ? c.mdt_criminals[0].image
                           : 'https://i.imgur.com/tdi3NGah.jpg'
                       }

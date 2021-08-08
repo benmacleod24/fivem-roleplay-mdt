@@ -1,7 +1,17 @@
 // import Image from 'next/image';
 import Layout from '../../../components/layout';
 import React, { useMemo } from 'react';
-import { HStack, Button, VStack, Flex, Text, Radio, RadioGroup, useToast } from '@chakra-ui/react';
+import {
+  Image,
+  HStack,
+  Button,
+  VStack,
+  Flex,
+  Text,
+  Radio,
+  RadioGroup,
+  useToast,
+} from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
 import { CheckIcon, SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
@@ -17,7 +27,9 @@ import usePenal from '../../../components/hooks/api/usePenal';
 import { Text as TextForm, Textarea } from '../../../components/form';
 import * as yup from 'yup';
 import { patchReport } from '../../../components/hooks/api/patchReport';
-import Reports from '../../api/reports/[reportId]';
+import Reports, { SingleReport } from '../../api/reports/[reportId]';
+import { patchImage } from '../../../components/hooks/api/patchCitizen';
+import { CitizenGet } from '../../api/citizen';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -43,10 +55,6 @@ Items seized from suspect: List items or state N/A (if seized items applies, inc
 Identified through: Identification Card
 Requested Attorney: Y/N`;
 
-interface SWRResponseType extends mdt_reports_new {
-  mdt_bookings_new: mdt_bookings_new_with_charges[];
-}
-
 interface mdt_bookings_new_with_charges extends mdt_bookings_new {
   mdt_booked_charges_new: mdt_booked_charges_new[];
 }
@@ -59,7 +67,7 @@ export default function Home({ session }: { session: Session }) {
     data: report,
     error: reportError,
     mutate: mutateReport,
-  } = useSWR(`/api/reports/${reportId}`) as SWRResponse<SWRResponseType, any>;
+  } = useSWR(`/api/reports/${reportId}`) as SWRResponse<SingleReport, any>;
 
   const penalByChargeId = useMemo(() => {
     return new Map(
@@ -92,6 +100,9 @@ export default function Home({ session }: { session: Session }) {
     <Layout>
       <LoadableContentSafe data={{ report, penal }} errors={[reportError, penalError]}>
         {({ report, penal }) => {
+          const criminal =
+            report.mdt_bookings_new[0]
+              .fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId;
           return (
             <Flex w="100%">
               <HStack flexDir="row" h="100%" w="100%" spacing="6">
@@ -181,6 +192,9 @@ export default function Home({ session }: { session: Session }) {
                 </Flex>
                 <VStack w="30%" flexDir="column" spacing="6">
                   {/* <Flex>{JSON.stringify(shittyPrintableBooking, undefined, 2)}</Flex> */}
+                  <Flex>
+                    <Mugshot criminal={criminal} />
+                  </Flex>
                   <Flex>Original Time: {timeAndPenalty?.time}</Flex>
                   <Flex>Fine: ${timeAndPenalty?.penalty}</Flex>
                   <Flex>Plea: {shittyPrintableBooking.bookingPlea}</Flex>
@@ -205,6 +219,84 @@ export default function Home({ session }: { session: Session }) {
     </Layout>
   );
 }
+
+// todo pull this out unti its own component
+const Mugshot = ({
+  criminal,
+}: {
+  criminal: {
+    image: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    id: number;
+    cuid: string;
+  };
+}) => {
+  const { data: citizen, mutate } = useSWR(
+    `/api/citizen/?citizenid=${criminal.cuid}`,
+  ) as SWRResponse<CitizenGet, any>;
+  if (!citizen) return <></>;
+  const schema = yup.object().shape({ image: yup.string().required('must have image to update') });
+  return (
+    <Flex>
+      {criminal.image && (
+        <Image
+          border="1px solid #4A5568"
+          mr="2.5%"
+          boxSize="5.5rem"
+          objectFit="fill"
+          borderRadius="md"
+          src={citizen.image ? citizen.image : undefined}
+          alt="blank_profile_picture"
+        />
+      )}
+      <Formik
+        initialValues={{ image: citizen.image }}
+        validationSchema={schema}
+        onSubmit={async (values, actions) => {
+          try {
+            console.log(values.image);
+            const res = await patchImage(criminal.id.toString(), {
+              image: values.image,
+            });
+            console.log(res);
+            mutate();
+          } catch (e) {
+            // todo add toast shit
+            //   toast({
+            //     description: 'Something broke...',
+            //     status: 'error',
+            //     duration: 5000,
+            //     isClosable: true,
+            //   });
+            // }
+            // mutateReport();
+          }
+        }}
+      >
+        {props => (
+          <FForm>
+            <Flex justifyContent="flex-start">
+              <VStack w="30rem">
+                <TextForm name="image" type="string" label="Image URL" />
+
+                <Button
+                  mt={4}
+                  colorScheme="teal"
+                  isDisabled={props.isSubmitting}
+                  isLoading={props.isSubmitting}
+                  type="submit"
+                >
+                  <CheckIcon />
+                </Button>
+              </VStack>
+            </Flex>
+          </FForm>
+        )}
+      </Formik>
+    </Flex>
+  );
+};
 
 export const getServerSideProps: GetServerSideProps = async (
   ctx: GetServerSidePropsContext<ParsedUrlQuery>,

@@ -1,4 +1,4 @@
-import { mdt_booked_charges, PrismaClient } from '@prisma/client';
+import { mdt_booked_charges, Prisma, PrismaClient } from '@prisma/client';
 import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/client';
@@ -84,17 +84,16 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   // res.json(bookingRes);
 };
 
+export type SingleReport = Prisma.PromiseReturnType<typeof GET>;
+
 const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { reportId } = ReportRequest.parse(req.query);
 
   if (!reportId) {
-    return res.status(300).json({
-      status: 300,
-      message: 'Could not find report id',
-    });
+    throw new Error('Could not find report id');
   }
 
-  const citizen = await prisma.mdt_reports_new.findFirst({
+  const reports = await prisma.mdt_reports_new.findFirst({
     where: {
       reportid: reportId,
     },
@@ -102,10 +101,19 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       mdt_bookings_new: {
         include: {
           mdt_booked_charges_new: true,
+          fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
+            select: { first_name: true, last_name: true, id: true, image: true, cuid: true },
+          },
+          fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
+            select: { first_name: true, last_name: true, id: true },
+          },
         },
       },
     },
   });
 
-  res.json(citizen);
+  if (!reports) throw new Error(`couldnt find report with ${reportId}`);
+
+  res.json(reports);
+  return reports;
 };

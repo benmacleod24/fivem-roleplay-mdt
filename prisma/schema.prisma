@@ -77,6 +77,7 @@ model fivem_characters {
   gender                                                               Boolean?                          @default(false)
   deleted                                                              Boolean?                          @default(false)
   ammo                                                                 String?                           @db.MediumText
+  image                                                                String?                           @db.VarChar(255)
   fivem_users                                                          fivem_users?                      @relation("fivem_charactersTo_fivem_users", fields: [uId], references: [id])
   fivem_accounts_access                                                fivem_accounts_access[]           @relation("fivem_accounts_accessTo_fivem_characters")
   fivem_apartments                                                     fivem_apartments[]                @relation("fivem_apartmentsTo_fivem_characters")

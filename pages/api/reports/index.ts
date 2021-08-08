@@ -65,43 +65,22 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     ReportRequest.parse(req.query);
 
   let where = {};
-  if (suspectFirstName) {
+  if (suspectFirstName || suspectLastName || suspectStateId) {
     where = {
       ...where,
       fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
-        first_name: { contains: suspectFirstName },
+        first_name: suspectFirstName ? { contains: suspectFirstName } : {},
+        last_name: suspectLastName ? { contains: suspectLastName } : {},
+        id: suspectStateId ? suspectStateId : undefined,
       },
     };
   }
-  if (suspectLastName) {
-    where = {
-      ...where,
-      fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
-        last_name: { contains: copLastName },
-      },
-    };
-  }
-  if (suspectStateId) {
-    where = {
-      ...where,
-      fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
-        id: suspectStateId,
-      },
-    };
-  }
-  if (copFirstName) {
+  if (copFirstName || copLastName) {
     where = {
       ...where,
       fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
-        first_name: { contains: copFirstName },
-      },
-    };
-  }
-  if (copLastName) {
-    where = {
-      ...where,
-      fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
-        last_name: { contains: copLastName },
+        first_name: copFirstName ? { contains: copFirstName } : {},
+        last_name: copLastName ? { contains: copLastName } : {},
       },
     };
   }
@@ -118,7 +97,7 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         select: { first_name: true, last_name: true },
       },
       fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
-        select: { first_name: true, last_name: true },
+        select: { first_name: true, last_name: true, image: true },
       },
       mdt_reports_new: true,
     },
