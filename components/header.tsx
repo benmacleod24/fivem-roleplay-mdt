@@ -10,24 +10,21 @@ import {
   MenuItem,
   MenuList,
   Image,
-  Grid,
-  GridItem,
   useColorModeValue,
-  Text,
   Skeleton,
   IconButton,
   MenuDivider,
   Heading,
 } from '@chakra-ui/react';
 import { Button, useColorMode } from '@chakra-ui/react';
-import { ChevronDownIcon, MoonIcon, SunIcon, InfoIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { BsFillPersonLinesFill } from 'react-icons/bs';
 import { BiExit } from 'react-icons/bi';
-import { GiRank3 } from "react-icons/gi"
+import { GiRank3 } from 'react-icons/gi';
 
-export interface HeaderProps { }
+export interface HeaderProps {}
 
-const Header: React.SFC<HeaderProps> = ({ }) => {
+const Header: React.SFC<HeaderProps> = ({}) => {
   // Session Data
   const [session, loading] = useSession();
 
@@ -78,10 +75,11 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
           </Link>
           <Menu>
             <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon ml="2" mr="-2" mt="0.5" fontSize="xl" />}
               variant="outline"
               colorScheme="yellow"
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
+              mr="1%"
             >
               Databases
             </MenuButton>
@@ -97,9 +95,11 @@ const Header: React.SFC<HeaderProps> = ({ }) => {
               Reports
             </Button>
           </Link>
-          <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
-            Dispatch
-          </Button>
+          <Link href="/dispatch" passHref>
+            <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
+              Dispatch
+            </Button>
+          </Link>
           <Button variant="outline" colorScheme="yellow" ml="1%" mr="1%" size="md">
             Warrants
           </Button>

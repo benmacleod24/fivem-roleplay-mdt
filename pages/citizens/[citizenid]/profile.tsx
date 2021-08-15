@@ -113,11 +113,12 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
             )}
           </Link>
         </Box>
-        <Flex width="full" height="100%" maxHeight="25%" mb="3">
+        <Flex width="full" height="100%" maxHeight="30%" mb="3">
           <Image
             mr="3"
             borderRadius="md"
             height="auto"
+            maxHeight="100%"
             width="16%"
             border="1px solid #4A5568"
             src={

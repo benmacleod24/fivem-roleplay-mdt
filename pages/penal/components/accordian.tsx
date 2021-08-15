@@ -1,3 +1,4 @@
+import { SearchIcon } from '@chakra-ui/icons';
 import {
   Accordion,
   AccordionButton,
@@ -12,6 +13,8 @@ import {
   HStack,
   Tag,
   Input,
+  InputGroup,
+  InputLeftElement,
 } from '@chakra-ui/react';
 import { mdt_charges, mdt_charges_categories } from '@prisma/client';
 import * as React from 'react';
@@ -26,8 +29,15 @@ const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdt
 
   const indecies = (category && category?.map(c => c.categoryid)) ?? [];
   return (
-    <>
-      <Input placeholder="filter" value={filter} onChange={e => handleChange(e)} />
+    <React.Fragment>
+      {/* <InputGroup mt="5"> */}
+      {/* <InputLeftElement children={<SearchIcon />} /> */}
+      <Input
+        placeholder="Search Penal Code (Name of Description)"
+        value={filter}
+        onChange={e => handleChange(e)}
+      />
+      {/* </InputGroup> */}
       <Accordion mt="8" allowMultiple w="100%" index={filter ? [0, ...indecies] : undefined}>
         {category &&
           category.map(c => {
@@ -57,7 +67,7 @@ const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdt
             );
           })}
       </Accordion>
-    </>
+    </React.Fragment>
   );
 };
 

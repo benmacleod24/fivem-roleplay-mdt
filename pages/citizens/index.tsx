@@ -121,6 +121,7 @@ export default function Home() {
 
   return (
     <Layout>
+      <title>MDT - Citizens</title>
       <Formik
         initialValues={initialValues}
         onSubmit={(values, actions) => {
