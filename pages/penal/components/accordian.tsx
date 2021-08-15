@@ -20,6 +20,7 @@ import { mdt_charges, mdt_charges_categories } from '@prisma/client';
 import * as React from 'react';
 import { useState } from 'react';
 import { mdtCharges } from '../../../components/hooks/api/usePenal';
+import SearchWrapper from '../../../components/Search';
 import { numberWithComma } from '../../../utils';
 
 const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdtCharges)[] }) => {
@@ -29,15 +30,8 @@ const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdt
 
   const indecies = (category && category?.map(c => c.categoryid)) ?? [];
   return (
-    <React.Fragment>
-      {/* <InputGroup mt="5"> */}
-      {/* <InputLeftElement children={<SearchIcon />} /> */}
-      <Input
-        placeholder="Search Penal Code (Name of Description)"
-        value={filter}
-        onChange={e => handleChange(e)}
-      />
-      {/* </InputGroup> */}
+    <Flex flexDir="column">
+      <SearchWrapper filter={filter} setFilter={setFilter} placeholder="Search Penal Code (Name or Description)" />
       <Accordion mt="8" allowMultiple w="100%" index={filter ? [0, ...indecies] : undefined}>
         {category &&
           category.map(c => {
@@ -67,7 +61,7 @@ const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdt
             );
           })}
       </Accordion>
-    </React.Fragment>
+    </Flex>
   );
 };
 
