@@ -17,7 +17,7 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import { Button, useColorMode } from '@chakra-ui/react';
-import { ChevronDownIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, HamburgerIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { BsFillPersonLinesFill } from 'react-icons/bs';
 import { BiExit } from 'react-icons/bi';
 import { GiRank3 } from 'react-icons/gi';
@@ -47,13 +47,29 @@ const Header: React.SFC<HeaderProps> = ({}) => {
       justifyContent={'space-between'}
     >
       {/* Police Branding */}
-      <Flex boxSizing="border-box" height="100%" minWidth="20%" alignItems="center">
-        <Image width="3.5rem" mr="5%" src={'https://i.imgur.com/AHFKtEZ.png'} alt="Police Badge" />
+      <Flex
+        boxSizing="border-box"
+        height="100%"
+        minWidth={['75%', '75%', '50%', '20%', '20%']}
+        alignItems="center"
+        justifyContent={['center', 'center', 'flex-start', 'flex-start']}
+      >
+        <Image
+          width={['2.8rem', '2.8rem', '3rem', '3rem']}
+          mr="2"
+          src={'https://i.imgur.com/AHFKtEZ.png'}
+          alt="Police Badge"
+        />
         <Flex direction="column" width="100%">
-          <Heading fontStyle="italic" fontWeight="normal" size="sm" color={saText}>
+          <Heading
+            fontStyle="italic"
+            fontWeight="normal"
+            fontSize={['sm', 'sm', 'xs', 'xs', 'sm']}
+            color={saText}
+          >
             San Andreas
           </Heading>
-          <Heading size="md" color={mdtText}>
+          <Heading fontSize={['sm', 'sm', 'x-small', 'xs', 'md']} color={mdtText}>
             Mobile Data Terminal
           </Heading>
         </Flex>
@@ -63,9 +79,10 @@ const Header: React.SFC<HeaderProps> = ({}) => {
       <Flex
         boxSizing="border-box"
         height="100%"
-        minWidth="60%"
+        minWidth={['0', '0', '60%', '60%']}
         alignItems="center"
         justifyContent="center"
+        display={['none', 'none', 'none', 'flex']}
       >
         <ButtonGroup>
           <Link href="/" passHref>
@@ -118,6 +135,7 @@ const Header: React.SFC<HeaderProps> = ({}) => {
         minWidth="20%"
         justifyContent="flex-end"
         alignItems="center"
+        display={['none', 'none', 'none', 'flex']}
       >
         {session ? (
           <Flex width="3.3rem" height="3.3rem" position="relative">
@@ -168,6 +186,23 @@ const Header: React.SFC<HeaderProps> = ({}) => {
           ''
         )}
         {loading ? <Skeleton width="3.3rem" height="3.3rem" borderRadius="full" /> : ''}
+      </Flex>
+
+      {/* Hamburger Menu */}
+      <Flex
+        boxSizing="border-box"
+        height="100%"
+        minWidth={['25%', '25%', '50%', '20%', '20%']}
+        alignItems="center"
+        justifyContent="flex-end"
+      >
+        <IconButton
+          variant="ghost"
+          borderRadius="md"
+          size="sm"
+          icon={<HamburgerIcon />}
+          aria-label="hamburger-menu"
+        />
       </Flex>
     </Flex>
   );
