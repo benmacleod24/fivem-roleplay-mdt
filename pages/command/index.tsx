@@ -1,5 +1,6 @@
-import { Button, Flex, Heading } from '@chakra-ui/react';
+import { Button, Fade, Flex, Heading } from '@chakra-ui/react';
 import * as React from 'react';
+import DojContainer from '../../components/Command/Doj';
 import Layout from '../../components/layout';
 
 export interface CommandProps {}
@@ -59,11 +60,8 @@ const Command: React.SFC<CommandProps> = ({}) => {
             Dept. of Justice
           </Button>
         </Flex>
-        <Flex h="full" w="full" p="1" boxSizing="border-box">
-          <h1>{page === 'home' ? 'home' : ''}</h1>
-          <h1>{page === 'off_man' ? 'Officer Management' : ''}</h1>
-          <h1>{page === 'dept_man' ? 'Department Management' : ''}</h1>
-          <h1>{page === 'doj' ? 'Dept. of Justice' : ''}</h1>
+        <Flex h="full" w="full" px="1">
+          {page === 'doj' ? <DojContainer /> : ''}
         </Flex>
       </Flex>
     </Layout>
