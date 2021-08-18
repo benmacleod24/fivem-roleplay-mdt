@@ -53,10 +53,11 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
 
   // Chakra Color Modes
   const cardBackground = useColorModeValue(theme.colors.gray[200], theme.colors.gray[700]);
+  const copCheck = session && session.user.isCop;
 
   return (
-    <LoadableContentSafe data={{ citizens, session }} errors={[error]}>
-      {({ citizens, session }) => {
+    <LoadableContentSafe data={{ citizens }} errors={[error]}>
+      {({ citizens }) => {
         return (
           <VStack spacing="1rem" mt="1%" mb="1%">
             {citizens &&
@@ -80,9 +81,9 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                       objectFit="fill"
                       borderRadius="md"
                       src={
-                        c.image
+                        c.image && copCheck
                           ? c.image
-                          : c.mdt_criminals && c.mdt_criminals[0]
+                          : c.mdt_criminals && c.mdt_criminals[0] && copCheck
                           ? c.mdt_criminals[0].image
                           : 'https://i.imgur.com/tdi3NGah.jpg'
                       }
@@ -97,13 +98,13 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                           View Profile
                         </Button>
                       </Link>
-                      <Link passHref href={`/booking/${c.cuid}`}>
-                        {session.user.isCop && (
+                      {copCheck && (
+                        <Link passHref href={`/booking/${c.cuid}`}>
                           <Button width="full" borderRadius="md" size="sm" colorScheme="blue">
                             Process
                           </Button>
-                        )}
-                      </Link>
+                        </Link>
+                      )}
                     </VStack>
                   </Flex>
                 );
