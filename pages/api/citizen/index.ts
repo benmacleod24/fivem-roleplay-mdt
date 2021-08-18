@@ -21,7 +21,7 @@ const Citizen = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 
 export default Citizen;
 
-export type CitizenGet = Prisma.PromiseReturnType<typeof GET>;
+export type SingleCitizen = Prisma.PromiseReturnType<typeof GET>;
 
 const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { citizenid } = CitizenRequest.parse(req.query);

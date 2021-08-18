@@ -102,7 +102,16 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         include: {
           mdt_booked_charges_new: true,
           fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId: {
-            select: { first_name: true, last_name: true, id: true, image: true, cuid: true },
+            select: {
+              first_name: true,
+              last_name: true,
+              id: true,
+              image: true,
+              cuid: true,
+              dob: true,
+              gender: true,
+              uId: true,
+            },
           },
           fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId: {
             select: { first_name: true, last_name: true, id: true },

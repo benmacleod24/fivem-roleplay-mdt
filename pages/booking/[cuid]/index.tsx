@@ -7,12 +7,13 @@ import { mdt_charges } from '@prisma/client';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import { getSession } from 'next-auth/client';
-import { Session } from 'inspector';
 import { useRouter } from 'next/router';
 import usePenal from '../../../components/hooks/api/usePenal';
 import BookingHeader from '../../../components/Booking/BookingHeader';
 import BookingCategoryCon from '../../../components/Booking/BookingCategoryCon';
 import BookingSummary from '../../../components/Booking/BookingSummary';
+import { SingleCitizen } from '../../api/citizen';
+import { Session } from 'next-auth';
 
 export interface chargeAndCount {
   counts: number;
@@ -35,7 +36,7 @@ export interface HomeProps {
   session: Session;
 }
 
-const Home: React.SFC<HomeProps> = ({ session }) => {
+const Home = ({ session }: HomeProps) => {
   // Router
   const router = useRouter();
 
@@ -44,7 +45,7 @@ const Home: React.SFC<HomeProps> = ({ session }) => {
   const { cuid } = router.query;
   const { data: character, error: characterError } = useSWR(
     `/api/citizen/?citizenid=${cuid}`,
-  ) as SWRResponse<BookingSWR, any>;
+  ) as SWRResponse<SingleCitizen, any>;
 
   // State
   const [selectedCharges, setSelectedCharges] = useState<Record<number, chargeAndCount>>({});
@@ -105,14 +106,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const session = await getSession(ctx);
   if (!session || !session.user || !session.user.isCop) {
-    const res = ctx.res;
-    if (res) {
-      res.writeHead(302, {
-        Location: `/?l=t`,
-      });
-      res.end();
-      return { props: {} };
-    }
+    return { redirect: { permanent: false, destination: '/?l=t' } };
   }
   return { props: { session } };
 };

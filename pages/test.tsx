@@ -3,22 +3,14 @@ import Layout from '../components/layout';
 import React, { useState } from 'react';
 import { HStack, Button, VStack, Box, Image, useColorModeValue, theme } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
-import { SearchIcon } from '@chakra-ui/icons';
-import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
+import { FieldInputProps, FieldMetaProps, FormikProps } from 'formik';
 // import useSWR from 'swr';
-import * as Form from '../components/form';
 import { toQuery } from '../utils/query';
 import { fivem_characters } from '@prisma/client';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import { getSession } from 'next-auth/client';
 import { Session } from 'inspector';
-
-const initialValues = {
-  firstName: undefined,
-  lastName: undefined,
-  stateId: undefined,
-};
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -93,14 +85,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const session = await getSession(ctx);
   if (!session || !session.user || !session.user.isCop) {
-    const res = ctx.res;
-    if (res) {
-      res.writeHead(302, {
-        Location: `/?l=t`,
-      });
-      res.end();
-      return { props: {} };
-    }
+    return { redirect: { permanent: false, destination: '/?l=t' } };
   }
   return { props: { session } };
 };

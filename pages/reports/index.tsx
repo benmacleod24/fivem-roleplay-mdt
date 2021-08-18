@@ -18,12 +18,14 @@ import { SearchIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
 import * as Form from '../../components/form';
 import { toQuery } from '../../utils/query';
-import { fivem_characters, mdt_criminals, mdt_reports_new } from '@prisma/client';
-import { useSession } from 'next-auth/client';
+import { getSession } from 'next-auth/client';
 import Link from 'next/link';
 import { LoadableContentSafe } from '../../ui/LoadableContent';
 import { Reportsz } from '../api/reports';
 import dayjs from 'dayjs';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { ParsedUrlQuery } from 'querystring';
+import { Session } from 'next-auth';
 
 const initialValues = {
   firstName: undefined,
@@ -42,10 +44,17 @@ export interface CitizenCardProps {
   searchValues: Record<string, string>;
 }
 
-const ReportCard = ({ index, searchValues }: { index: number; searchValues: any }) => {
+const ReportCard = ({
+  index,
+  searchValues,
+  session,
+}: {
+  index: number;
+  searchValues: any;
+  session: Session;
+}) => {
   // Params & Data
   const searchParams = toQuery(searchValues);
-  const [session, loading] = useSession();
 
   const { data: bookings, error } = useSWR(
     index !== null ? `/api/reports?page=${index}&${searchParams}` : null,
@@ -134,7 +143,7 @@ const ReportCard = ({ index, searchValues }: { index: number; searchValues: any 
   );
 };
 
-export default function Reports() {
+const Reports = ({ session }: { session: Session }) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [searchValues, setSearchValues] = useState({});
 
@@ -202,7 +211,7 @@ export default function Reports() {
             Finalized
           </Button>
         </Flex>
-        <ReportCard index={pageIndex} searchValues={searchValues} />
+        <ReportCard index={pageIndex} searchValues={searchValues} session={session} />
         <Button m="1rem" isDisabled={pageIndex < 1} onClick={() => setPageIndex(pageIndex - 1)}>
           Previous
         </Button>
@@ -212,4 +221,16 @@ export default function Reports() {
       </Box>
     </Layout>
   );
-}
+};
+
+export default Reports;
+
+export const getServerSideProps: GetServerSideProps = async (
+  ctx: GetServerSidePropsContext<ParsedUrlQuery>,
+) => {
+  const session = await getSession(ctx);
+  if (!session || !session.user || !session.user.isCop) {
+    return { redirect: { permanent: false, destination: '/?l=t' } };
+  }
+  return { props: { session } };
+};

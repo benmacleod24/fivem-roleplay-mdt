@@ -1,22 +1,10 @@
-// import Image from 'next/image';
 import Layout from '../../../components/layout';
 import React, { useMemo } from 'react';
-import {
-  Image,
-  HStack,
-  Button,
-  VStack,
-  Flex,
-  Text,
-  Radio,
-  RadioGroup,
-  useToast,
-} from '@chakra-ui/react';
+import { Image, HStack, Button, VStack, Flex, Radio, RadioGroup, useToast } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
-import { CheckIcon, SearchIcon } from '@chakra-ui/icons';
+import { CheckIcon } from '@chakra-ui/icons';
 import { FieldInputProps, FieldMetaProps, Form as FForm, Formik, FormikProps } from 'formik';
-// import useSWR from 'swr';
-import { mdt_booked_charges_new, mdt_bookings_new, mdt_reports_new } from '@prisma/client';
+import { mdt_booked_charges_new, mdt_bookings_new } from '@prisma/client';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import { getSession } from 'next-auth/client';
@@ -27,9 +15,9 @@ import usePenal from '../../../components/hooks/api/usePenal';
 import { Text as TextForm, Textarea } from '../../../components/form';
 import * as yup from 'yup';
 import { patchReport } from '../../../components/hooks/api/patchReport';
-import Reports, { SingleReport } from '../../api/reports/[reportId]';
+import { SingleReport } from '../../api/reports/[reportId]';
 import { patchImage } from '../../../components/hooks/api/patchCitizen';
-import { CitizenGet } from '../../api/citizen';
+import { SingleCitizen } from '../../api/citizen';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -95,6 +83,7 @@ export default function Home({ session }: { session: Session }) {
   }, [charges, penalByChargeId]);
   const toast = useToast();
 
+  console.log(report);
   const shittyPrintableBooking = Object.assign({}, report?.mdt_bookings_new)[0];
   return (
     <Layout>
@@ -103,6 +92,9 @@ export default function Home({ session }: { session: Session }) {
           const criminal =
             report.mdt_bookings_new[0]
               .fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId;
+          const cop =
+            report.mdt_bookings_new[0]
+              .fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId;
           return (
             <Flex w="100%">
               <HStack flexDir="row" h="100%" w="100%" spacing="6">
@@ -195,12 +187,13 @@ export default function Home({ session }: { session: Session }) {
                   <Flex>
                     <Mugshot criminal={criminal} />
                   </Flex>
+                  <Flex>{`${criminal.first_name} ${criminal.last_name}`}</Flex>
                   <Flex>Original Time: {timeAndPenalty?.time}</Flex>
                   <Flex>Fine: ${timeAndPenalty?.penalty}</Flex>
                   <Flex>Plea: {shittyPrintableBooking.bookingPlea}</Flex>
                   <Flex>Booking reduction: {shittyPrintableBooking.bookingReduction}%</Flex>
                   <Flex>Override time: {shittyPrintableBooking.bookingOverride}</Flex>
-                  <Flex>Officer: {shittyPrintableBooking.filingOfficerId} (todo later)</Flex>
+                  <Flex>Officer: {`${cop.first_name} ${cop.last_name}`} </Flex>
 
                   {charges?.map(c => {
                     return (
@@ -234,7 +227,7 @@ const Mugshot = ({
 }) => {
   const { data: citizen, mutate } = useSWR(
     `/api/citizen/?citizenid=${criminal.cuid}`,
-  ) as SWRResponse<CitizenGet, any>;
+  ) as SWRResponse<SingleCitizen, any>;
   if (!citizen) return <></>;
   const schema = yup.object().shape({ image: yup.string().required('must have image to update') });
   return (
@@ -278,7 +271,7 @@ const Mugshot = ({
           <FForm>
             <Flex justifyContent="flex-start">
               <VStack w="30rem">
-                <TextForm name="image" type="string" label="Image URL" />
+                <TextForm name="image" type="string" label="Mugshot URL" />
 
                 <Button
                   mt={4}
@@ -303,14 +296,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const session = await getSession(ctx);
   if (!session || !session.user || !session.user.isCop) {
-    const res = ctx.res;
-    if (res) {
-      res.writeHead(302, {
-        Location: `/?l=t`,
-      });
-      res.end();
-      return { props: {} };
-    }
+    return { redirect: { permanent: false, destination: '/?l=t' } };
   }
   return { props: { session } };
 };

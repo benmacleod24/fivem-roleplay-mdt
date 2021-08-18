@@ -2,18 +2,19 @@ import { Button, Flex, HStack, IconButton, Radio, RadioGroup, Text } from '@chak
 import { CloseIcon } from '@chakra-ui/icons';
 import { Formik, FormikProps, Form as FForm } from 'formik';
 import * as React from 'react';
-import { BookingSWR, chargeAndCount, TRIAL } from '../../pages/booking/[cuid]';
+import { chargeAndCount, TRIAL } from '../../pages/booking/[cuid]';
 import { numberWithComma } from '../../utils';
 import * as yup from 'yup';
 import { createBooking } from '../hooks/api/postBooking';
 
 import * as Form from '../../components/form/index';
 import { useRouter } from 'next/router';
+import { SingleCitizen } from '../../pages/api/citizen';
 
 export interface BookingSummaryProps {
   selectedCharges: Record<number, chargeAndCount>;
   removeCharge: (a: number) => void;
-  character: BookingSWR | undefined;
+  character: SingleCitizen | undefined;
 }
 
 const schema = yup.object().shape({
@@ -21,11 +22,7 @@ const schema = yup.object().shape({
   chargesAndAccounts: yup.array().min(1, 'Must select at least one charge'),
 });
 
-const BookingSummary: React.SFC<BookingSummaryProps> = ({
-  character,
-  selectedCharges,
-  removeCharge,
-}) => {
+const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSummaryProps) => {
   const router = useRouter();
 
   const initialValues = {
@@ -100,6 +97,7 @@ const BookingSummary: React.SFC<BookingSummaryProps> = ({
                 )}
                 {chargesArray.map(char => (
                   <Flex
+                    key={char.charge.chargeid}
                     w="full"
                     _hover={{ background: 'gray.800' }}
                     transition="0.2s ease-in-out"
