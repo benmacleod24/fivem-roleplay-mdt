@@ -94,6 +94,7 @@ model fivem_characters {
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_filingOfficerId mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId")
   mdt_criminals                                                        mdt_criminals[]                   @relation("fivem_charactersTo_mdt_criminals")
   mdt_department_members                                               mdt_department_members[]          @relation("fivem_charactersTo_mdt_department_members")
+  mdt_dispatch_new                                                     mdt_dispatch_new[]                @relation("fivem_charactersTo_mdt_dispatch_new")
   mdt_reports_involved_new                                             mdt_reports_involved_new[]        @relation("fivem_charactersTo_mdt_reports_involved_new")
   mdt_reports_new                                                      mdt_reports_new[]                 @relation("fivem_charactersTo_mdt_reports_new")
 
@@ -719,4 +720,15 @@ model mdt_warrants {
   @@index([requesting_officer_id], name: "FK__mdt_warrants__mdt_officers_officerid")
   @@index([report_id], name: "FK__mdt_warrants__mdt_reports_reportid")
   @@map("_mdt_warrants")
+}
+
+model mdt_dispatch_new {
+  recordId         Int              @id @default(autoincrement())
+  characterId      Int
+  clockIn          DateTime         @db.Date
+  clockOut         DateTime?        @db.Date
+  fivem_characters fivem_characters @relation("fivem_charactersTo_mdt_dispatch_new", fields: [characterId], references: [id])
+
+  @@index([characterId], name: "characterId")
+  @@map("_mdt_dispatch_new")
 }

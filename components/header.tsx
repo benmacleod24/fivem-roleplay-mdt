@@ -170,13 +170,13 @@ const Header: React.SFC<HeaderProps> = ({}) => {
                   <Link href="/profile" passHref>
                     <MenuItem icon={<BsFillPersonLinesFill />}>Profile</MenuItem>
                   </Link>
-                  {session.user.rankLvl >= 4 ? (
-                    <Link href="/command" passHref>
-                      <MenuItem icon={<GiRank3 />}>Command Managment</MenuItem>
-                    </Link>
-                  ) : (
+                  {/* {session.user.rankLvl >= 4 ? ( */}
+                  <Link href="/command" passHref>
+                    <MenuItem icon={<GiRank3 />}>Command Managment</MenuItem>
+                  </Link>
+                  {/* ) : (
                     ''
-                  )}
+                  )} */}
                   <MenuItem
                     onClick={toggleColorMode}
                     icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
