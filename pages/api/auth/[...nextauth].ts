@@ -156,7 +156,7 @@ export default NextAuth({
       session.user.copId = copId;
       // session.user.rankLvl = lvl;
       return Promise.resolve(session);
-    };,
+    },
   },
 
   // Events are useful for logging
