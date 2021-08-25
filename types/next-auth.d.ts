@@ -13,6 +13,7 @@ declare module 'next-auth' {
       name?: string;
       copName?: string;
       copId?: number;
+      rankLvl: number;
     };
   }
 }

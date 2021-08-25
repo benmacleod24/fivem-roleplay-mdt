@@ -1,6 +1,10 @@
 import { Button, Fade, Flex, Heading } from '@chakra-ui/react';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { getSession } from 'next-auth/client';
+import { ParsedUrlQuery } from 'querystring';
 import * as React from 'react';
 import DojContainer from '../../components/Command/Doj';
+import CommandHome from '../../components/Command/Home';
 import Layout from '../../components/layout';
 
 export interface CommandProps {}
@@ -61,6 +65,7 @@ const Command: React.SFC<CommandProps> = ({}) => {
           </Button>
         </Flex>
         <Flex h="full" w="full" px="1">
+          {page === 'home' ? <CommandHome /> : ''}
           {page === 'doj' ? <DojContainer /> : ''}
         </Flex>
       </Flex>
@@ -69,3 +74,13 @@ const Command: React.SFC<CommandProps> = ({}) => {
 };
 
 export default Command;
+
+export const getServerSideProps: GetServerSideProps = async (
+  ctx: GetServerSidePropsContext<ParsedUrlQuery>,
+) => {
+  const session = await getSession(ctx);
+  if (!session || !session.user || !session.user.isCop || session.user.rankLvl < 4) {
+    return { redirect: { permanent: false, destination: '/?l=t' } };
+  }
+  return { props: { session } };
+};
