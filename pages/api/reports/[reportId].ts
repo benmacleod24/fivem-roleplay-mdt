@@ -49,10 +49,6 @@ const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     throw 'Not a cop/not logged in';
   }
 
-  if (filingOfficerId !== copId) {
-    throw "you're not the officer that wrote this";
-  }
-
   const reportRes = await prisma.mdt_reports_new.update({
     where: {
       reportid: reportId,
