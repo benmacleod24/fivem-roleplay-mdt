@@ -1,7 +1,8 @@
-import { mdt_booked_charges, Prisma, PrismaClient } from '@prisma/client';
+import { mdt_booked_charges, Prisma, PrismaClient, fivem_characters } from '@prisma/client';
 import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/client';
+import { GiTurret } from 'react-icons/gi';
 import { string, z } from 'zod';
 import { stringToNumber } from '../../../utils/parse';
 
@@ -16,6 +17,7 @@ const ReportBodyRequest = z.object({
   title: z.string(),
   filingOfficerId: z.number(),
   draft: z.boolean(),
+  cops: z.array(z.string().transform(stringToNumber)),
 });
 
 type NextApiRequestWithQuery = NextApiRequest & z.infer<typeof ReportRequest>;
@@ -37,7 +39,9 @@ export default Reports;
 
 const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { reportId } = ReportRequest.parse(req.query) as { reportId: number };
-  const { content, title, filingOfficerId, draft } = ReportBodyRequest.parse(JSON.parse(req.body));
+  const { cops, content, title, filingOfficerId, draft } = ReportBodyRequest.parse(
+    JSON.parse(req.body),
+  );
 
   const session = await getSession({ req });
   const copId = session?.user.copId;
@@ -57,6 +61,10 @@ const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       content,
       title,
       draft: Boolean(draft),
+      mdt_reports_involved_new: {
+        deleteMany: { report_id: reportId },
+        createMany: { data: cops.map(c => ({ officer_id: c })) },
+      },
     },
   });
 
@@ -98,6 +106,17 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       reportid: reportId,
     },
     include: {
+      mdt_reports_involved_new: {
+        include: {
+          fivem_characters: {
+            select: {
+              first_name: true,
+              last_name: true,
+              id: true,
+            },
+          },
+        },
+      },
       mdt_bookings_new: {
         include: {
           mdt_booked_charges_new: true,

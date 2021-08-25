@@ -18,6 +18,8 @@ import { patchReport } from '../../../components/hooks/api/patchReport';
 import { SingleReport } from '../../api/reports/[reportId]';
 import { patchImage } from '../../../components/hooks/api/patchCitizen';
 import { SingleCitizen } from '../../api/citizen';
+import CopSelect from '../../../components/CopSelect';
+import { tCop } from '../../api/cops';
 
 export interface FieldProps<V = any> {
   field: FieldInputProps<V>;
@@ -57,6 +59,8 @@ export default function Home({ session }: { session: Session }) {
     mutate: mutateReport,
   } = useSWR(`/api/reports/${reportId}`) as SWRResponse<SingleReport, any>;
 
+  const { data: cops, error: copsError } = useSWR(`/api/cops`) as SWRResponse<tCop, any>;
+
   const penalByChargeId = useMemo(() => {
     return new Map(
       penal
@@ -83,18 +87,25 @@ export default function Home({ session }: { session: Session }) {
   }, [charges, penalByChargeId]);
   const toast = useToast();
 
-  console.log(report);
   const shittyPrintableBooking = Object.assign({}, report?.mdt_bookings_new)[0];
   return (
     <Layout>
-      <LoadableContentSafe data={{ report, penal }} errors={[reportError, penalError]}>
-        {({ report, penal }) => {
+      <LoadableContentSafe
+        data={{ report, penal, cops }}
+        errors={[reportError, penalError, copsError]}
+      >
+        {({ report, penal, cops }) => {
           const criminal =
             report.mdt_bookings_new[0]
               .fivem_characters_fivem_charactersTo_mdt_bookings_new_criminalId;
           const cop =
             report.mdt_bookings_new[0]
               .fivem_characters_fivem_charactersTo_mdt_bookings_new_filingOfficerId;
+
+          const copsOnReport = report.mdt_reports_involved_new.map(r => ({
+            id: r.officer_id ? r.officer_id.toString() : '0',
+            name: `${r.fivem_characters?.first_name} ${r.fivem_characters?.last_name}`,
+          }));
           return (
             <Flex w="100%">
               <HStack flexDir="row" h="100%" w="100%" spacing="6">
@@ -106,6 +117,7 @@ export default function Home({ session }: { session: Session }) {
                       reportId,
                       draft: report.draft ? '1' : '0',
                       filingOfficerId: report.filingOfficerId,
+                      cops: copsOnReport.map(c => c.id),
                     }}
                     validationSchema={schema}
                     onSubmit={async (values, actions) => {
@@ -167,6 +179,15 @@ export default function Home({ session }: { session: Session }) {
                                 </HStack>
                               </RadioGroup>
                             </Flex>
+                            <CopSelect
+                              name="cops"
+                              type="string"
+                              cops={cops}
+                              preSelected={copsOnReport.map(c => ({
+                                label: c.name,
+                                value: c.id,
+                              }))}
+                            />
                             <Button
                               mt={4}
                               colorScheme="teal"
@@ -194,7 +215,14 @@ export default function Home({ session }: { session: Session }) {
                   <Flex>Booking reduction: {shittyPrintableBooking.bookingReduction}%</Flex>
                   <Flex>Override time: {shittyPrintableBooking.bookingOverride}</Flex>
                   <Flex>Officer: {`${cop.first_name} ${cop.last_name}`} </Flex>
-
+                  <Flex>Additionals involved:</Flex>
+                  {/*  todo: add delete on mdt_reports_involved_new or tie it into the multiselect and clear 
+                  any officers that aren't present there  */}
+                  <VStack>
+                    {copsOnReport.map(c => {
+                      return <Flex key={c.id}>{`${c.name}`}</Flex>;
+                    })}
+                  </VStack>
                   {charges?.map(c => {
                     return (
                       <Flex key={c.chargeId} mt="1rem">
