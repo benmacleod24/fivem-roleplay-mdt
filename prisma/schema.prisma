@@ -725,8 +725,8 @@ model mdt_warrants {
 model mdt_dispatch_new {
   recordId         Int              @id @default(autoincrement())
   characterId      Int
-  clockIn          DateTime         @db.Date
-  clockOut         DateTime?        @db.Date
+  clockIn          DateTime         @db.DateTime(0)
+  clockOut         DateTime?        @db.DateTime(0)
   fivem_characters fivem_characters @relation("fivem_charactersTo_mdt_dispatch_new", fields: [characterId], references: [id])
 
   @@index([characterId], name: "characterId")
