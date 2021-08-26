@@ -12,11 +12,25 @@ type NextApiRequestWithQuery = NextApiRequest & z.infer<typeof DispatchRequest>;
 
 const Dispatch = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   switch (req.method) {
+    case 'GET':
+      return GET(req, res);
     case 'POST':
       return POST(req, res);
+    case 'PATCH':
+      return PATCH(req, res);
     default:
       throw 'no clue how you got here.';
   }
+};
+
+const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
+  const { characterId } = DispatchRequest.parse(req.query);
+  const getAll = await prisma.mdt_dispatch_new.findMany();
+  const getCharacters = await prisma.mdt_dispatch_new.findMany({
+    where: { characterId: Number(characterId) },
+  });
+
+  res.json(characterId ? getCharacters : getAll);
 };
 
 const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
@@ -27,6 +41,23 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       clockIn: new Date(),
     },
   });
+
+  res.json(clockIn);
+};
+
+const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
+  const { characterId } = DispatchRequest.parse(req.query);
+  const clockOut = await prisma.mdt_dispatch_new.updateMany({
+    where: {
+      characterId: Number(characterId),
+      clockOut: null,
+    },
+    data: {
+      clockOut: new Date(),
+    },
+  });
+
+  res.json(clockOut);
 };
 
 export default Dispatch;
