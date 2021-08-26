@@ -164,7 +164,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
               {citizen.gender ? 'Female' : 'Male'}
             </Flex>
             <Flex mt="3" alignItems="center">
-              {Array.isArray(criminalFlags)
+              {session?.user.isCop && Array.isArray(criminalFlags)
                 ? criminalFlags.map(f => {
                     return (
                       <Tag
@@ -206,7 +206,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
             Registered Vehicles
           </Heading>
           <Flex width="100%">
-            {vehicles
+            {session?.user.isCop && vehicles
               ? vehicles.map(v => {
                   return (
                     <Box
