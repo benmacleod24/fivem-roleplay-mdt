@@ -1,4 +1,4 @@
-import Header from '../components/header';
+import Header from './Header';
 import Footer from '../components/footer';
 import React from 'react';
 import { Container, Flex } from '@chakra-ui/react';

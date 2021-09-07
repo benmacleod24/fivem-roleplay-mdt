@@ -155,12 +155,7 @@ const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSum
                   <Text mb="0.5">Penalty:</Text>
                   <Text background="gray.800" borderRadius="md" p="1.5">
                     {timeAndPenalty.penalty < TRIAL
-                      ? `$${numberWithComma(
-                          Math.floor(
-                            timeAndPenalty.penalty *
-                              (1 - parseFloat(props.values.bookingReduction) / 100),
-                          ),
-                        )}`
+                      ? `$${numberWithComma(Math.floor(timeAndPenalty.penalty))}`
                       : `Hold Until Trial`}
                   </Text>
                 </Flex>
