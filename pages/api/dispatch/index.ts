@@ -25,12 +25,24 @@ const Dispatch = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 
 const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { characterId } = DispatchRequest.parse(req.query);
-  const getAll = await prisma.mdt_dispatch_new.findMany();
-  const getCharacters = await prisma.mdt_dispatch_new.findMany({
-    where: { characterId: Number(characterId) },
+  const getAll = await prisma.mdt_dispatch_new.findMany({
+    where: { clockOut: null },
+    include: {
+      fivem_characters: {
+        select: {
+          first_name: true,
+          last_name: true,
+        },
+      },
+    },
   });
 
-  res.json(characterId ? getCharacters : getAll);
+  if (!characterId) return res.json(getAll);
+  res.json(
+    await prisma.mdt_dispatch_new.findMany({
+      where: { characterId: Number(characterId), clockOut: null },
+    }),
+  );
 };
 
 const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
