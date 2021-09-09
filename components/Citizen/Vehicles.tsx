@@ -8,7 +8,7 @@ export interface VehiclesProps {
   citizenId: number;
 }
 
-const Vehicles: React.SFC<VehiclesProps> = ({ citizenId }) => {
+const Vehicles: React.FunctionComponent<VehiclesProps> = ({ citizenId }) => {
   const { data: vehicles } = useSWR(`/api/citizen/vehicles?cid=${citizenId}`) as SWRResponse<
     Array<fivem_vehicles>,
     any

@@ -72,7 +72,7 @@ export interface PCodeChargeWrapperProps {
   charge: mdt_charges;
 }
 
-const PCodeChargeWrapper: React.SFC<PCodeChargeWrapperProps> = ({ charge }) => {
+const PCodeChargeWrapper: React.FunctionComponent<PCodeChargeWrapperProps> = ({ charge }) => {
   const isHoldUntil = () => (charge.time && charge.time >= 99999 ? true : false);
 
   const classColor = () => {

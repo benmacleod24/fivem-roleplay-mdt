@@ -23,7 +23,7 @@ interface SWRResponseType extends fivem_characters {
   mdt_criminals: mdt_criminals[];
 }
 
-const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
+const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
   const router = useRouter();
   const { citizenid } = router.query;
   const [session, loading] = useSession();

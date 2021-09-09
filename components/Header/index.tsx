@@ -7,7 +7,7 @@ import HeaderProfile from './components/HeaderProfile';
 
 export interface HeaderProps {}
 
-const Header: React.SFC<HeaderProps> = ({}) => {
+const Header: React.FunctionComponent<HeaderProps> = ({}) => {
   // Session Data
   const [session, loading] = useSession();
 

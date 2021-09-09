@@ -5,7 +5,7 @@ import * as React from 'react';
 
 export interface TagsProps {}
 
-const Tags: React.SFC<TagsProps> = ({}) => {
+const Tags: React.FunctionComponent<TagsProps> = ({}) => {
   return (
     <Flex
       w="full"

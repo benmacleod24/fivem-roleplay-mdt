@@ -69,7 +69,7 @@ export interface ReportProps {
   session: Session;
 }
 
-const Report: React.SFC<ReportProps> = ({ session }) => {
+const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
   const router = useRouter();
   const { reportId } = router.query as { reportId: string };
 

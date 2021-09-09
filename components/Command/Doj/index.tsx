@@ -5,7 +5,7 @@ import NewCharge from './components/NewCharge/NewCharge';
 
 export interface DojContainerProps {}
 
-const DojContainer: React.SFC<DojContainerProps> = ({}) => {
+const DojContainer: React.FunctionComponent<DojContainerProps> = ({}) => {
   return (
     <Flex w="full" h="full" px="4" flexDir={['column', 'column', 'column', 'row']}>
       <NewCharge />

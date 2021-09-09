@@ -13,7 +13,7 @@ export interface LicensesProps {
   id: number;
 }
 
-const Licenses: React.SFC<LicensesProps> = ({ id }) => {
+const Licenses: React.FunctionComponent<LicensesProps> = ({ id }) => {
   const { data: lics, revalidate } = useSWR(`/api/citizen/licenses?citizenId=${id}`) as SWRResponse<
     fivem_licenses,
     any

@@ -11,7 +11,7 @@ import { BiExit } from 'react-icons/bi';
 
 export interface HeaderProfileProps {}
 
-const HeaderProfile: React.SFC<HeaderProfileProps> = ({}) => {
+const HeaderProfile: React.FunctionComponent<HeaderProfileProps> = ({}) => {
   const [session, loading] = useSession();
 
   return (

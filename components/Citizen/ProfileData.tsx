@@ -11,7 +11,7 @@ export interface ProfileDataProps {
   citizen: SWRResponseType;
 }
 
-const ProfileData: React.SFC<ProfileDataProps> = ({ citizen }) => {
+const ProfileData: React.FunctionComponent<ProfileDataProps> = ({ citizen }) => {
   const calculateAge = (): string => {
     if (!citizen.dob) return 'DoB not found';
     const birthYear = stringToNumber(citizen.dob.split('-')[0]);

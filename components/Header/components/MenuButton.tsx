@@ -8,7 +8,7 @@ export interface MenuButtonProps {
   link?: string;
 }
 
-const MenuButton: React.SFC<MenuButtonProps> = ({ title, link }) => {
+const MenuButton: React.FunctionComponent<MenuButtonProps> = ({ title, link }) => {
   const router = useRouter();
 
   const isActive = () => {

@@ -4,7 +4,7 @@ export interface MobileMenuProps {
     
 }
  
-const MobileMenu: React.SFC<MobileMenuProps> = ({}) => {
+const MobileMenu: React.FunctionComponent<MobileMenuProps> = ({}) => {
     return (  );
 }
  

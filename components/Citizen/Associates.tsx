@@ -4,7 +4,7 @@ import * as React from 'react';
 
 export interface AssociatesProps {}
 
-const Associates: React.SFC<AssociatesProps> = ({}) => {
+const Associates: React.FunctionComponent<AssociatesProps> = ({}) => {
   return (
     <Flex
       w="16%"

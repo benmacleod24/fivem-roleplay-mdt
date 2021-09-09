@@ -42,7 +42,7 @@ interface SWRResponseType extends fivem_characters {
   mdt_criminals: Array<{ image: string }>;
 }
 
-const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
+const CitizenCard: React.FunctionComponent<CitizenCardProps> = ({ index, searchValues }) => {
   // Params & Data
   const searchParams = toQuery(searchValues);
   const [session, loading] = useSession();

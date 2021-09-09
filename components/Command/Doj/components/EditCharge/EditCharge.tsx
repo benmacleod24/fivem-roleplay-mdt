@@ -10,7 +10,7 @@ import { EditIcon } from '@chakra-ui/icons';
 
 export interface EditChargeProps {}
 
-const EditCharge: React.SFC<EditChargeProps> = ({}) => {
+const EditCharge: React.FunctionComponent<EditChargeProps> = ({}) => {
   const { category, error: penalError } = usePenal();
   const [currCat, setCat] = React.useState<(mdt_charges_categories & mdtCharges) | undefined>();
   const [currCharge, setCharge] = React.useState<mdt_charges | undefined>();

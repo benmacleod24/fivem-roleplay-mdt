@@ -28,7 +28,7 @@
 
 // export interface HeaderProps {}
 
-// const Header: React.SFC<HeaderProps> = ({}) => {
+// const Header: React.FunctionComponent<HeaderProps> = ({}) => {
 //   // State
 //   const [mobileMenu, setMobileMenu] = React.useState(false);
 

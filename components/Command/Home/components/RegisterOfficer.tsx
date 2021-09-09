@@ -26,7 +26,7 @@ const validSchema = yup.object().shape({
   rankId: yup.number().required('A rank is required'),
 });
 
-const RegisterOfficer: React.SFC<RegisterOfficerProps> = ({}) => {
+const RegisterOfficer: React.FunctionComponent<RegisterOfficerProps> = ({}) => {
   const { category, error: penalError } = usePenal();
   const { departments, error: deptError } = useDepartments();
   const [currDept, setCurrDept] = React.useState<(mdt_departments & mdtRanks) | undefined>();

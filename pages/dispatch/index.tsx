@@ -5,7 +5,7 @@ import Layout from '../../components/layout';
 
 export interface DispatchProps {}
 
-const Dispatch: React.SFC<DispatchProps> = ({}) => {
+const Dispatch: React.FunctionComponent<DispatchProps> = ({}) => {
   const { dispatch, error } = useDispatch();
 
   return (

@@ -4,7 +4,7 @@ import RegisterOfficer from './components/RegisterOfficer';
 
 export interface CommandHomeProps {}
 
-const CommandHome: React.SFC<CommandHomeProps> = ({}) => {
+const CommandHome: React.FunctionComponent<CommandHomeProps> = ({}) => {
   return (
     <Flex w="full" h="full">
       <RegisterOfficer />

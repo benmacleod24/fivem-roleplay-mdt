@@ -9,7 +9,7 @@ import MenuButton from './MenuButton';
 
 export interface HeaderButtonsProps {}
 
-const HeaderButtons: React.SFC<HeaderButtonsProps> = ({}) => {
+const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({}) => {
   const router = useRouter();
 
   return (

@@ -96,7 +96,7 @@ export interface ChargeBoxProps {
   addChagre: (a: mdt_charges) => void;
 }
 
-const ChargeBox: React.SFC<ChargeBoxProps> = ({ charge, addChagre }) => {
+const ChargeBox: React.FunctionComponent<ChargeBoxProps> = ({ charge, addChagre }) => {
   const chargeColor = useChargeColor(charge.class);
 
   const isHUT = () => (charge.time === 99999 ? true : false);
