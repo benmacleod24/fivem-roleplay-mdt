@@ -99,7 +99,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
         <Flex w="full">
           {session?.user.isCop ? <Associates /> : ''}
           <Flex flexGrow={1} borderRadius="md" flexDir="column">
-            {session?.user.isCop ? <Licenses /> : ''}
+            {session?.user.isCop ? <Licenses id={citizen.id} /> : ''}
             {session?.user.isCop ? <Vehicles citizenId={citizen.id} /> : ''}
           </Flex>
         </Flex>
