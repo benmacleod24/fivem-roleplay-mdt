@@ -166,6 +166,7 @@ const Report: React.SFC<ReportProps> = ({ session }) => {
                               my="1"
                               w="full"
                               p="2"
+                              key={c.chargeId}
                               borderRadius="md"
                               transition="0.2s ease-in-out"
                               justifyContent="space-between"
