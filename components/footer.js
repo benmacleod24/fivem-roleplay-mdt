@@ -1,4 +1,3 @@
-import styles from './footer.module.css';
 import React from 'react';
 import { useColorModeValue, Flex, Text, Link, theme } from '@chakra-ui/react';
 
@@ -29,9 +28,17 @@ export default function Footer() {
       <Flex>
         <Text fontStyle="italic">
           {`Developed by `}
-          <Link href="https://github.com/knames" target="_blank" color={theme.colors.blue[400]}>{`Chips`}</Link>
+          <Link
+            href="https://github.com/knames"
+            target="_blank"
+            color={theme.colors.blue[400]}
+          >{`Chips`}</Link>
           {` & `}
-          <Link href="https://github.com/twotap02" target="_blank" color={theme.colors.blue[400]}>{`Ben`}</Link>
+          <Link
+            href="https://github.com/twotap02"
+            target="_blank"
+            color={theme.colors.blue[400]}
+          >{`Ben`}</Link>
         </Text>
       </Flex>
       <Flex>
