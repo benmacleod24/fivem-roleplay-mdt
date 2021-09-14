@@ -122,7 +122,6 @@ export default function Home({ session }: { session: Session }) {
                     validationSchema={schema}
                     onSubmit={async (values, actions) => {
                       try {
-                        console.log(values);
                         const res = await patchReport(reportId, {
                           ...values,
                           draft: values.draft === '1' ? true : false,
@@ -276,11 +275,9 @@ const Mugshot = ({
         validationSchema={schema}
         onSubmit={async (values, actions) => {
           try {
-            console.log(values.image);
             const res = await patchImage(criminal.id.toString(), {
               image: values.image,
             });
-            console.log(res);
             mutate();
           } catch (e) {
             // todo add toast shit

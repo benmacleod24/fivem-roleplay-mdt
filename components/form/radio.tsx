@@ -25,7 +25,6 @@ const Radio = ({
   defaultChecked?: boolean;
 }): ReactElement => {
   const isChecked = selectedValue == value;
-  if (isChecked) console.log('checky check', value);
 
   return (
     <>

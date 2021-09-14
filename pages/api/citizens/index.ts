@@ -41,10 +41,11 @@ export default async function Citizen(
   if (stateId) {
     where = { ...where, id: stateId };
   }
+  const take = 5;
   const posts = await prisma.fivem_characters.findMany({
     where,
-    take: 5,
-    skip: page !== undefined && page !== null ? 20 * 5 : 0,
+    take,
+    skip: page !== undefined && page !== null ? page * take : 0,
     orderBy: { id: 'asc' },
     include: {
       mdt_criminals: {
