@@ -5,7 +5,6 @@ import {
   Text,
   Image,
   Button,
-  Badge,
   Tag,
   TagLabel,
   TagCloseButton,
@@ -33,6 +32,9 @@ import useFlags from '../../../components/hooks/api/useFlags';
 import Layout from '../../../components/layout';
 import { stringToNumber } from '../../../utils/parse';
 import { IoIosCar } from 'react-icons/io';
+import { useState } from 'react';
+import { ReportCard } from '../../reports';
+import dayjs from 'dayjs';
 
 // Images
 const truck = require('../../../imgs/kamacho-gtao-front_orig.png');
@@ -67,13 +69,12 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
   >;
   const { flags } = useFlags();
 
+  const [pageIndex, setPageIndex] = useState(0);
+
   if (!citizen) return <React.Fragment></React.Fragment>;
 
   const calcAge = (dob: string | null): string => {
-    if (!dob) return 'DoB not found';
-    const birthYear = stringToNumber(dob.split('-')[0]);
-    if (!birthYear) return dob;
-    return String(2020 - birthYear);
+    return dob ? (dayjs().year() - dayjs(dob).year()).toString() : 'n/a';
   };
 
   const checkFlags = () => {
@@ -228,6 +229,20 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
                 })
               : ''}
           </Flex>
+        </Flex>
+
+        <ReportCard
+          hideReport={true}
+          index={pageIndex}
+          searchValues={{ suspectStateId: citizen.id }}
+        />
+        <Flex>
+          <Button m="1rem" isDisabled={pageIndex < 1} onClick={() => setPageIndex(pageIndex - 1)}>
+            Previous
+          </Button>
+          <Button m="1rem" onClick={() => setPageIndex(pageIndex + 1)}>
+            Next
+          </Button>
         </Flex>
       </Flex>
     </Layout>

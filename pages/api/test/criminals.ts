@@ -52,7 +52,7 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     const criminals = await prisma.mdt_criminals.findMany({
       where,
       take: 5,
-      skip: page !== undefined && page !== null ? 20 * page : 0,
+      skip: page !== undefined && page !== null ? 20 * 5 : 0,
       orderBy: { criminalid: 'asc' },
     });
     res.json(criminals);

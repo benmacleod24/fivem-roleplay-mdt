@@ -84,10 +84,12 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       },
     };
   }
+
+  const take = 5;
   // use booking because it has more shit already.
   const reports = await prisma.mdt_bookings_new.findMany({
-    take: 5,
-    skip: page !== undefined && page !== null ? 20 * page : 0,
+    take,
+    skip: page !== undefined && page !== null ? take * page : 0,
     orderBy: { bookingId: 'desc' },
     include: {
       mdt_booked_charges_new: {
