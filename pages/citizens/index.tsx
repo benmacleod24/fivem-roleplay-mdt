@@ -40,7 +40,7 @@ export interface CitizenCardProps {
 
 interface SWRResponseType extends fivem_characters {}
 
-const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
+const CitizenCard: React.FunctionComponent<CitizenCardProps> = ({ index, searchValues }) => {
   // Params & Data
   const searchParams = toQuery(searchValues);
   const [session, loading] = useSession();

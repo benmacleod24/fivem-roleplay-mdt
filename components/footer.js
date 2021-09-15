@@ -1,4 +1,3 @@
-import styles from './footer.module.css';
 import React from 'react';
 import { useColorModeValue, Flex, Text, Link, theme } from '@chakra-ui/react';
 import { useSession } from 'next-auth/client';

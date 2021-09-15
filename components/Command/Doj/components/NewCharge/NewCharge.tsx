@@ -30,7 +30,7 @@ const validSchema = yup.object().shape({
   chargeClass: yup.string().required('A Class is required.'),
 });
 
-const NewCharge: React.SFC<NewChargeProps> = ({}) => {
+const NewCharge: React.FunctionComponent<NewChargeProps> = ({}) => {
   const { category, error: penalError } = usePenal();
 
   const handleNewCharge = async (values: typeof newChargeInitValues, actions: any) => {

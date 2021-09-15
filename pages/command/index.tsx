@@ -1,4 +1,4 @@
-import { Button, Fade, Flex, Heading } from '@chakra-ui/react';
+import { Button, Flex, Heading } from '@chakra-ui/react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { getSession } from 'next-auth/client';
 import { ParsedUrlQuery } from 'querystring';
@@ -9,7 +9,7 @@ import Layout from '../../components/layout';
 
 export interface CommandProps {}
 
-const Command: React.SFC<CommandProps> = ({}) => {
+const Command: React.FunctionComponent<CommandProps> = ({}) => {
   const [page, setPage] = React.useState('home');
 
   return (

@@ -7,18 +7,18 @@ export interface ProfileProps {
 
 }
 
-const Profile: React.SFC<ProfileProps> = ({ }) => {
-    const [session, loading] = useSession();
+const Profile: React.FunctionComponent<ProfileProps> = ({}) => {
+  const [session, loading] = useSession();
 
-    return (
-        <Layout>
-            <Flex>
-                <Box background="gray.700" borderRadius="md" width="100%" p='3'>
-                    <Heading size="lg">My Profile</Heading>
-                </Box>
-            </Flex>
-        </Layout>
-    );
-}
+  return (
+    <Layout>
+      <Flex>
+        <Box background="gray.700" borderRadius="md" width="100%" p="3">
+          <Heading size="lg">My Profile</Heading>
+        </Box>
+      </Flex>
+    </Layout>
+  );
+};
 
 export default Profile;

@@ -76,7 +76,7 @@ const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSum
               criminalId: character?.id,
               forWarrant: false, //todo change later
               bookedCharges: chargesAndCounts,
-              bookingOverride: values.time ? parseInt(values.time) : defaultTime,
+              bookingOverride: Math.floor(defaultTime),
             });
 
             const res = await createBooking(submission);
@@ -155,12 +155,7 @@ const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSum
                   <Text mb="0.5">Penalty:</Text>
                   <Text background="gray.800" borderRadius="md" p="1.5">
                     {timeAndPenalty.penalty < TRIAL
-                      ? `$${numberWithComma(
-                          Math.floor(
-                            timeAndPenalty.penalty *
-                              (1 - parseFloat(props.values.bookingReduction) / 100),
-                          ),
-                        )}`
+                      ? `$${numberWithComma(Math.floor(timeAndPenalty.penalty))}`
                       : `Hold Until Trial`}
                   </Text>
                 </Flex>

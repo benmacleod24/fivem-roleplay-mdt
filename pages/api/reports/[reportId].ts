@@ -1,4 +1,4 @@
-import { mdt_booked_charges, Prisma, PrismaClient, fivem_characters } from '@prisma/client';
+import { Prisma, PrismaClient, fivem_characters } from '@prisma/client';
 import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/client';
