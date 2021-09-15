@@ -3,9 +3,7 @@ import { fivem_characters, mdt_criminals } from '@prisma/client';
 import * as React from 'react';
 import { stringToNumber } from '../../utils/parse';
 
-interface SWRResponseType extends fivem_characters {
-  mdt_criminals: mdt_criminals[];
-}
+interface SWRResponseType extends fivem_characters {}
 
 export interface ProfileDataProps {
   citizen: SWRResponseType;

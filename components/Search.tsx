@@ -20,6 +20,7 @@ const SearchWrapper: React.FunctionComponent<SearchWrapperProps> = ({
         placeholder={placeholder}
         value={filter}
         onChange={evt => setFilter(evt.target.value)}
+        _focus={{ border: 'none' }}
       />
     </InputGroup>
   );

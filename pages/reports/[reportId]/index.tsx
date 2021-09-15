@@ -113,8 +113,8 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
 
   return (
     <Layout>
-      <LoadableContentSafe data={{ report, penal }} errors={[reportError, penalError]}>
-        {({ report, penal }) => {
+      <LoadableContentSafe data={{ report }} errors={[reportError]}>
+        {({ report }) => {
           const copsOnReport = report.mdt_reports_involved_new.map(r => ({
             id: r.officer_id ? r.officer_id.toString() : '0',
             name: `${r.fivem_characters?.first_name} ${r.fivem_characters?.last_name}`,
