@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import {
   fivem_characters,
+  fivem_vehicles,
   mdt_criminals,
   mdt_criminal_flags,
   mdt_flag_types,
@@ -43,11 +44,12 @@ const truck = require('../../../imgs/kamacho-gtao-front_orig.png');
 
 export interface CitizenProfileProps {}
 
-interface SWRResponseType extends fivem_characters {
-  mdt_criminals: mdt_criminals[];
-}
+interface SWRResponseType extends fivem_characters {}
 
-const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
+// type SWRFlagsResponse = Array<mdt_criminal_flags & mdt_flag_types>;
+
+const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
+  // Router Data
   const router = useRouter();
   const { citizenid } = router.query;
   const [session, loading] = useSession();
@@ -57,6 +59,11 @@ const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
     SWRResponseType,
     any
   >;
+  const { data: vehicles } = useSWR(`/api/citizen/vehicles?cid=${citizen?.id}`) as SWRResponse<
+    Array<fivem_vehicles>,
+    any
+  >;
+  // const { flags } = useFlags();
 
   const [pageIndex, setPageIndex] = React.useState(0);
 
@@ -65,6 +72,12 @@ const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
   const calcAge = (dob: string | null): string => {
     return dob ? (dayjs().year() - dayjs(dob).year()).toString() : 'n/a';
   };
+
+  // const checkFlags = () => {
+  //   if (!flags) return [];
+  //   const missingFlags = flags.filter(
+  //     f => !criminalFlags && !criminalFlags?.find(_f => f.typeid === _f.typeid),
+  //   );
 
   //   if (missingFlags.length <= 0) return <MenuItem>No More Flags</MenuItem>;
   //   return missingFlags.map(f => <MenuItem key={f.typeid}>{f.type_name}</MenuItem>);
@@ -105,20 +118,77 @@ const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
             maxHeight="100%"
             width="16%"
             border="1px solid #4A5568"
-            objectFit="cover"
-            objectPosition="center center"
-            src={
-              citizen.image
-                ? citizen.image
-                : citizen.mdt_criminals &&
-                  citizen.mdt_criminals[0] &&
-                  citizen.mdt_criminals[0].image
-                ? citizen.mdt_criminals[0].image
-                : 'https://i.imgur.com/tdi3NGah.jpg'
-            }
+            src={citizen.image ? citizen.image : 'https://i.imgur.com/tdi3NGah.jpg'}
             alt="profile-pic"
           />
-          <ProfileData citizen={citizen} />
+          <Box p="5" background="gray.700" borderRadius="md" flexGrow={1}>
+            <Flex>
+              <Text fontWeight="medium" color="blue.400" mr="1">
+                Name:
+              </Text>{' '}
+              {citizen.first_name} {citizen.last_name}
+            </Flex>
+            <Flex>
+              <Text fontWeight="medium" color="blue.400" mr="1">
+                Date of Birth:
+              </Text>{' '}
+              {citizen.dob}
+            </Flex>
+            <Flex>
+              <Text fontWeight="medium" color="blue.400" mr="1">
+                Drivers Liscense Ref:
+              </Text>{' '}
+              {citizen.cuid.split('-')[0]}
+            </Flex>
+            <Flex>
+              <Text fontWeight="medium" color="blue.400" mr="1">
+                Age:
+              </Text>{' '}
+              {calcAge(citizen.dob)}
+            </Flex>
+            <Flex>
+              <Text fontWeight="medium" color="blue.400" mr="1">
+                Gender:
+              </Text>{' '}
+              {citizen.gender ? 'Female' : 'Male'}
+            </Flex>
+            {/* <Flex mt="3" alignItems="center">
+              {session?.user.isCop && Array.isArray(criminalFlags)
+                ? criminalFlags.map(f => {
+                    return (
+                      <Tag
+                        key={f.flagid}
+                        fontSize="sm"
+                        borderRadius="md"
+                        p="1"
+                        pl="2"
+                        pr="2"
+                        mr="2"
+                        variant="subtle"
+                        colorScheme={f.type_color}
+                      >
+                        <TagLabel>{f.type_name}</TagLabel>
+                        {session?.user.isCop ? <TagCloseButton /> : ''}
+                      </Tag>
+                    );
+                  })
+                : ''}
+              {session?.user.isCop ? (
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="add-flag"
+                    icon={<BiPlus />}
+                    size="sm"
+                    borderRadius="full"
+                  />
+                  <MenuList>{checkFlags()}</MenuList>
+                </Menu>
+              ) : (
+                ''
+              )}
+            </Flex> */}
+          </Box>
         </Flex>
         <Flex w="full">
           {session?.user.isCop ? <Associates id={citizen.id} /> : ''}
