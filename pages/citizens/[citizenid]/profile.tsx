@@ -92,23 +92,27 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
               </Flex>
             </Flex>
 
-            <ReportCard
-              hideReport={true}
-              index={pageIndex}
-              searchValues={{ suspectStateId: citizen.id }}
-            />
-            <Flex>
-              <Button
-                m="1rem"
-                isDisabled={pageIndex < 1}
-                onClick={() => setPageIndex(pageIndex - 1)}
-              >
-                Previous
-              </Button>
-              <Button m="1rem" onClick={() => setPageIndex(pageIndex + 1)}>
-                Next
-              </Button>
-            </Flex>
+            {session?.user.isCop && (
+              <>
+                <ReportCard
+                  hideReport={true}
+                  index={pageIndex}
+                  searchValues={{ suspectStateId: citizen.id }}
+                />
+                <Flex>
+                  <Button
+                    m="1rem"
+                    isDisabled={pageIndex < 1}
+                    onClick={() => setPageIndex(pageIndex - 1)}
+                  >
+                    Previous
+                  </Button>
+                  <Button m="1rem" onClick={() => setPageIndex(pageIndex + 1)}>
+                    Next
+                  </Button>
+                </Flex>
+              </>
+            )}
           </Flex>
         )}
       </LoadableContentSafe>
