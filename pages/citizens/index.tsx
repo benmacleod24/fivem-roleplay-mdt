@@ -38,9 +38,7 @@ export interface CitizenCardProps {
   searchValues: Record<string, string>;
 }
 
-interface SWRResponseType extends fivem_characters {
-  mdt_criminals: Array<{ image: string }>;
-}
+interface SWRResponseType extends fivem_characters {}
 
 const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
   // Params & Data
@@ -80,13 +78,7 @@ const CitizenCard: React.SFC<CitizenCardProps> = ({ index, searchValues }) => {
                       boxSize="5.5rem"
                       objectFit="fill"
                       borderRadius="md"
-                      src={
-                        c.image && copCheck
-                          ? c.image
-                          : c.mdt_criminals && c.mdt_criminals[0] && copCheck
-                          ? c.mdt_criminals[0].image
-                          : 'https://i.imgur.com/tdi3NGah.jpg'
-                      }
+                      src={c.image && copCheck ? c.image : 'https://i.imgur.com/tdi3NGah.jpg'}
                       alt="blank_profile_picture"
                     />
                     <Heading flex={1} size="md">
