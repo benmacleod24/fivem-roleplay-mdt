@@ -21,6 +21,10 @@ const CitizenRequest = z.object({
   ),
 });
 
+const BookingRequest = z.object({
+  criminalId: z.string().transform(stringToNumber),
+});
+
 type NextApiRequestWithQuery = NextApiRequest & z.infer<typeof CitizenRequest>;
 
 const Citizen = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
@@ -68,5 +72,26 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 };
 
 const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
-  throw 'not yet implemented';
+  const { criminalId } = BookingRequest.parse(req.query);
+
+  if (criminalId) {
+    const allBookings = await prisma.mdt_bookings_new.findMany({
+      where: {
+        criminalId: criminalId,
+      },
+      include: {
+        mdt_booked_charges_new: {
+          include: {
+            mdt_charges: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return res.json(allBookings);
+  }
 };

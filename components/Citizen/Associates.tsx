@@ -36,6 +36,8 @@ const Associates: React.FunctionComponent<AssociatesProps> = ({ id }) => {
   return (
     <Flex
       w="16%"
+      minW="16%"
+      maxW="16%"
       mr="3"
       p="3"
       h="fit-content"
