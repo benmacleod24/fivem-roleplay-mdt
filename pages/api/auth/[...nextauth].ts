@@ -132,19 +132,26 @@ export default NextAuth({
       let isCop = false;
       let copName;
       let copId;
+      let rankLevel;
       try {
-        const copList =
-          await prisma.$queryRaw(`select u.id, u.discord, c.first_name, c.last_name, c.id as copId, ucj.job_id, wlj.displayName from _fivem_users as u 
-      left join _fivem_characters as c on u.id=c.uId
-      left join _fivem_whitelist_characters_jobs as ucj on c.id = ucj.character_id
-      left join _fivem_whitelist_jobs as wlj on wlj.jobid = ucj.job_id
-        where wlj.displayName = 'Police Officer'
-        and u.discord = ${discord};`);
+        const copList = await prisma.$queryRaw(`
+          select u.id, u.discord, c.first_name, c.last_name, c.id as copId, ucj.job_id, wlj.displayName, depr.rankLevel from _fivem_users as u 
+            left join _fivem_characters as c on u.id=c.uId
+            left join _fivem_whitelist_characters_jobs as ucj on c.id = ucj.character_id
+            left join _fivem_whitelist_jobs as wlj on wlj.jobid = ucj.job_id
+            left join _mdt_department_members as depm on c.id = depm.characterId
+            left join _mdt_department_ranks as depr on depm.rankId = depr.rankId
+              where wlj.displayName = 'Police Officer' and u.discord = ${discord};
+              `);
         isCop = (copList && copList.length > 0) ?? false;
         copName =
           (copList && copList.length > 0 && `${copList[0].first_name} ${copList[0].last_name}`) ??
           undefined;
         copId = (copList && copList.length > 0 && copList[0].copId) ?? undefined;
+
+        if (copList && copList.length > 0 && String(copList[0].rankLevel)) {
+          rankLevel = copList[0].rankLevel;
+        }
       } catch (e) {
         console.error('some shit blew up', e);
       }
@@ -152,6 +159,7 @@ export default NextAuth({
       session.user.isCop = isCop;
       session.user.copName = copName;
       session.user.copId = copId;
+      session.user.rankLvl = rankLevel;
       return Promise.resolve(session);
     },
   },
