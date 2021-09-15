@@ -61,10 +61,10 @@ const Charges: React.FunctionComponent<ChargesProps> = ({ citizenId }) => {
             p="2"
             w="full"
           >
-            <Heading size="sm" color="yellow.300">
+            <Heading size="xs" color="yellow.300">
               {c.label}
             </Heading>
-            <Text>
+            <Text minW="27%" textAlign="right">
               {c.value} {Number(c.value) > 1 ? 'Counts' : 'Count'}
             </Text>
           </Flex>

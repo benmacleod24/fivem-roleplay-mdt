@@ -4,6 +4,7 @@ import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import { Badge, Flex, Heading, Text } from '@chakra-ui/layout';
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/menu';
 import { Tag, TagCloseButton, TagLabel, TagLeftIcon, TagRightIcon } from '@chakra-ui/tag';
+import { useToast } from '@chakra-ui/toast';
 import * as React from 'react';
 import { GiDoubleFish, GiPistolGun, GiPolarBear } from 'react-icons/gi';
 import { IoIosAirplane, IoMdCar } from 'react-icons/io';
@@ -14,17 +15,26 @@ export interface LicensesProps {
 }
 
 const Licenses: React.FunctionComponent<LicensesProps> = ({ id }) => {
-  const { data: lics, revalidate } = useSWR(`/api/citizen/licenses?citizenId=${id}`) as SWRResponse<
+  const toast = useToast();
+  const { data: lics, mutate } = useSWR(`/api/citizen/licenses?citizenId=${id}`) as SWRResponse<
     fivem_licenses,
     any
   >;
 
   const updateLic = async (lic: string, lvl: number) => {
-    const res = await fetch(`/api/citizen/licenses?citizenId=${id}&value=${lic}&level=${lvl}`, {
-      method: 'PATCH',
-    }).then(r => r.json());
-    revalidate();
-    return res;
+    try {
+      const res = await fetch(`/api/citizen/licenses?citizenId=${id}&value=${lic}&level=${lvl}`, {
+        method: 'PATCH',
+      }).then(r => r.json());
+      mutate();
+    } catch (e) {
+      useToast({
+        variant: 'solid',
+        position: 'top-right',
+        description: 'An error occured while updating the license',
+        status: 'error',
+      });
+    }
   };
 
   if (!lics) return <React.Fragment></React.Fragment>;
