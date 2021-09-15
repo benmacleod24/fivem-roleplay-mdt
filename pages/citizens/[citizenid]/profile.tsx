@@ -41,11 +41,9 @@ const truck = require('../../../imgs/kamacho-gtao-front_orig.png');
 
 export interface CitizenProfileProps {}
 
-interface SWRResponseType extends fivem_characters {
-  mdt_criminals: mdt_criminals[];
-}
+interface SWRResponseType extends fivem_characters {}
 
-type SWRFlagsResponse = Array<mdt_criminal_flags & mdt_flag_types>;
+// type SWRFlagsResponse = Array<mdt_criminal_flags & mdt_flag_types>;
 
 const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
   // Router Data
@@ -60,14 +58,11 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
     SWRResponseType,
     any
   >;
-  const { data: criminalFlags, error } = useSWR(
-    `/api/citizen/flags?id=${citizen?.mdt_criminals[0] ? citizen.mdt_criminals[0].criminalid : ''}`,
-  ) as SWRResponse<SWRFlagsResponse, any>;
   const { data: vehicles } = useSWR(`/api/citizen/vehicles?cid=${citizen?.id}`) as SWRResponse<
     Array<fivem_vehicles>,
     any
   >;
-  const { flags } = useFlags();
+  // const { flags } = useFlags();
 
   const [pageIndex, setPageIndex] = useState(0);
 
@@ -77,15 +72,15 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
     return dob ? (dayjs().year() - dayjs(dob).year()).toString() : 'n/a';
   };
 
-  const checkFlags = () => {
-    if (!flags) return [];
-    const missingFlags = flags.filter(
-      f => !criminalFlags && !criminalFlags?.find(_f => f.typeid === _f.typeid),
-    );
+  // const checkFlags = () => {
+  //   if (!flags) return [];
+  //   const missingFlags = flags.filter(
+  //     f => !criminalFlags && !criminalFlags?.find(_f => f.typeid === _f.typeid),
+  //   );
 
-    if (missingFlags.length <= 0) return <MenuItem>No More Flags</MenuItem>;
-    return missingFlags.map(f => <MenuItem key={f.typeid}>{f.type_name}</MenuItem>);
-  };
+  //   if (missingFlags.length <= 0) return <MenuItem>No More Flags</MenuItem>;
+  //   return missingFlags.map(f => <MenuItem key={f.typeid}>{f.type_name}</MenuItem>);
+  // };
 
   return (
     <Layout>
@@ -122,15 +117,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
             maxHeight="100%"
             width="16%"
             border="1px solid #4A5568"
-            src={
-              citizen.image
-                ? citizen.image
-                : citizen.mdt_criminals &&
-                  citizen.mdt_criminals[0] &&
-                  citizen.mdt_criminals[0].image
-                ? citizen.mdt_criminals[0].image
-                : 'https://i.imgur.com/tdi3NGah.jpg'
-            }
+            src={citizen.image ? citizen.image : 'https://i.imgur.com/tdi3NGah.jpg'}
             alt="profile-pic"
           />
           <Box p="5" background="gray.700" borderRadius="md" flexGrow={1}>
@@ -164,7 +151,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
               </Text>{' '}
               {citizen.gender ? 'Female' : 'Male'}
             </Flex>
-            <Flex mt="3" alignItems="center">
+            {/* <Flex mt="3" alignItems="center">
               {session?.user.isCop && Array.isArray(criminalFlags)
                 ? criminalFlags.map(f => {
                     return (
@@ -199,7 +186,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
               ) : (
                 ''
               )}
-            </Flex>
+            </Flex> */}
           </Box>
         </Flex>
         <Flex borderRadius="md" p="3" direction="column" width="full" background="gray.700">

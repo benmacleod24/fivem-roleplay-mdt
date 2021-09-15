@@ -37,13 +37,6 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     where: {
       cuid: citizenid,
     },
-    include: {
-      mdt_criminals: {
-        where: {
-          character_uid: citizenid,
-        },
-      },
-    },
   });
 
   res.json(citizen);
