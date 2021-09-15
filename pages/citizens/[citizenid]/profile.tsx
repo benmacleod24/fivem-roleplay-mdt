@@ -39,8 +39,8 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
 
   return (
     <Layout>
-      <LoadableContentSafe data={{ citizen, session }} errors={[citizenError]}>
-        {({ citizen, session }) => (
+      <LoadableContentSafe data={{ citizen }} errors={[citizenError]}>
+        {({ citizen }) => (
           <Flex width="full" height="full" direction="column">
             <Box
               width="full"
@@ -57,7 +57,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
                 Viewing {citizen.first_name} {citizen.last_name}
               </Heading>
               <Link href={`/booking/${citizen.cuid}`}>
-                {session.user.isCop ? (
+                {session?.user.isCop ? (
                   <Button size="sm" colorScheme="blue">
                     Process
                   </Button>

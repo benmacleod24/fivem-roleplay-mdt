@@ -78,7 +78,7 @@ const CitizenCard: React.FunctionComponent<CitizenCardProps> = ({ index, searchV
                       boxSize="5.5rem"
                       objectFit="fill"
                       borderRadius="md"
-                      src={c.image && copCheck ? c.image : 'https://i.imgur.com/tdi3NGah.jpg'}
+                      src={c.image ? c.image : 'https://i.imgur.com/tdi3NGah.jpg'}
                       alt="blank_profile_picture"
                     />
                     <Heading flex={1} size="md">
