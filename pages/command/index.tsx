@@ -5,6 +5,7 @@ import { ParsedUrlQuery } from 'querystring';
 import * as React from 'react';
 import DojContainer from '../../components/Command/Doj';
 import CommandHome from '../../components/Command/Home';
+import Officers from '../../components/Command/Officers';
 import Layout from '../../components/layout';
 
 export interface CommandProps {}
@@ -67,6 +68,7 @@ const Command: React.FunctionComponent<CommandProps> = ({}) => {
         <Flex h="full" w="full" px="1">
           {page === 'home' ? <CommandHome /> : ''}
           {page === 'doj' ? <DojContainer /> : ''}
+          {page === 'off_man' ? <Officers /> : ''}
         </Flex>
       </Flex>
     </Layout>
