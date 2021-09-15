@@ -5,6 +5,7 @@ import { tCop } from '../pages/api/cops';
 import { Code, Flex, Tag, TagCloseButton, Text } from '@chakra-ui/react';
 import SearchDropdown from './SearchDropdonwn';
 import { array } from 'zod';
+import { report } from 'process';
 
 // export interface Item {
 //   label: string;
@@ -72,7 +73,16 @@ export interface Item {
   value: string;
 }
 
-export default function CopSelect({ cops, preSelected, ...props }: { preSelected: Item[]; cops: any }) {
+export default function CopSelect({
+  cops,
+  preSelected,
+  isDraft,
+  ...props
+}: {
+  preSelected: Item[];
+  cops: any;
+  isDraft: boolean | null;
+}) {
   const [field, meta, helpers] = useField('cops');
   const [selectedCops, setSelectedCops] = React.useState<Item[]>([]);
 
@@ -108,45 +118,49 @@ export default function CopSelect({ cops, preSelected, ...props }: { preSelected
         <Text mb="0.5" mr="1" color="yellow.200" fontWeight="semibold">
           Involved Officers
         </Text>
-        <SearchDropdown>
-          {(filter, open, setOpen) => {
-            if (!filter)
+        {isDraft ? (
+          <SearchDropdown>
+            {(filter, open, setOpen) => {
+              if (!filter)
+                return (
+                  <Flex flexDir="column" alignItems="center" justifyContent="center" h="24">
+                    <Text>Start Typing</Text>
+                    <Code mt="1" borderRadius="lg" px="2">
+                      First Last
+                    </Code>
+                  </Flex>
+                );
+
               return (
-                <Flex flexDir="column" alignItems="center" justifyContent="center" h="24">
-                  <Text>Start Typing</Text>
-                  <Code mt="1" borderRadius="lg" px="2">
-                    First Last
-                  </Code>
+                <Flex w="full" h="full" flexDir="column" overflow="auto">
+                  {copOptions
+                    .filter(
+                      c =>
+                        c.label?.toLocaleLowerCase().includes(filter.toLocaleLowerCase()) &&
+                        selectedCops.indexOf(c) < 0,
+                    )
+                    .map(c => (
+                      <Flex
+                        key={c.value}
+                        py="2.5"
+                        transition="0.2s ease-in-out"
+                        cursor="pointer"
+                        px="3.5"
+                        onClick={() => {
+                          onClick(c);
+                          setOpen(false);
+                        }}
+                      >
+                        {c.label}
+                      </Flex>
+                    ))}
                 </Flex>
               );
-
-            return (
-              <Flex w="full" h="full" flexDir="column" overflow="auto">
-                {copOptions
-                  .filter(
-                    c =>
-                      c.label?.toLocaleLowerCase().includes(filter.toLocaleLowerCase()) &&
-                      selectedCops.indexOf(c) < 0,
-                  )
-                  .map(c => (
-                    <Flex
-                      key={c.value}
-                      py="2.5"
-                      transition="0.2s ease-in-out"
-                      cursor="pointer"
-                      px="3.5"
-                      onClick={() => {
-                        onClick(c);
-                        setOpen(false);
-                      }}
-                    >
-                      {c.label}
-                    </Flex>
-                  ))}
-              </Flex>
-            );
-          }}
-        </SearchDropdown>
+            }}
+          </SearchDropdown>
+        ) : (
+          ''
+        )}
       </Flex>
       <Flex
         w="full"

@@ -155,7 +155,6 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                     isClosable: true,
                     variant: 'solid',
                     position: 'top-right',
-                    
                   });
                 } catch (e) {
                   toast({
@@ -283,6 +282,7 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                       label: c.name,
                       value: c.id,
                     }))}
+                    isDraft={report.draft}
                   />
                   <Flex w="full" h="fit-content" flexDir="column" mb="4">
                     <Text mb="0.5" color="yellow.200" fontWeight="semibold">
@@ -325,15 +325,19 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                     </RadioGroup>
                   </Flex>
                   <Flex w="full" justifyContent="center" alignItems="center">
-                    <Button
-                      w="25%"
-                      colorScheme="yellow"
-                      visibility={report.draft ? 'visible' : 'hidden'}
-                      isLoading={props.isSubmitting}
-                      type="submit"
-                    >
-                      {props.values.draft === '1' ? 'Submit Changes' : 'Submit Report'}
-                    </Button>
+                    {report.draft ? (
+                      <Button
+                        w="25%"
+                        colorScheme="yellow"
+                        visibility={report.draft ? 'visible' : 'hidden'}
+                        isLoading={props.isSubmitting}
+                        type="submit"
+                      >
+                        {props.values.draft === '1' ? 'Submit Changes' : 'Submit Report'}
+                      </Button>
+                    ) : (
+                      ''
+                    )}
                   </Flex>
                 </FForm>
               )}
