@@ -81,6 +81,7 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
   } = useSWR(`/api/reports/${reportId}`) as SWRResponse<SingleReport, any>;
   const { category: penal, error: penalError } = usePenal();
   const { data: cops, error: copsError } = useSWR(`/api/cops`) as SWRResponse<tCop, any>;
+  const toast = useToast();
 
   // Memos
   const penalByChargeId = useMemo(() => {
@@ -129,6 +130,7 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
 
           return (
             <Formik
+              validationSchema={schema}
               initialValues={{
                 content: report.content ? report.content : defaultReport,
                 title: report.title ? report.title : '',
@@ -137,7 +139,25 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                 filingOfficerId: report.filingOfficerId,
                 cops: copsOnReport.map(c => c.id),
               }}
-              onSubmit={() => {}}
+              onSubmit={async (values, actions) => {
+                try {
+                  console.log(values);
+                  const res = await patchReport(reportId, {
+                    ...values,
+                    draft: values.draft === '1' ? true : false,
+                  });
+
+                  actions.setSubmitting(false);
+                } catch (e) {
+                  toast({
+                    description: 'Error Occured While Saving Report',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                  });
+                }
+                mutateReport();
+              }}
             >
               {props => (
                 <FForm>
@@ -298,6 +318,8 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                       w="25%"
                       colorScheme="yellow"
                       visibility={report.draft ? 'visible' : 'hidden'}
+                      isLoading={props.isSubmitting}
+                      type="submit"
                     >
                       {props.values.draft === '1' ? 'Submit Changes' : 'Submit Report'}
                     </Button>

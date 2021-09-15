@@ -81,20 +81,23 @@ export default function CopSelect({
   cops: tCop;
 }) {
   const [field, meta, helpers] = useField('cops');
+  const [selectedCops, setSelectedCops] = React.useState<Item[]>([]);
 
   React.useEffect(() => {
     if (!preSelected) return;
-    helpers.setValue(preSelected);
+    setSelectedCops(preSelected);
+    helpers.setValue(preSelected.map(c => c.value));
     console.log(preSelected);
   }, []);
 
   const onClick = (cop: Item) => {
-    return helpers.setValue([...field.value, cop]);
+    setSelectedCops([...selectedCops, cop]);
+    return helpers.setValue(selectedCops.map(c => c.value));
   };
 
   const onDelete = (cop: Item) => {
-    const newArray = field.value.filter((c: Item) => c.value !== cop.value);
-    return helpers.setValue([...newArray]);
+    const newArray = selectedCops.filter((c: Item) => c.value !== cop.value);
+    return helpers.setValue(newArray.map(c => c.value));
   };
 
   if (!cops) return <React.Fragment></React.Fragment>;
@@ -158,12 +161,12 @@ export default function CopSelect({
         alignItems="center"
       >
         <Flex mr="1.5">
-          {field.value.map((c: Item) => (
+          {selectedCops.map((c: Item) => (
             <Tag mx="1" variant="subtle" colorScheme="blue">
               {c.label} <TagCloseButton onClick={() => onDelete(c)} />
             </Tag>
           ))}
-          {field.value.length <= 0 ? (
+          {selectedCops.length <= 0 ? (
             <Text color="gray.500" fontStyle="italic">
               No Officers Select
             </Text>
