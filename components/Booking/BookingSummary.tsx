@@ -76,7 +76,7 @@ const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSum
               criminalId: character?.id,
               forWarrant: false, //todo change later
               bookedCharges: chargesAndCounts,
-              bookingOverride: values.time ? parseInt(values.time) : defaultTime,
+              bookingOverride: Math.floor(defaultTime),
             });
 
             const res = await createBooking(submission);

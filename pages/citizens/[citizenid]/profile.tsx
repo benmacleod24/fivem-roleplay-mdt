@@ -97,7 +97,7 @@ const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
           <ProfileData citizen={citizen} />
         </Flex>
         <Flex w="full">
-          {session?.user.isCop ? <Associates /> : ''}
+          {session?.user.isCop ? <Associates id={citizen.id} /> : ''}
           <Flex flexGrow={1} borderRadius="md" flexDir="column">
             {session?.user.isCop ? <Licenses id={citizen.id} /> : ''}
             {session?.user.isCop ? <Vehicles citizenId={citizen.id} /> : ''}

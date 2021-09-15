@@ -80,6 +80,7 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
     mutate: mutateReport,
   } = useSWR(`/api/reports/${reportId}`) as SWRResponse<SingleReport, any>;
   const { category: penal, error: penalError } = usePenal();
+  const { data: cops, error: copsError } = useSWR(`/api/cops`) as SWRResponse<tCop, any>;
 
   // Memos
   const penalByChargeId = useMemo(() => {
@@ -245,6 +246,13 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                       </Flex>
                     </Flex>
                   </Flex>
+                  <CopSelect
+                    cops={cops}
+                    preSelected={copsOnReport.map(c => ({
+                      label: c.name,
+                      value: c.id,
+                    }))}
+                  />
                   <Flex w="full" h="fit-content" flexDir="column" mb="4">
                     <Text mb="0.5" color="yellow.200" fontWeight="semibold">
                       Report Content

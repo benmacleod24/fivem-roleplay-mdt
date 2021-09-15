@@ -7,7 +7,11 @@ import * as React from 'react';
 import { useDebounce } from '../hooks/useDebounce';
 
 interface SearchDropdownProps {
-  children: (filter: string, status: boolean) => React.ReactElement;
+  children: (
+    filter: string,
+    status: boolean,
+    onSubmit: (val: boolean) => void,
+  ) => React.ReactElement;
   Button?: React.ReactElement;
   placeholder?: string;
   debounce?: boolean;
@@ -100,10 +104,11 @@ const SearchDropdown: React.FunctionComponent<SearchDropdownProps> = ({
             _focus={{ outline: 'none' }}
             value={filter}
             onChange={e => setFilter(e.target.value)}
+            autoFocus={open}
           />
         </InputGroup>
         <Flex flexDir="column" minH="75%">
-          {children(debounce ? debouncedValue : filter, open)}{' '}
+          {children(debounce ? debouncedValue : filter, open, setOpen)}{' '}
         </Flex>
       </Flex>
     </Flex>

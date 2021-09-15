@@ -46,6 +46,12 @@ const ProfileData: React.FunctionComponent<ProfileDataProps> = ({ citizen }) => 
           </Text>
           {citizen.gender === false ? 'Male' : 'Female'}
         </Flex>
+        <Flex>
+          <Text mr="1" color="blue.300" fontWeight="semibold">
+            State Identifier:
+          </Text>
+          {citizen.id}
+        </Flex>
       </Flex>
     </Flex>
   );
