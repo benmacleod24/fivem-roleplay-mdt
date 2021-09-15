@@ -1,47 +1,20 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  Text,
-  Image,
-  Button,
-  Tag,
-  TagLabel,
-  TagCloseButton,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Icon,
-} from '@chakra-ui/react';
-import {
-  fivem_characters,
-  fivem_vehicles,
-  mdt_criminals,
-  mdt_criminal_flags,
-  mdt_flag_types,
-} from '@prisma/client';
+import { Box, Flex, Heading, Image, Button } from '@chakra-ui/react';
+import { fivem_characters } from '@prisma/client';
 import { useSession } from 'next-auth/client';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import useSWR, { SWRResponse } from 'swr';
-import useFlags from '../../../components/hooks/api/useFlags';
 import Layout from '../../../components/layout';
-import { stringToNumber } from '../../../utils/parse';
-import { IoIosCar } from 'react-icons/io';
-import { useState } from 'react';
 import { ReportCard } from '../../reports';
-import dayjs from 'dayjs';
 import Associates from '../../../components/Citizen/Associates';
 import Licenses from '../../../components/Citizen/Licenses';
 import Vehicles from '../../../components/Citizen/Vehicles';
 import ProfileData from '../../../components/Citizen/ProfileData';
 import { LoadableContentSafe } from '../../../ui/LoadableContent';
+import Charges from '../../../components/Citizen/Charges';
 
 // Images
-const truck = require('../../../imgs/kamacho-gtao-front_orig.png');
 
 export interface CitizenProfileProps {}
 
@@ -115,6 +88,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
               <Flex flexGrow={1} borderRadius="md" flexDir="column">
                 {session?.user.isCop ? <Licenses id={citizen.id} /> : ''}
                 {session?.user.isCop ? <Vehicles citizenId={citizen.id} /> : ''}
+                {session?.user.isCop ? <Charges citizenId={citizen.id} /> : ''}
               </Flex>
             </Flex>
 
