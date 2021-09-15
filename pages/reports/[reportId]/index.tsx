@@ -148,12 +148,23 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                   });
 
                   actions.setSubmitting(false);
+                  toast({
+                    description: 'Report Saved!',
+                    status: 'info',
+                    duration: 5000,
+                    isClosable: true,
+                    variant: 'solid',
+                    position: 'top-right',
+                    
+                  });
                 } catch (e) {
                   toast({
                     description: 'Error Occured While Saving Report',
                     status: 'error',
                     duration: 5000,
                     isClosable: true,
+                    variant: 'solid',
+                    position: 'top-right',
                   });
                 }
                 mutateReport();

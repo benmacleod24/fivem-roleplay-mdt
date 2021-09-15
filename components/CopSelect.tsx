@@ -72,32 +72,28 @@ export interface Item {
   value: string;
 }
 
-export default function CopSelect({
-  cops,
-  preSelected,
-  ...props
-}: {
-  preSelected: Item[];
-  cops: tCop;
-}) {
+export default function CopSelect({ cops, preSelected, ...props }: { preSelected: Item[]; cops: any }) {
   const [field, meta, helpers] = useField('cops');
   const [selectedCops, setSelectedCops] = React.useState<Item[]>([]);
 
   React.useEffect(() => {
     if (!preSelected) return;
     setSelectedCops(preSelected);
-    helpers.setValue(preSelected.map(c => c.value));
-    console.log(preSelected);
   }, []);
+
+  React.useEffect(() => {
+    console.log(selectedCops, 'check');
+    helpers.setValue(selectedCops.map(c => c.value));
+    console.log(field.value, 'check2');
+  }, [selectedCops]);
 
   const onClick = (cop: Item) => {
     setSelectedCops([...selectedCops, cop]);
-    return helpers.setValue(selectedCops.map(c => c.value));
   };
 
   const onDelete = (cop: Item) => {
     const newArray = selectedCops.filter((c: Item) => c.value !== cop.value);
-    return helpers.setValue(newArray.map(c => c.value));
+    setSelectedCops(newArray);
   };
 
   if (!cops) return <React.Fragment></React.Fragment>;
@@ -130,10 +126,11 @@ export default function CopSelect({
                   .filter(
                     c =>
                       c.label?.toLocaleLowerCase().includes(filter.toLocaleLowerCase()) &&
-                      field.value.indexOf(c) < 0,
+                      selectedCops.indexOf(c) < 0,
                   )
                   .map(c => (
                     <Flex
+                      key={c.value}
                       py="2.5"
                       transition="0.2s ease-in-out"
                       cursor="pointer"
@@ -162,7 +159,7 @@ export default function CopSelect({
       >
         <Flex mr="1.5">
           {selectedCops.map((c: Item) => (
-            <Tag mx="1" variant="subtle" colorScheme="blue">
+            <Tag mx="1" variant="subtle" colorScheme="blue" key={c.value}>
               {c.label} <TagCloseButton onClick={() => onDelete(c)} />
             </Tag>
           ))}

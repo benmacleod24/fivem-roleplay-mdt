@@ -45,9 +45,13 @@ const HeaderProfile: React.FunctionComponent<HeaderProfileProps> = ({}) => {
                   <Link href="/profile" passHref>
                     <MenuItem icon={<BsFillPersonLinesFill />}>Profile</MenuItem>
                   </Link>
-                  <Link href="/command" passHref>
-                    <MenuItem icon={<GiRank3 />}>Command Managment</MenuItem>
-                  </Link>
+                  {session?.user.rankLvl || session!.user.rankLvl >= 4 ? (
+                    <Link href="/command" passHref>
+                      <MenuItem icon={<GiRank3 />}>Command Managment</MenuItem>
+                    </Link>
+                  ) : (
+                    ''
+                  )}
                   <MenuDivider />
                   <MenuItem onClick={() => signOut()} icon={<BiExit />}>
                     Sign Out

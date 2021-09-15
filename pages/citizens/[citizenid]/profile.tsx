@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-import { Box, Flex, Heading, Image, Button } from '@chakra-ui/react';
-=======
 import {
   Box,
   Flex,
@@ -18,7 +15,6 @@ import {
   MenuItem,
   Icon,
 } from '@chakra-ui/react';
->>>>>>> master
 import {
   fivem_characters,
   mdt_criminals,
@@ -32,21 +28,18 @@ import * as React from 'react';
 import useSWR, { SWRResponse } from 'swr';
 import useFlags from '../../../components/hooks/api/useFlags';
 import Layout from '../../../components/layout';
-<<<<<<< HEAD
-import ProfileData from '../../../components/Citizen/ProfileData';
-import Associates from '../../../components/Citizen/Associates';
-import Licenses from '../../../components/Citizen/Licenses';
-import Vehicles from '../../../components/Citizen/Vehicles';
-=======
 import { stringToNumber } from '../../../utils/parse';
 import { IoIosCar } from 'react-icons/io';
 import { useState } from 'react';
 import { ReportCard } from '../../reports';
 import dayjs from 'dayjs';
+import Associates from '../../../components/Citizen/Associates';
+import Licenses from '../../../components/Citizen/Licenses';
+import Vehicles from '../../../components/Citizen/Vehicles';
+import ProfileData from '../../../components/Citizen/ProfileData';
 
 // Images
 const truck = require('../../../imgs/kamacho-gtao-front_orig.png');
->>>>>>> master
 
 export interface CitizenProfileProps {}
 
@@ -65,21 +58,13 @@ const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
     any
   >;
 
-  const [pageIndex, setPageIndex] = useState(0);
+  const [pageIndex, setPageIndex] = React.useState(0);
 
   if (!citizen) return <React.Fragment></React.Fragment>;
 
-<<<<<<< HEAD
-  // const checkFlags = () => {
-  //   if (!flags) return [];
-  //   const missingFlags = flags.filter(
-  //     f => !criminalFlags && !criminalFlags?.find(_f => f.typeid === _f.typeid),
-  //   );
-=======
   const calcAge = (dob: string | null): string => {
     return dob ? (dayjs().year() - dayjs(dob).year()).toString() : 'n/a';
   };
->>>>>>> master
 
   //   if (missingFlags.length <= 0) return <MenuItem>No More Flags</MenuItem>;
   //   return missingFlags.map(f => <MenuItem key={f.typeid}>{f.type_name}</MenuItem>);
