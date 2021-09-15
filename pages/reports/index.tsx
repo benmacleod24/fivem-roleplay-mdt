@@ -44,14 +44,14 @@ export interface CitizenCardProps {
   searchValues: Record<string, string>;
 }
 
-const ReportCard = ({
+export const ReportCard = ({
   index,
   searchValues,
-  session,
+  hideReport = false,
 }: {
   index: number;
   searchValues: any;
-  session: Session;
+  hideReport?: boolean;
 }) => {
   // Params & Data
   const searchParams = toQuery(searchValues);
@@ -64,8 +64,8 @@ const ReportCard = ({
   const cardBackground = useColorModeValue(theme.colors.gray[200], theme.colors.gray[700]);
 
   return (
-    <LoadableContentSafe data={{ bookings, session }} errors={[error]}>
-      {({ bookings, session }) => {
+    <LoadableContentSafe data={{ bookings }} errors={[error]}>
+      {({ bookings }) => {
         return (
           <VStack spacing="1rem" mt="1%" mb="1%">
             {bookings &&
@@ -124,11 +124,13 @@ const ReportCard = ({
                       <GridItem colSpan={2} colStart={10}>
                         <Flex>
                           <VStack>
-                            <Link passHref href={`/reports/${report.reportid}`}>
-                              <Button size="sm" colorScheme={report.draft ? 'yellow' : 'green'}>
-                                View Report
-                              </Button>
-                            </Link>
+                            {!hideReport && (
+                              <Link passHref href={`/reports/${report.reportid}`}>
+                                <Button size="sm" colorScheme={report.draft ? 'yellow' : 'green'}>
+                                  View Report
+                                </Button>
+                              </Link>
+                            )}
                           </VStack>
                         </Flex>
                       </GridItem>
@@ -211,7 +213,7 @@ const Reports = ({ session }: { session: Session }) => {
             Finalized
           </Button>
         </Flex>
-        <ReportCard index={pageIndex} searchValues={searchValues} session={session} />
+        <ReportCard index={pageIndex} searchValues={searchValues} />
         <Button m="1rem" isDisabled={pageIndex < 1} onClick={() => setPageIndex(pageIndex - 1)}>
           Previous
         </Button>

@@ -1,10 +1,12 @@
 import React from 'react';
 import { useColorModeValue, Flex, Text, Link, theme } from '@chakra-ui/react';
+import { useSession } from 'next-auth/client';
 
 // I was redoing the layout in flex form
 
 export default function Footer() {
   const headerColor = useColorModeValue('gray.50', 'gray.700');
+  const [session, loading] = useSession();
 
   return (
     <Flex

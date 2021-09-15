@@ -1,4 +1,24 @@
+<<<<<<< HEAD
 import { Box, Flex, Heading, Image, Button } from '@chakra-ui/react';
+=======
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Image,
+  Button,
+  Tag,
+  TagLabel,
+  TagCloseButton,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Icon,
+} from '@chakra-ui/react';
+>>>>>>> master
 import {
   fivem_characters,
   mdt_criminals,
@@ -12,10 +32,21 @@ import * as React from 'react';
 import useSWR, { SWRResponse } from 'swr';
 import useFlags from '../../../components/hooks/api/useFlags';
 import Layout from '../../../components/layout';
+<<<<<<< HEAD
 import ProfileData from '../../../components/Citizen/ProfileData';
 import Associates from '../../../components/Citizen/Associates';
 import Licenses from '../../../components/Citizen/Licenses';
 import Vehicles from '../../../components/Citizen/Vehicles';
+=======
+import { stringToNumber } from '../../../utils/parse';
+import { IoIosCar } from 'react-icons/io';
+import { useState } from 'react';
+import { ReportCard } from '../../reports';
+import dayjs from 'dayjs';
+
+// Images
+const truck = require('../../../imgs/kamacho-gtao-front_orig.png');
+>>>>>>> master
 
 export interface CitizenProfileProps {}
 
@@ -34,13 +65,21 @@ const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
     any
   >;
 
+  const [pageIndex, setPageIndex] = useState(0);
+
   if (!citizen) return <React.Fragment></React.Fragment>;
 
+<<<<<<< HEAD
   // const checkFlags = () => {
   //   if (!flags) return [];
   //   const missingFlags = flags.filter(
   //     f => !criminalFlags && !criminalFlags?.find(_f => f.typeid === _f.typeid),
   //   );
+=======
+  const calcAge = (dob: string | null): string => {
+    return dob ? (dayjs().year() - dayjs(dob).year()).toString() : 'n/a';
+  };
+>>>>>>> master
 
   //   if (missingFlags.length <= 0) return <MenuItem>No More Flags</MenuItem>;
   //   return missingFlags.map(f => <MenuItem key={f.typeid}>{f.type_name}</MenuItem>);
@@ -102,6 +141,20 @@ const CitizenProfile: React.FunctionComponent<CitizenProfileProps> = ({}) => {
             {session?.user.isCop ? <Licenses id={citizen.id} /> : ''}
             {session?.user.isCop ? <Vehicles citizenId={citizen.id} /> : ''}
           </Flex>
+        </Flex>
+
+        <ReportCard
+          hideReport={true}
+          index={pageIndex}
+          searchValues={{ suspectStateId: citizen.id }}
+        />
+        <Flex>
+          <Button m="1rem" isDisabled={pageIndex < 1} onClick={() => setPageIndex(pageIndex - 1)}>
+            Previous
+          </Button>
+          <Button m="1rem" onClick={() => setPageIndex(pageIndex + 1)}>
+            Next
+          </Button>
         </Flex>
       </Flex>
     </Layout>
