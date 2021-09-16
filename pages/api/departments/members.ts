@@ -37,15 +37,12 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const isCop = session?.user.isCop;
   const isJudge = session?.user.isJudge;
 
-  if (!isCop || !isJudge) {
-    throw 'You are not a cop';
-  }
-
   const newMember = await prisma.mdt_department_members.create({
     data: {
       characterId,
       departmentId,
       rankId,
+      callSign: '',
     },
   });
 
