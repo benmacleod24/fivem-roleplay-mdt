@@ -133,9 +133,10 @@ export default NextAuth({
       let copName;
       let copId;
       let rankLevel;
+      let dept;
       try {
         const copList = await prisma.$queryRaw(`
-          select u.id, u.discord, c.first_name, c.last_name, c.id as copId, ucj.job_id, wlj.displayName, depr.rankLevel from _fivem_users as u 
+          select u.id, u.discord, c.first_name, c.last_name, c.id as copId, ucj.job_id, wlj.displayName, depr.rankLevel, depm.departmentId from _fivem_users as u 
             left join _fivem_characters as c on u.id=c.uId
             left join _fivem_whitelist_characters_jobs as ucj on c.id = ucj.character_id
             left join _fivem_whitelist_jobs as wlj on wlj.jobid = ucj.job_id
@@ -152,6 +153,10 @@ export default NextAuth({
         if (copList && copList.length > 0 && String(copList[0].rankLevel)) {
           rankLevel = copList[0].rankLevel;
         }
+
+        if (copList && copList.length > 0 && String(copList[0].departmentId)) {
+          dept = copList[0].departmentId;
+        }
       } catch (e) {
         console.error('some shit blew up', e);
       }
@@ -160,6 +165,7 @@ export default NextAuth({
       session.user.copName = copName;
       session.user.copId = copId;
       session.user.rankLvl = rankLevel;
+      session.user.dept = dept;
       return Promise.resolve(session);
     },
   },

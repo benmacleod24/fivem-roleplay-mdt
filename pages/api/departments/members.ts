@@ -45,6 +45,7 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       characterId,
       departmentId,
       rankId,
+      callSign: '',
     },
   });
 
