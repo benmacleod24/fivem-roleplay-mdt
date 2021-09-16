@@ -625,7 +625,7 @@ export const getServerSideProps: GetServerSideProps = async (
   ctx: GetServerSidePropsContext<ParsedUrlQuery>,
 ) => {
   const session = await getSession(ctx);
-  if (!session || !session.user) {
+  if (!session || !session.user || (!session.user.isJudge && !session.user.isCop)) {
     return { redirect: { permanent: false, destination: '/?l=t' } };
   }
   return { props: { session } };
