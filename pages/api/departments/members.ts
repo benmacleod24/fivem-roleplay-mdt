@@ -11,7 +11,8 @@ const NewMemberRequest = z.object({
 });
 
 const GetMembersRequest = z.object({
-  departmentId: z.string().transform(stringToNumber),
+  departmentId: z.ostring().transform(stringToNumber),
+  characterId: z.ostring().transform(stringToNumber),
 });
 
 const prisma = new PrismaClient();
@@ -54,7 +55,7 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 
 export type tDeptMembers = Prisma.PromiseReturnType<typeof GET>;
 const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
-  const { departmentId } = GetMembersRequest.parse(req.query);
+  const { departmentId, characterId } = GetMembersRequest.parse(req.query);
   const session = await getSession({ req });
   const isCop = session?.user.isCop;
 
@@ -62,21 +63,35 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   //   throw 'You are not a cop';
   // }
 
-  if (!departmentId) {
-    throw 'Not a department';
+  if (characterId) {
+    const members = await prisma.mdt_department_members.findUnique({
+      where: {
+        characterId: characterId,
+      },
+      include: {
+        fivem_characters: true,
+        mdt_department_ranks: true,
+      },
+    });
+
+    res.json(members);
+    return members;
   }
 
-  const members = await prisma.mdt_department_members.findMany({
-    where: {
-      departmentId: departmentId,
-    },
-    include: {
-      fivem_characters: true,
-    },
-  });
+  if (departmentId) {
+    const members = await prisma.mdt_department_members.findMany({
+      where: {
+        departmentId: departmentId,
+      },
+      include: {
+        fivem_characters: true,
+        mdt_department_ranks: true,
+      },
+    });
 
-  res.json(members);
-  return members;
+    res.json(members);
+    return members;
+  }
 };
 
 export default Members;

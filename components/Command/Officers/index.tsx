@@ -1,30 +1,44 @@
-import { mdt_department_members } from '.prisma/client';
-import { IconButton } from '@chakra-ui/button';
-import { EditIcon } from '@chakra-ui/icons';
+import { fivem_characters, mdt_department_members, mdt_department_ranks } from '.prisma/client';
+import { Button, IconButton } from '@chakra-ui/button';
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { Flex, Grid, Heading, Text } from '@chakra-ui/layout';
 import { Modal, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/modal';
-import { ModalBody } from '@chakra-ui/react';
+import {
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  InputLeftElement,
+  ModalBody,
+  Select,
+} from '@chakra-ui/react';
 import { useSession } from 'next-auth/client';
-import { Head } from 'next/document';
 import * as React from 'react';
 import useSWR, { SWRResponse } from 'swr';
-import { tDeptMember } from '../../../pages/api/departments/member';
-import { tDeptMembers } from '../../../pages/api/departments/members';
 import { LoadableContentSafe } from '../../../ui/LoadableContent';
+import { FiHash } from 'react-icons/fi';
+import { BiSave } from 'react-icons/bi';
+import { Formik, FormikProps, Form as FForm } from 'formik';
+import useDepartments from '../../hooks/api/useDepartments';
 
 interface OfficersProps {}
+
+export interface DeptMember extends mdt_department_members {
+  fivem_characters: fivem_characters;
+  mdt_department_ranks: mdt_department_ranks;
+}
 
 const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
   const [session, loading] = useSession();
   const [officer, setOfficer] = React.useState<number | undefined>();
+  const { departments, error: deptError } = useDepartments();
 
   const { data: officers, error } = useSWR(
     `/api/departments/members?departmentId=${session?.user.dept}`,
-  ) as SWRResponse<tDeptMembers, any>;
+  ) as SWRResponse<DeptMember[], any>;
 
   const { data: member, error: memberError } = useSWR(
-    Boolean(officer) ? `/api/departments/member?characterId=${officer}` : '',
-  ) as SWRResponse<tDeptMember, any>;
+    Boolean(officer) ? `/api/departments/members?characterId=${officer}` : '',
+  ) as SWRResponse<DeptMember, any>;
 
   return (
     <React.Fragment>
@@ -62,7 +76,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                     </Flex>
                     <Flex mt="1" alignItems="center" justifyContent="center">
                       <Text mr="2" color="gray.400" fontSize="xs">
-                        Rank: {o.rankId}
+                        Rank: {o.mdt_department_ranks.rankName}
                       </Text>
                       <Text color="gray.400" fontSize="xs">
                         Call Sign: {o.callSign}
@@ -90,10 +104,73 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
       <Modal isCentered isOpen={Boolean(officer)} onClose={() => setOfficer(undefined)}>
         <ModalOverlay background="blackAlpha.500" backdropFilter="blur(0.5px)" />
         <ModalContent>
-          <ModalHeader>Edit Officer</ModalHeader>
-          <ModalBody>
-            <Text>Editing Character ID {member?.fivem_characters.first_name}</Text>
-          </ModalBody>
+          <LoadableContentSafe data={{ member }} errors={[memberError]}>
+            {({ member }) => (
+              <ModalBody px="8" py="5">
+                <Flex w="100%" flexDir="column" mx="auto">
+                  <Flex>
+                    <Heading size="md">
+                      {member.mdt_department_ranks.rankName} {member.fivem_characters.first_name}{' '}
+                      {member.fivem_characters.last_name}
+                    </Heading>
+                  </Flex>
+                  <Formik
+                    onSubmit={() => {}}
+                    initialValues={{
+                      callSign: member.callSign,
+                      rank: member.rankId,
+                    }}
+                  >
+                    {props => (
+                      <FForm>
+                        <Grid my="5" mb="8" templateColumns="repeat(1, 1fr)" gap="3.5">
+                          <InputGroup variant="filled">
+                            <InputLeftAddon children={<FiHash />} />
+                            <Input
+                              placeholder="Call Sign"
+                              _focus={{ boxShadow: 'none' }}
+                              value={props.values.callSign}
+                              onChange={e => {
+                                if (isNaN(Number(e.target.value))) return;
+                                props.setFieldValue('callSign', e.target.value);
+                              }}
+                            />
+                          </InputGroup>
+                          <Flex flexDir="column">
+                            <Text fontSize="sm" color="yellow.300" mb="0.5">
+                              Member Rank:
+                            </Text>
+                            <Select
+                              value={props.values.rank}
+                              onChange={e => {
+                                props.setFieldValue('rank', e.target.value);
+                              }}
+                            >
+                              {departments
+                                ?.find(d => d.departmentId === session?.user.dept)
+                                ?.mdt_department_ranks.map(r => (
+                                  <option value={r.rankId} key={r.rankId}>
+                                    {r.rankName}
+                                  </option>
+                                ))}
+                            </Select>
+                          </Flex>
+                        </Grid>
+                        <Flex>
+                          <Button size="sm" mr="2.5" colorScheme="yellow" leftIcon={<BiSave />}>
+                            Submit Changes
+                          </Button>
+                          <Button size="sm" colorScheme="red" leftIcon={<DeleteIcon />}>
+                            Remove Officer
+                          </Button>
+                        </Flex>
+                      </FForm>
+                    )}
+                  </Formik>
+                </Flex>
+              </ModalBody>
+            )}
+          </LoadableContentSafe>
         </ModalContent>
       </Modal>
     </React.Fragment>

@@ -433,6 +433,16 @@ model mdt_annoucments {
   @@map("_mdt_annoucments")
 }
 
+model mdt_associates {
+  associateId      Int              @id @default(autoincrement())
+  characterId      Int
+  associatedId     Int
+  fivem_characters fivem_characters @relation("fivem_charactersTo_mdt_associates", fields: [associatedId], references: [id])
+
+  @@index([associatedId], name: "associatedId")
+  @@map("_mdt_associates")
+}
+
 model mdt_booked_charges_new {
   bookedChargeId   Int              @id @default(autoincrement())
   bookingId        Int
@@ -558,6 +568,13 @@ model mdt_department_ranks {
   @@map("_mdt_department_ranks")
 }
 
+model mdt_department_subdepartments {
+  subdepartmentId   Int    @id @default(autoincrement())
+  subdepartmentName String @db.VarChar(255)
+
+  @@map("_mdt_department_subdepartments")
+}
+
 model mdt_departments {
   departmentId           Int                      @id @default(autoincrement())
   departmentName         String                   @db.VarChar(255)
@@ -565,6 +582,17 @@ model mdt_departments {
   mdt_department_ranks   mdt_department_ranks[]   @relation("mdt_department_ranksTo_mdt_departments")
 
   @@map("_mdt_departments")
+}
+
+model mdt_dispatch_new {
+  recordId         Int              @id @default(autoincrement())
+  characterId      Int
+  clockIn          DateTime         @db.DateTime(0)
+  clockOut         DateTime?        @db.DateTime(0)
+  fivem_characters fivem_characters @relation("fivem_charactersTo_mdt_dispatch_new", fields: [characterId], references: [id])
+
+  @@index([characterId], name: "characterId")
+  @@map("_mdt_dispatch_new")
 }
 
 model mdt_flag_types {
@@ -634,32 +662,4 @@ model mdt_warrants {
   @@index([requesting_officer_id], name: "FK__mdt_warrants__mdt_officers_officerid")
   @@index([report_id], name: "FK__mdt_warrants__mdt_reports_reportid")
   @@map("_mdt_warrants")
-}
-
-model mdt_dispatch_new {
-  recordId         Int              @id @default(autoincrement())
-  characterId      Int
-  clockIn          DateTime         @db.DateTime(0)
-  clockOut         DateTime?        @db.DateTime(0)
-  fivem_characters fivem_characters @relation("fivem_charactersTo_mdt_dispatch_new", fields: [characterId], references: [id])
-
-  @@index([characterId], name: "characterId")
-  @@map("_mdt_dispatch_new")
-}
-
-model mdt_associates {
-  associateId      Int              @id @default(autoincrement())
-  characterId      Int
-  associatedId     Int
-  fivem_characters fivem_characters @relation("fivem_charactersTo_mdt_associates", fields: [associatedId], references: [id])
-
-  @@index([associatedId], name: "associatedId")
-  @@map("_mdt_associates")
-}
-
-model mdt_department_subdepartments {
-  subdepartmentId   Int    @id @default(autoincrement())
-  subdepartmentName String @db.VarChar(255)
-
-  @@map("_mdt_department_subdepartments")
 }
