@@ -73,6 +73,7 @@ const BookingCategoryCon = ({
                       gap={1}
                     >
                       {cat.mdt_charges
+                        .filter(c => !c.deleted)
                         .filter(_c => _c.name?.toLocaleLowerCase().match(filter))
                         .map(char => (
                           <ChargeBox addChagre={addChagre} charge={char} key={char.chargeid} />

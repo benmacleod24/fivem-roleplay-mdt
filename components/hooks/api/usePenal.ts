@@ -5,16 +5,23 @@ export interface mdtCharges {
   mdt_charges: mdt_charges[];
 }
 
-export const usePenal = (): {
+export const usePenal = (
+  getDeleted?: boolean,
+): {
   category?: Array<mdt_charges_categories & mdtCharges>;
   error: any;
+  mutate: any;
 } => {
-  const { data: category, error } = useSWR('/api/penal') as SWRResponse<
+  const {
+    data: category,
+    error,
+    mutate,
+  } = useSWR(`/api/penal?getDeleted=${getDeleted ? true : false}`) as SWRResponse<
     Array<mdt_charges_categories & mdtCharges> | undefined,
     any
   >;
 
-  return { category, error };
+  return { category, error, mutate };
 };
 
 export default usePenal;

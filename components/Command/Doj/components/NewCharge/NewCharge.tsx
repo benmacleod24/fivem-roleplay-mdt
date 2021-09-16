@@ -1,7 +1,7 @@
 import { EditIcon, SearchIcon } from '@chakra-ui/icons';
 import { Input, InputGroup, InputLeftElement } from '@chakra-ui/input';
 import { Flex, Heading, Text } from '@chakra-ui/layout';
-import { Button, Textarea } from '@chakra-ui/react';
+import { Button, Checkbox, Switch, Textarea, useToast } from '@chakra-ui/react';
 import * as React from 'react';
 import { BiDollar, BiMoney } from 'react-icons/bi';
 import { BsClock } from 'react-icons/bs';
@@ -31,10 +31,27 @@ const validSchema = yup.object().shape({
 });
 
 const NewCharge: React.FunctionComponent<NewChargeProps> = ({}) => {
-  const { category, error: penalError } = usePenal();
+  const { category, error: penalError, mutate } = usePenal();
+  const toast = useToast();
 
   const handleNewCharge = async (values: typeof newChargeInitValues, actions: any) => {
-    console.log(values);
+    try {
+      const res = await fetch('/api/penal', {
+        method: 'POST',
+        body: JSON.stringify({ ...values }),
+      }).then(r => r.json());
+      toast({
+        position: 'top-right',
+        status: 'success',
+        description: 'New Charge Made!',
+      });
+    } catch (e) {
+      toast({
+        position: 'top-right',
+        status: 'error',
+        description: 'An error occured while making new charge',
+      });
+    }
   };
 
   return (
@@ -103,6 +120,23 @@ const NewCharge: React.FunctionComponent<NewChargeProps> = ({}) => {
                     onChange={e => props.setFieldValue('chargeFine', e.target.value)}
                   />
                 </InputGroup>
+              </Flex>
+              <Flex flexDir="column" mt="2" w="fit-content">
+                <Text mb="1" fontSize="sm" color="gray.500">
+                  Hold Until Trial
+                </Text>
+                <Switch
+                  isChecked={Boolean(Number(props.values.chargeTime) >= 99999)}
+                  onChange={e => {
+                    if (Boolean(Number(props.values.chargeTime) >= 99999)) {
+                      props.setFieldValue('chargeTime', '0');
+                      props.setFieldValue('chargeFine', '0');
+                    } else {
+                      props.setFieldValue('chargeTime', String(99999));
+                      props.setFieldValue('chargeFine', String(99999));
+                    }
+                  }}
+                />
               </Flex>
             </Flex>
             <Flex mb="5" flexDir="column">

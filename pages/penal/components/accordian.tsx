@@ -46,6 +46,7 @@ const PCodeAccordian = ({ category }: { category?: (mdt_charges_categories & mdt
                 <AccordionPanel>
                   <VStack spacing={3}>
                     {c.mdt_charges
+                      .filter(c => !c.deleted)
                       .filter(c => {
                         return (
                           (c.description && c.description.toLowerCase().match(filter)) ||
