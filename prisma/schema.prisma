@@ -72,13 +72,13 @@ model fivem_characters {
   first_name                                                           String?                           @db.VarChar(255)
   last_name                                                            String?                           @db.VarChar(255)
   dob                                                                  String?                           @db.VarChar(255)
-  cash                                                                 Decimal                           @default(500.00) @db.Decimal(20, 2)
-  payslip                                                              Decimal                           @default(0.00) @db.Decimal(20, 2)
+  cash                                                                 BigInt                            @default(500)
+  payslip                                                              BigInt                            @default(0)
   gender                                                               Boolean?                          @default(false)
   deleted                                                              Boolean?                          @default(false)
   ammo                                                                 String?                           @db.MediumText
   image                                                                String?                           @db.VarChar(255)
-  mmc                                                                  Decimal?                          @default(0.00) @db.Decimal(20, 2)
+  mmc                                                                  Int?
   fivem_users                                                          fivem_users?                      @relation("fivem_charactersTo_fivem_users", fields: [uId], references: [id])
   fivem_accounts_access                                                fivem_accounts_access[]           @relation("fivem_accounts_accessTo_fivem_characters")
   fivem_apartments                                                     fivem_apartments[]                @relation("fivem_apartmentsTo_fivem_characters")
@@ -94,7 +94,7 @@ model fivem_characters {
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_criminalId      mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_criminalId")
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_filingOfficerId mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId")
   mdt_criminals                                                        mdt_criminals[]                   @relation("fivem_charactersTo_mdt_criminals")
-  mdt_department_members                                               mdt_department_members[]          @relation("fivem_charactersTo_mdt_department_members")
+  mdt_department_members                                               mdt_department_members?           @relation("fivem_charactersTo_mdt_department_members")
   mdt_dispatch_new                                                     mdt_dispatch_new[]                @relation("fivem_charactersTo_mdt_dispatch_new")
   mdt_reports_involved_new                                             mdt_reports_involved_new[]        @relation("fivem_charactersTo_mdt_reports_involved_new")
   mdt_reports_new                                                      mdt_reports_new[]                 @relation("fivem_charactersTo_mdt_reports_new")
@@ -475,6 +475,7 @@ model mdt_charges {
   time                   Int?
   fine                   Int?
   class                  String?                  @db.VarChar(255)
+  deleted                Boolean?                 @default(false)
   mdt_charges_categories mdt_charges_categories?  @relation("mdt_chargesTo_mdt_charges_categories", fields: [category_id], references: [categoryid])
   mdt_booked_charges_new mdt_booked_charges_new[] @relation("mdt_booked_charges_newTo_mdt_charges")
 
@@ -535,12 +536,12 @@ model mdt_department_members {
   memberId             Int                  @id @default(autoincrement())
   departmentId         Int
   rankId               Int
-  characterId          Int
+  characterId          Int                  @unique
+  callSign             String               @db.Text
   fivem_characters     fivem_characters     @relation("fivem_charactersTo_mdt_department_members", fields: [characterId], references: [id])
   mdt_departments      mdt_departments      @relation("mdt_department_membersTo_mdt_departments", fields: [departmentId], references: [departmentId])
   mdt_department_ranks mdt_department_ranks @relation("mdt_department_membersTo_mdt_department_ranks", fields: [rankId], references: [rankId])
 
-  @@index([characterId], name: "characterId")
   @@index([departmentId], name: "departmentId")
   @@index([rankId], name: "rankId")
   @@map("_mdt_department_members")

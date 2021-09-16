@@ -35,8 +35,9 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { characterId, departmentId, rankId } = NewMemberRequest.parse(JSON.parse(req.body));
   const session = await getSession({ req });
   const isCop = session?.user.isCop;
+  const isJudge = session?.user.isJudge;
 
-  if (!isCop) {
+  if (!isCop || !isJudge) {
     throw 'You are not a cop';
   }
 
