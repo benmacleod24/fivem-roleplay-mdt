@@ -33,10 +33,21 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     });
   }
 
+  const select = {
+    id: true,
+    uId: true,
+    cuid: true,
+    dob: true,
+    first_name: true,
+    last_name: true,
+    gender: true,
+  };
+
   const citizen = await prisma.fivem_characters.findFirst({
     where: {
       cuid: citizenid,
     },
+    select,
   });
 
   res.json(citizen);

@@ -47,6 +47,7 @@ export default async function Citizen(
     take,
     skip: page !== undefined && page !== null ? page * take : 0,
     orderBy: { id: 'asc' },
+    select,
   });
   res.json(posts);
 }

@@ -36,9 +36,10 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { characterId, departmentId, rankId } = NewMemberRequest.parse(JSON.parse(req.body));
   const session = await getSession({ req });
   const isCop = session?.user.isCop;
+  const isJudge = session?.user.isJudge;
 
-  if (!isCop) {
-    throw 'You are not a cop';
+  if (!isJudge && !isCop) {
+    throw 'Not Cop or Judge';
   }
 
   const newMember = await prisma.mdt_department_members.create({
@@ -58,10 +59,11 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const { departmentId, characterId } = GetMembersRequest.parse(req.query);
   const session = await getSession({ req });
   const isCop = session?.user.isCop;
+  const isJudge = session?.user.isJudge;
 
-  // if (!isCop) {
-  //   throw 'You are not a cop';
-  // }
+  if (!isJudge && !isCop) {
+    throw 'Not Cop or Judge';
+  }
 
   if (characterId) {
     const members = await prisma.mdt_department_members.findUnique({

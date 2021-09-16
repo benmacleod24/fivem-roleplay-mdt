@@ -1,5 +1,5 @@
 import { Flex, Text } from '@chakra-ui/layout';
-import { Button, Heading, Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
+import { Button, Heading, Input, InputGroup, InputLeftElement, useToast } from '@chakra-ui/react';
 import * as React from 'react';
 import usePenal, { mdtCharges } from '../../../../hooks/api/usePenal';
 import * as yup from 'yup';
@@ -14,14 +14,10 @@ const EditCharge: React.FunctionComponent<EditChargeProps> = ({}) => {
   const { category, error: penalError } = usePenal();
   const [currCat, setCat] = React.useState<(mdt_charges_categories & mdtCharges) | undefined>();
   const [currCharge, setCharge] = React.useState<mdt_charges | undefined>();
+  const toast = useToast();
 
   const initValues = {
-    chargeTitle: '',
-    chargeDescription: '',
-    chargeTime: '',
-    chargeFine: '',
-    chargeCategory: 0,
-    chargeClass: '',
+    chargeId: '',
   };
 
   return (
@@ -38,7 +34,22 @@ const EditCharge: React.FunctionComponent<EditChargeProps> = ({}) => {
       <Formik
         initialValues={initValues}
         onSubmit={async (values, actions) => {
-          console.log(values);
+          try {
+            const res = await fetch(`/api/penal?chargeId=${values.chargeId}`, {
+              method: 'DELETE',
+            }).then(r => r.json());
+            toast({
+              position: 'top-right',
+              status: 'success',
+              description: 'Charge Deleted!',
+            });
+          } catch (e) {
+            toast({
+              position: 'top-right',
+              status: 'error',
+              description: 'An error occured while deleting charge',
+            });
+          }
         }}
       >
         {(props: FormikProps<typeof initValues>) => (
@@ -70,7 +81,6 @@ const EditCharge: React.FunctionComponent<EditChargeProps> = ({}) => {
                 placeholder="Select Category"
                 name="chargeCategory"
                 onChange={e => {
-                  props.setFieldValue('chargeCategory', e.target.value);
                   setCat(category?.find(c => c.categoryid === Number(e.target.value)));
                 }}
               >
@@ -94,20 +104,19 @@ const EditCharge: React.FunctionComponent<EditChargeProps> = ({}) => {
                 placeholder="Select Charge"
                 name="charge"
                 onChange={async e => {
-                  props.setFieldValue('charge', e.target.value);
+                  props.setFieldValue('chargeId', e.target.value);
                   setCharge(currCat?.mdt_charges.find(c => c.chargeid === Number(e.target.value)));
-                  props.setFieldValue('chargeTitle', currCharge?.name);
                 }}
               >
                 {currCat ? (
-                  currCat.mdt_charges.map(c => <option>{c.name}</option>)
+                  currCat.mdt_charges.map(c => <option value={c.chargeid}>{c.name}</option>)
                 ) : (
                   <option>No options avaible</option>
                 )}
               </Form.Select>
             </Flex>
             <Flex mb="5" flexDir="column">
-              <Button colorScheme="red" isLoading={props.isSubmitting}>
+              <Button colorScheme="red" type="submit" isLoading={props.isSubmitting}>
                 Delete Charge
               </Button>
             </Flex>

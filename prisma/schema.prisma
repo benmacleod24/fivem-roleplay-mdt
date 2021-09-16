@@ -72,13 +72,13 @@ model fivem_characters {
   first_name                                                           String?                           @db.VarChar(255)
   last_name                                                            String?                           @db.VarChar(255)
   dob                                                                  String?                           @db.VarChar(255)
-  cash                                                                 Decimal                           @default(500.00) @db.Decimal(20, 2)
-  payslip                                                              Decimal                           @default(0.00) @db.Decimal(20, 2)
+  cash                                                                 BigInt                            @default(500)
+  payslip                                                              BigInt                            @default(0)
   gender                                                               Boolean?                          @default(false)
   deleted                                                              Boolean?                          @default(false)
   ammo                                                                 String?                           @db.MediumText
   image                                                                String?                           @db.VarChar(255)
-  mmc                                                                  Decimal?                          @default(0.00) @db.Decimal(20, 2)
+  mmc                                                                  Int?
   fivem_users                                                          fivem_users?                      @relation("fivem_charactersTo_fivem_users", fields: [uId], references: [id])
   fivem_accounts_access                                                fivem_accounts_access[]           @relation("fivem_accounts_accessTo_fivem_characters")
   fivem_apartments                                                     fivem_apartments[]                @relation("fivem_apartmentsTo_fivem_characters")
@@ -93,7 +93,6 @@ model fivem_characters {
   mdt_associates                                                       mdt_associates[]                  @relation("fivem_charactersTo_mdt_associates")
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_criminalId      mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_criminalId")
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_filingOfficerId mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId")
-  mdt_criminals                                                        mdt_criminals[]                   @relation("fivem_charactersTo_mdt_criminals")
   mdt_department_members                                               mdt_department_members?           @relation("fivem_charactersTo_mdt_department_members")
   mdt_dispatch_new                                                     mdt_dispatch_new[]                @relation("fivem_charactersTo_mdt_dispatch_new")
   mdt_reports_involved_new                                             mdt_reports_involved_new[]        @relation("fivem_charactersTo_mdt_reports_involved_new")
@@ -485,6 +484,7 @@ model mdt_charges {
   time                   Int?
   fine                   Int?
   class                  String?                  @db.VarChar(255)
+  deleted                Boolean?                 @default(false)
   mdt_charges_categories mdt_charges_categories?  @relation("mdt_chargesTo_mdt_charges_categories", fields: [category_id], references: [categoryid])
   mdt_booked_charges_new mdt_booked_charges_new[] @relation("mdt_booked_charges_newTo_mdt_charges")
 
@@ -504,7 +504,6 @@ model mdt_criminal_flags {
   flagid         Int             @id @default(autoincrement())
   criminal_id    Int?
   type_id        Int?
-  mdt_criminals  mdt_criminals?  @relation("mdt_criminal_flagsTo_mdt_criminals", fields: [criminal_id], references: [criminalid])
   mdt_flag_types mdt_flag_types? @relation("mdt_criminal_flagsTo_mdt_flag_types", fields: [type_id], references: [typeid])
 
   @@index([criminal_id], name: "FK__mdt_criminal_flags_criminalid")
@@ -513,32 +512,15 @@ model mdt_criminal_flags {
 }
 
 model mdt_criminal_notes {
-  noteid        Int            @id @default(autoincrement())
-  criminal_id   Int?
-  note_content  String?        @db.LongText
-  note_date     DateTime?      @default(now()) @db.Timestamp(0)
-  note_author   Int?
-  mdt_criminals mdt_criminals? @relation("mdt_criminal_notesTo_mdt_criminals", fields: [criminal_id], references: [criminalid])
-  mdt_officers  mdt_officers?  @relation("mdt_criminal_notesTo_mdt_officers", fields: [note_author], references: [officerid])
+  noteid       Int       @id @default(autoincrement())
+  criminal_id  Int?
+  note_content String?   @db.LongText
+  note_date    DateTime? @default(now()) @db.Timestamp(0)
+  note_author  Int?
 
   @@index([criminal_id], name: "FK__mdt_criminal_notes_criminal_id")
   @@index([note_author], name: "FK__mdt_criminal_notes_note_author")
   @@map("_mdt_criminal_notes")
-}
-
-model mdt_criminals {
-  criminalid         Int                  @id @default(autoincrement())
-  character_uid      String               @db.VarChar(255)
-  first_name         String?              @db.VarChar(255)
-  last_name          String?              @db.VarChar(255)
-  date_of_birth      String?              @db.VarChar(255)
-  image              String?              @db.VarChar(255)
-  fivem_characters   fivem_characters     @relation("fivem_charactersTo_mdt_criminals", fields: [character_uid], references: [cuid])
-  mdt_criminal_flags mdt_criminal_flags[] @relation("mdt_criminal_flagsTo_mdt_criminals")
-  mdt_criminal_notes mdt_criminal_notes[] @relation("mdt_criminal_notesTo_mdt_criminals")
-
-  @@index([character_uid], name: "character_uid")
-  @@map("_mdt_criminals")
 }
 
 model mdt_department_members {
@@ -604,22 +586,6 @@ model mdt_flag_types {
   @@map("_mdt_flag_types")
 }
 
-model mdt_officers {
-  officerid          Int                  @id @default(autoincrement())
-  officeruid         String?              @default(dbgenerated("(uuid())")) @db.VarChar(255)
-  character_id       String?              @db.VarChar(255)
-  username           String?              @db.VarChar(255)
-  password           String?              @db.VarChar(255)
-  first_name         String?              @db.VarChar(255)
-  last_name          String?              @db.VarChar(255)
-  call_sign          Int?
-  blacklisted        Int?
-  mdt_criminal_notes mdt_criminal_notes[] @relation("mdt_criminal_notesTo_mdt_officers")
-  mdt_warrants       mdt_warrants[]       @relation("mdt_officersTo_mdt_warrants")
-
-  @@map("_mdt_officers")
-}
-
 model mdt_reports_involved_new {
   involvedid       Int               @id @default(autoincrement())
   report_id        Int?
@@ -648,15 +614,14 @@ model mdt_reports_new {
 }
 
 model mdt_warrants {
-  warrantid             Int           @id @default(autoincrement())
+  warrantid             Int       @id @default(autoincrement())
   requesting_officer_id Int?
   report_id             Int?
   booking_id            Int?
-  approved              Boolean?      @default(false)
-  start                 DateTime?     @db.DateTime(0)
-  end                   DateTime?     @db.DateTime(0)
-  served                Int?          @default(0) @db.TinyInt
-  mdt_officers          mdt_officers? @relation("mdt_officersTo_mdt_warrants", fields: [requesting_officer_id], references: [officerid])
+  approved              Boolean?  @default(false)
+  start                 DateTime? @db.DateTime(0)
+  end                   DateTime? @db.DateTime(0)
+  served                Int?      @default(0) @db.TinyInt
 
   @@index([booking_id], name: "FK__mdt_warrants__mdt_bookings_bookingid")
   @@index([requesting_officer_id], name: "FK__mdt_warrants__mdt_officers_officerid")
