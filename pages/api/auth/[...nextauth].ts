@@ -147,7 +147,7 @@ export default NextAuth({
         //       `);
 
         const copList = await prisma.$queryRaw(`
-              SELECT u.id, u.discord, c.first_name, c.last_name, c.id as copId, wcj.job_id, wlj.name, depr.rankLevel FROM _fivem_users as u 
+              SELECT u.id, u.discord, c.first_name, c.last_name, c.id as copId, wcj.job_id, wlj.name, depr.rankLevel, depm.departmentId FROM _fivem_users as u 
                 LEFT JOIN _fivem_characters as c on u.id = c.uId
                 LEFT JOIN _fivem_whitelist_characters_jobs as wcj ON c.id = wcj.character_id
                 LEFT JOIN _fivem_whitelist_jobs as wlj ON wlj.jobid = wcj.job_id

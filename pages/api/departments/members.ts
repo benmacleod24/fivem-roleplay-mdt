@@ -65,13 +65,25 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     throw 'Not Cop or Judge';
   }
 
+  const select = {
+    id: true,
+    uId: true,
+    cuid: true,
+    dob: true,
+    first_name: true,
+    last_name: true,
+    gender: true,
+  };
+
   if (characterId) {
     const members = await prisma.mdt_department_members.findUnique({
       where: {
         characterId: characterId,
       },
       include: {
-        fivem_characters: true,
+        fivem_characters: {
+          select,
+        },
         mdt_department_ranks: true,
       },
     });
@@ -86,7 +98,9 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         departmentId: departmentId,
       },
       include: {
-        fivem_characters: true,
+        fivem_characters: {
+          select,
+        },
         mdt_department_ranks: true,
       },
     });
@@ -94,6 +108,8 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     res.json(members);
     return members;
   }
+
+  res.json([]);
 };
 
 export default Members;
