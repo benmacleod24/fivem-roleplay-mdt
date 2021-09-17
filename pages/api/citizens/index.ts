@@ -3,6 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
 import { stringToNumber } from '../../../utils/parse';
 
+BigInt.prototype.toJSON = function () {
+  return Number(this);
+};
+
 const prisma = new PrismaClient();
 
 const CitizenRequest = z.object({

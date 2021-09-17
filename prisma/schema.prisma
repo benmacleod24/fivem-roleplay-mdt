@@ -33,7 +33,7 @@ model fivem_accounts {
   account_routing       Int?
   account_name          String?                 @db.VarChar(255)
   account_type          Int?
-  account_amount        Decimal?                @default(5000.00) @db.Decimal(30, 2)
+  account_amount        BigInt?                 @default(0)
   fivem_account_types   fivem_account_types?    @relation("fivem_account_typesTo_fivem_accounts", fields: [account_type], references: [typeid])
   fivem_accounts_access fivem_accounts_access[] @relation("fivem_accountsTo_fivem_accounts_access")
 
@@ -57,7 +57,7 @@ model fivem_accounts_access {
 model fivem_apartments {
   id               Int               @id @default(autoincrement())
   cid              Int?
-  stash            Decimal?          @default(0.00) @db.Decimal(20, 2)
+  stash            BigInt?           @default(0)
   outfits          String            @default("{}") @db.Text
   fivem_characters fivem_characters? @relation("fivem_apartmentsTo_fivem_characters", fields: [cid], references: [id])
 
@@ -68,17 +68,18 @@ model fivem_apartments {
 model fivem_characters {
   id                                                                   Int                               @id @default(autoincrement())
   uId                                                                  Int?
+  deleted                                                              Boolean?                          @default(false)
+  newchar                                                              Int?                              @default(1)
   cuid                                                                 String                            @unique @db.VarChar(255)
   first_name                                                           String?                           @db.VarChar(255)
   last_name                                                            String?                           @db.VarChar(255)
   dob                                                                  String?                           @db.VarChar(255)
-  cash                                                                 Decimal                           @default(500.00) @db.Decimal(20, 2)
-  payslip                                                              Decimal                           @default(0.00) @db.Decimal(20, 2)
+  cash                                                                 BigInt                            @default(500)
+  payslip                                                              BigInt                            @default(0)
+  mmc                                                                  Int?                              @default(0)
   gender                                                               Boolean?                          @default(false)
-  deleted                                                              Boolean?                          @default(false)
   ammo                                                                 String?                           @db.MediumText
   image                                                                String?                           @db.VarChar(255)
-  mmc                                                                  Decimal?                          @default(0.00) @db.Decimal(20, 2)
   fivem_users                                                          fivem_users?                      @relation("fivem_charactersTo_fivem_users", fields: [uId], references: [id])
   fivem_accounts_access                                                fivem_accounts_access[]           @relation("fivem_accounts_accessTo_fivem_characters")
   fivem_apartments                                                     fivem_apartments[]                @relation("fivem_apartmentsTo_fivem_characters")
@@ -90,11 +91,10 @@ model fivem_characters {
   fivem_properties                                                     fivem_properties[]                @relation("fivem_charactersTo_fivem_properties")
   fivem_vehicles                                                       fivem_vehicles[]                  @relation("fivem_charactersTo_fivem_vehicles")
   fivem_whitelist_characters_jobs                                      fivem_whitelist_characters_jobs[] @relation("fivem_charactersTo_fivem_whitelist_characters_jobs")
-  mdt_associates                                                       mdt_associates[]                  @relation("fivem_charactersTo_mdt_associates")
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_criminalId      mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_criminalId")
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_filingOfficerId mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId")
   mdt_criminals                                                        mdt_criminals[]                   @relation("fivem_charactersTo_mdt_criminals")
-  mdt_department_members                                               mdt_department_members[]          @relation("fivem_charactersTo_mdt_department_members")
+  mdt_department_members                                               mdt_department_members?           @relation("fivem_charactersTo_mdt_department_members")
   mdt_dispatch_new                                                     mdt_dispatch_new[]                @relation("fivem_charactersTo_mdt_dispatch_new")
   mdt_reports_involved_new                                             mdt_reports_involved_new[]        @relation("fivem_charactersTo_mdt_reports_involved_new")
   mdt_reports_new                                                      mdt_reports_new[]                 @relation("fivem_charactersTo_mdt_reports_new")
@@ -186,12 +186,13 @@ model fivem_licenses {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model fivem_pdm_vehicles {
-  name     String  @db.VarChar(50)
-  model    String  @db.VarChar(50)
-  costs    Decimal @default(0) @db.Decimal(10, 0)
-  stock    Int     @default(0)
-  category String  @db.VarChar(50)
-  selling  Int?    @default(1)
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(50)
+  model    String @db.VarChar(50)
+  costs    BigInt @default(0)
+  stock    Int    @default(0)
+  category String @db.VarChar(50)
+  selling  Int?   @default(1)
 
   @@map("_fivem_pdm_vehicles")
   @@ignore
@@ -201,8 +202,6 @@ model fivem_phones {
   phoneid               Int                     @id @default(autoincrement())
   phone_owner           Int?
   phone_number          String?                 @unique @db.VarChar(255)
-  burner                Int?                    @default(0)
-  burner_number         String?                 @default("0") @db.VarChar(255)
   fivem_characters      fivem_characters?       @relation("fivem_charactersTo_fivem_phones", fields: [phone_owner], references: [id])
   fivem_phones_contacts fivem_phones_contacts[] @relation("fivem_phonesTo_fivem_phones_contacts")
 
@@ -267,7 +266,7 @@ model fivem_properties {
 model fivem_properties_details {
   detailsid        Int               @id @default(autoincrement())
   property_id      Int?
-  stash            Decimal           @default(0.00) @db.Decimal(20, 2)
+  stash            BigInt            @default(0)
   finance          String?           @db.Text
   fivem_properties fivem_properties? @relation("fivem_propertiesTo_fivem_properties_details", fields: [property_id], references: [property_id])
 
@@ -316,13 +315,11 @@ model fivem_properties_positions {
 model fivem_users {
   id               Int                @id @default(autoincrement())
   uuid             String?            @db.VarChar(255)
-  steamId          String             @default("0") @db.VarChar(255)
   license          String             @default("0") @db.VarChar(255)
+  steamId          String             @default("0") @db.VarChar(255)
   discord          String             @default("0") @db.VarChar(255)
   ip               String             @default("0") @db.VarChar(255)
   priority         Int?               @default(0)
-  banned           BigInt?
-  banned_reason    String?            @db.VarChar(255)
   fivem_characters fivem_characters[] @relation("fivem_charactersTo_fivem_users")
 
   @@map("_fivem_users")
@@ -535,12 +532,12 @@ model mdt_department_members {
   memberId             Int                  @id @default(autoincrement())
   departmentId         Int
   rankId               Int
-  characterId          Int
+  characterId          Int                  @unique
+  callSign             String               @db.Text
   fivem_characters     fivem_characters     @relation("fivem_charactersTo_mdt_department_members", fields: [characterId], references: [id])
   mdt_departments      mdt_departments      @relation("mdt_department_membersTo_mdt_departments", fields: [departmentId], references: [departmentId])
   mdt_department_ranks mdt_department_ranks @relation("mdt_department_membersTo_mdt_department_ranks", fields: [rankId], references: [rankId])
 
-  @@index([characterId], name: "characterId")
   @@index([departmentId], name: "departmentId")
   @@index([rankId], name: "rankId")
   @@map("_mdt_department_members")
@@ -577,17 +574,19 @@ model mdt_flag_types {
 }
 
 model mdt_officers {
-  officerid          Int                  @id @default(autoincrement())
-  officeruid         String?              @default(dbgenerated("(uuid())")) @db.VarChar(255)
-  character_id       String?              @db.VarChar(255)
-  username           String?              @db.VarChar(255)
-  password           String?              @db.VarChar(255)
-  first_name         String?              @db.VarChar(255)
-  last_name          String?              @db.VarChar(255)
-  call_sign          Int?
-  blacklisted        Int?
-  mdt_criminal_notes mdt_criminal_notes[] @relation("mdt_criminal_notesTo_mdt_officers")
-  mdt_warrants       mdt_warrants[]       @relation("mdt_officersTo_mdt_warrants")
+  officerid            Int                    @id @default(autoincrement())
+  officeruid           String?                @default(dbgenerated("(uuid())")) @db.VarChar(255)
+  character_id         String?                @db.VarChar(255)
+  username             String?                @db.VarChar(255)
+  password             String?                @db.VarChar(255)
+  first_name           String?                @db.VarChar(255)
+  last_name            String?                @db.VarChar(255)
+  call_sign            Int?
+  blacklisted          Int?
+  mdt_criminal_notes   mdt_criminal_notes[]   @relation("mdt_criminal_notesTo_mdt_officers")
+  mdt_reports          mdt_reports[]          @relation("mdt_officersTo_mdt_reports")
+  mdt_reports_involved mdt_reports_involved[] @relation("mdt_officersTo_mdt_reports_involved")
+  mdt_warrants         mdt_warrants[]         @relation("mdt_officersTo_mdt_warrants")
 
   @@map("_mdt_officers")
 }
@@ -628,6 +627,7 @@ model mdt_warrants {
   start                 DateTime?     @db.DateTime(0)
   end                   DateTime?     @db.DateTime(0)
   served                Int?          @default(0) @db.TinyInt
+  mdt_reports           mdt_reports?  @relation("mdt_reportsTo_mdt_warrants", fields: [report_id], references: [reportid])
   mdt_officers          mdt_officers? @relation("mdt_officersTo_mdt_warrants", fields: [requesting_officer_id], references: [officerid])
 
   @@index([booking_id], name: "FK__mdt_warrants__mdt_bookings_bookingid")
@@ -647,14 +647,68 @@ model mdt_dispatch_new {
   @@map("_mdt_dispatch_new")
 }
 
-model mdt_associates {
-  associateId      Int              @id @default(autoincrement())
-  characterId      Int
-  associatedId     Int
-  fivem_characters fivem_characters @relation("fivem_charactersTo_mdt_associates", fields: [associatedId], references: [id])
+model fivem_pdm_logs {
+  logid    Int     @id @default(autoincrement())
+  type     String? @db.VarChar(50)
+  model    String? @db.VarChar(50)
+  employee String? @db.VarChar(255)
+  ecid     Int?
+  soldto   String? @db.VarChar(255)
+  cid      Int?
+  total    Int?
+  comm     Int?
+  profit   Int?
+  time     String? @db.VarChar(255)
 
-  @@index([associatedId], name: "associatedId")
-  @@map("_mdt_associates")
+  @@map("_fivem_pdm_logs")
+}
+
+model mdt_dispatch {
+  recordid       Int       @id @default(autoincrement())
+  officer_id     Int?
+  clock_in_date  DateTime? @db.DateTime(0)
+  clock_out_date DateTime? @db.DateTime(0)
+
+  @@map("_mdt_dispatch")
+}
+
+model mdt_reports {
+  reportid             Int                    @id @default(autoincrement())
+  filing_officer_id    Int?
+  title                String?                @db.VarChar(255)
+  content              String?                @db.LongText
+  draft                Boolean?
+  date                 DateTime?              @db.DateTime(0)
+  mdt_officers         mdt_officers?          @relation("mdt_officersTo_mdt_reports", fields: [filing_officer_id], references: [officerid])
+  mdt_reports_images   mdt_reports_images[]   @relation("mdt_reportsTo_mdt_reports_images")
+  mdt_reports_involved mdt_reports_involved[] @relation("mdt_reportsTo_mdt_reports_involved")
+  mdt_warrants         mdt_warrants[]         @relation("mdt_reportsTo_mdt_warrants")
+
+  @@index([filing_officer_id], name: "FK__mdt_reports__mdt_officers_officerid")
+  @@map("_mdt_reports")
+}
+
+model mdt_reports_images {
+  imageid           Int          @id @default(autoincrement())
+  report_id         Int?
+  image_description String?      @db.VarChar(255)
+  image_url         String?      @db.VarChar(500)
+  mdt_reports       mdt_reports? @relation("mdt_reportsTo_mdt_reports_images", fields: [report_id], references: [reportid])
+
+  @@index([report_id], name: "FK__mdt_report_images__mdt_reports_reportid")
+  @@map("_mdt_reports_images")
+}
+
+model mdt_reports_involved {
+  involvedid   Int           @id @default(autoincrement())
+  report_id    Int?
+  officer_id   Int?
+  mdt_officers mdt_officers? @relation("mdt_officersTo_mdt_reports_involved", fields: [officer_id], references: [officerid])
+  mdt_reports  mdt_reports?  @relation("mdt_reportsTo_mdt_reports_involved", fields: [report_id], references: [reportid])
+
+  @@index([officer_id], name: "FK__mdt_report_involved__mdt_officers_officerid")
+  @@index([report_id], name: "FK__mdt_report_involved__mdt_reports_reportid")
+  @@map("_mdt_reports_involved")
 }
 
 model mdt_department_subdepartments {

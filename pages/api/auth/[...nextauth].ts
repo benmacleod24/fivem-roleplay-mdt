@@ -4,6 +4,11 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// todo move this to .env or some shit
+const ADMIN_DISCORD_IDS = [
+  '160829675940216832', // chips
+];
+
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
 
@@ -133,6 +138,7 @@ export default NextAuth({
       let copName;
       let copId;
       let rankLevel;
+      const isAdmin = ADMIN_DISCORD_IDS.indexOf(session.user.id.toString()) > -1;
       try {
         const copList = await prisma.$queryRaw(`
           select u.id, u.discord, c.first_name, c.last_name, c.id as copId, ucj.job_id, wlj.displayName, depr.rankLevel from _fivem_users as u 
@@ -143,7 +149,7 @@ export default NextAuth({
             left join _mdt_department_ranks as depr on depm.rankId = depr.rankId
               where wlj.displayName = 'Police Officer' and u.discord = ${discord};
               `);
-        isCop = (copList && copList.length > 0) ?? false;
+        isCop = (isAdmin || (copList && copList.length > 0)) ?? false;
         copName =
           (copList && copList.length > 0 && `${copList[0].first_name} ${copList[0].last_name}`) ??
           undefined;
