@@ -231,7 +231,7 @@ export const getServerSideProps: GetServerSideProps = async (
   ctx: GetServerSidePropsContext<ParsedUrlQuery>,
 ) => {
   const session = await getSession(ctx);
-  if (!session || !session.user || !session.user.isCop) {
+  if (!session || !session.user) {
     return { redirect: { permanent: false, destination: '/?l=t' } };
   }
   return { props: { session } };

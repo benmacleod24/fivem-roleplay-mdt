@@ -1,16 +1,18 @@
 import { Button, Flex, Heading } from '@chakra-ui/react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { getSession } from 'next-auth/client';
+import { getSession, useSession } from 'next-auth/client';
 import { ParsedUrlQuery } from 'querystring';
 import * as React from 'react';
 import DojContainer from '../../components/Command/Doj';
 import CommandHome from '../../components/Command/Home';
+import Officers from '../../components/Command/Officers';
 import Layout from '../../components/layout';
 
 export interface CommandProps {}
 
 const Command: React.FunctionComponent<CommandProps> = ({}) => {
   const [page, setPage] = React.useState('home');
+  const [session, loading] = useSession();
 
   return (
     <Layout>
@@ -54,19 +56,24 @@ const Command: React.FunctionComponent<CommandProps> = ({}) => {
           >
             Dept. Management
           </Button>
-          <Button
-            onClick={() => setPage('doj')}
-            variant={page === 'doj' ? 'solid' : 'ghost'}
-            colorScheme={page === 'doj' ? 'blue' : 'gray'}
-            justifyContent="flex-start"
-            my="1"
-          >
-            Dept. of Justice
-          </Button>
+          {session?.user.isJudge ? (
+            <Button
+              onClick={() => setPage('doj')}
+              variant={page === 'doj' ? 'solid' : 'ghost'}
+              colorScheme={page === 'doj' ? 'blue' : 'gray'}
+              justifyContent="flex-start"
+              my="1"
+            >
+              Dept. of Justice
+            </Button>
+          ) : (
+            ''
+          )}
         </Flex>
         <Flex h="full" w="full" px="1">
           {page === 'home' ? <CommandHome /> : ''}
           {page === 'doj' ? <DojContainer /> : ''}
+          {page === 'off_man' ? <Officers /> : ''}
         </Flex>
       </Flex>
     </Layout>
@@ -82,7 +89,7 @@ export const getServerSideProps: GetServerSideProps = async (
   if (
     !session ||
     !session.user ||
-    !session.user.isCop ||
+    (!session.user.isJudge && !session.user.isCop) ||
     !session.user.rankLvl ||
     session.user.rankLvl < 4
   ) {

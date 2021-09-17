@@ -135,21 +135,37 @@ export default NextAuth({
       const discord = user.sub ?? undefined;
       session.user.id = discord as number;
       let isCop = false;
+      let isJudge = false;
       let copName;
       let copId;
       let rankLevel;
       const isAdmin = ADMIN_DISCORD_IDS.indexOf(session.user.id.toString()) > -1;
       try {
+        // const copList = await prisma.$queryRaw(`
+        //   select u.id, u.discord, c.first_name, c.last_name, c.id as copId, ucj.job_id, wlj.displayName, depr.rankLevel from _fivem_users as u
+        //     left join _fivem_characters as c on u.id=c.uId
+        //     left join _fivem_whitelist_characters_jobs as ucj on c.id = ucj.character_id
+        //     left join _fivem_whitelist_jobs as wlj on wlj.jobid = ucj.job_id
+        //     left join _mdt_department_members as depm on c.id = depm.characterId
+        //     left join _mdt_department_ranks as depr on depm.rankId = depr.rankId
+        //       where wlj.displayName = 'Police Officer' or wlj.displayName = 'Judge' and u.discord = ${discord};
+        //       `);
+
         const copList = await prisma.$queryRaw(`
-          select u.id, u.discord, c.first_name, c.last_name, c.id as copId, ucj.job_id, wlj.displayName, depr.rankLevel from _fivem_users as u 
-            left join _fivem_characters as c on u.id=c.uId
-            left join _fivem_whitelist_characters_jobs as ucj on c.id = ucj.character_id
-            left join _fivem_whitelist_jobs as wlj on wlj.jobid = ucj.job_id
-            left join _mdt_department_members as depm on c.id = depm.characterId
-            left join _mdt_department_ranks as depr on depm.rankId = depr.rankId
-              where wlj.displayName = 'Police Officer' and u.discord = ${discord};
-              `);
-        isCop = (isAdmin || (copList && copList.length > 0)) ?? false;
+              SELECT u.id, u.discord, c.first_name, c.last_name, c.id as copId, wcj.job_id, wlj.name, depr.rankLevel FROM _fivem_users as u 
+                LEFT JOIN _fivem_characters as c on u.id = c.uId
+                LEFT JOIN _fivem_whitelist_characters_jobs as wcj ON c.id = wcj.character_id
+                LEFT JOIN _fivem_whitelist_jobs as wlj ON wlj.jobid = wcj.job_id
+                LEFT JOIN _mdt_department_members as depm ON c.id = depm.characterId
+                LEFT JOIN _mdt_department_ranks as depr on depm.rankId = depr.rankId
+                WHERE u.discord = ${discord} and c.deleted = 0 and (wlj.name = "cop" or wlj.name = "judge")
+        `);
+
+        isCop = (isAdmin || (copList && copList.length > 0 && copList[0].name === 'cop')) ?? false;
+
+        isJudge =
+          (isAdmin || (copList && copList.length > 0 && copList[0].name === 'judge')) ?? false;
+
         copName =
           (copList && copList.length > 0 && `${copList[0].first_name} ${copList[0].last_name}`) ??
           undefined;
@@ -163,6 +179,7 @@ export default NextAuth({
       }
 
       session.user.isCop = isCop;
+      session.user.isJudge = isJudge;
       session.user.copName = copName;
       session.user.copId = copId;
       session.user.rankLvl = rankLevel;

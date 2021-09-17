@@ -1,6 +1,6 @@
 import { Input, InputGroup, InputLeftElement } from '@chakra-ui/input';
 import { Flex, Heading, Text } from '@chakra-ui/layout';
-import { Button, Textarea } from '@chakra-ui/react';
+import { Button, Textarea, useToast } from '@chakra-ui/react';
 import * as React from 'react';
 import { BiDollar, BiMoney } from 'react-icons/bi';
 import { BsClock } from 'react-icons/bs';
@@ -30,12 +30,19 @@ const RegisterOfficer: React.FunctionComponent<RegisterOfficerProps> = ({}) => {
   const { category, error: penalError } = usePenal();
   const { departments, error: deptError } = useDepartments();
   const [currDept, setCurrDept] = React.useState<(mdt_departments & mdtRanks) | undefined>();
+  const toast = useToast();
 
   const handleNewCharge = async (values: typeof newChargeInitValues, actions: any) => {
     createMember({
       characterId: Number(values.characterId),
       departmentId: Number(values.departmentId),
       rankId: Number(values.rankId),
+    });
+    toast({
+      position: 'top-right',
+      title: 'Officer Registered',
+      description: `Registered #${values.characterId}`,
+      status: 'success',
     });
   };
 
