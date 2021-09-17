@@ -41,6 +41,10 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     throw 'Not Cop or Judge';
   }
 
+  if (!characterId || !departmentId || !rankId) {
+    throw 'Empty Values';
+  }
+
   const newMember = await prisma.mdt_department_members.create({
     data: {
       characterId,
@@ -68,12 +72,24 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     throw 'Not a department';
   }
 
+  const select = {
+    id: true,
+    uId: true,
+    cuid: true,
+    dob: true,
+    first_name: true,
+    last_name: true,
+    gender: true,
+  };
+
   const members = await prisma.mdt_department_members.findMany({
     where: {
       departmentId: departmentId,
     },
     include: {
-      fivem_characters: true,
+      fivem_characters: {
+        select,
+      },
     },
   });
 
