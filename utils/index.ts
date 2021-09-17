@@ -1,6 +1,7 @@
-const numberWithComma = (number: any): string => number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const numberWithComma = (number: any): string =>
+  (number && number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')) ?? 'should be a number here';
 
-export {numberWithComma}
+export { numberWithComma };
 export default {
-    numberWithComma
-}
+  numberWithComma,
+};
