@@ -21,7 +21,7 @@ const HeaderProfile: React.FunctionComponent<HeaderProfileProps> = ({}) => {
       minWidth="20%"
       justifyContent="flex-end"
       alignItems="center"
-      display={['none', 'none', 'none', 'flex']}
+      display={['none', 'none', 'none', 'none', 'flex']}
     >
       <Fade in={Boolean(session)} unmountOnExit>
         <Flex width="3rem" height="3rem" alignItems="center" mr="9">
@@ -45,7 +45,7 @@ const HeaderProfile: React.FunctionComponent<HeaderProfileProps> = ({}) => {
                   <Link href="/profile" passHref>
                     <MenuItem icon={<BsFillPersonLinesFill />}>Profile</MenuItem>
                   </Link>
-                  {session?.user.rankLvl || session!.user.rankLvl >= 4 ? (
+                  {session && session?.user.rankLvl && session.user.rankLvl >= 4 ? (
                     <Link href="/command" passHref>
                       <MenuItem icon={<GiRank3 />}>Command Managment</MenuItem>
                     </Link>

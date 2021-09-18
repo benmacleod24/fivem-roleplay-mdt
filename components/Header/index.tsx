@@ -1,15 +1,18 @@
 import React from 'react';
 import { signIn, signOut, useSession } from 'next-auth/client';
-import { Flex, Image, useColorModeValue, Skeleton, Heading } from '@chakra-ui/react';
+import { Flex, Image, useColorModeValue, Skeleton, Heading, IconButton } from '@chakra-ui/react';
 import { Button } from '@chakra-ui/react';
 import HeaderButtons from './components/HeaderButtons';
 import HeaderProfile from './components/HeaderProfile';
+import { HamburgerIcon } from '@chakra-ui/icons';
+import MobileMenu from './components/MobileMenu';
 
 export interface HeaderProps {}
 
 const Header: React.FunctionComponent<HeaderProps> = ({}) => {
   // Session Data
   const [session, loading] = useSession();
+  const [modal, setModal] = React.useState(false);
 
   // Chakra Colors
   const headerColor = useColorModeValue('gray.50', 'gray.700');
@@ -28,6 +31,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({}) => {
         background={headerColor}
         justifyContent={'space-between'}
         boxSizing="border-box"
+        alignItems="center"
       >
         <Flex
           boxSizing="border-box"
@@ -37,7 +41,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({}) => {
           justifyContent={['center', 'center', 'flex-start', 'flex-start']}
         >
           <Image
-            width={['2.8rem', '2.8rem', '3rem', '3rem']}
+            width={['2.8rem', '2.8rem', '2.8rem', '2.8rem', '3rem']}
             mr="2"
             src={'https://i.imgur.com/AHFKtEZ.png'}
             alt="Police Badge"
@@ -57,8 +61,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({}) => {
           </Flex>
         </Flex>
         <HeaderButtons />
+        <IconButton
+          variant="ghost"
+          borderRadius="lg"
+          aria-label="mobile-menu"
+          icon={<HamburgerIcon />}
+          display={['inherit', 'inherit', 'inherit', 'inherit', 'none']}
+          onClick={() => setModal(true)}
+        />
         <HeaderProfile />
       </Flex>
+      <MobileMenu modal={modal} setModal={setModal} />
     </React.Fragment>
   );
 };

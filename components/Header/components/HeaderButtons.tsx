@@ -1,7 +1,7 @@
-import { ChevronDownIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, HamburgerIcon } from '@chakra-ui/icons';
 import { Flex } from '@chakra-ui/layout';
 import { Menu, MenuButton as MB, MenuItem, MenuList } from '@chakra-ui/menu';
-import { Button } from '@chakra-ui/react';
+import { Button, IconButton } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as React from 'react';
@@ -18,7 +18,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({}) => {
       h="full"
       alignItems="center"
       justifyContent="center"
-      display={['none', 'none', 'none', 'flex']}
+      display={['none', 'none', 'none', 'none', 'flex']}
     >
       <MenuButton title="home" link="/" />
       <Menu>

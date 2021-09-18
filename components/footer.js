@@ -13,14 +13,16 @@ export default function Footer() {
       pl="6.5%"
       pr="6.5%"
       width="100%"
-      height="8vh"
-      minHeight="8vh"
+      height="100%"
+      minHeight={['17vh', '17vh', '17vh', '15vh', '8vh']}
       maxHeight="8vh"
       background={headerColor}
       border="none"
       alignItems="center"
       justifyContent="space-between"
       mt="1rem"
+      py={['3', '3', '3', '3', '0']}
+      flexDir={['column', 'column', 'column', 'column', 'row']}
     >
       <Flex>
         <Link href="https://www.raze.community/forum/index.php" target="_blank">
