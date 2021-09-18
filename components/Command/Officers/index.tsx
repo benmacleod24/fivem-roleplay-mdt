@@ -19,6 +19,7 @@ import { FiHash } from 'react-icons/fi';
 import { BiSave } from 'react-icons/bi';
 import { Formik, FormikProps, Form as FForm } from 'formik';
 import useDepartments from '../../hooks/api/useDepartments';
+import { patchMember } from '../../hooks/api/patchMember';
 
 interface OfficersProps {}
 
@@ -32,9 +33,14 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
   const [officer, setOfficer] = React.useState<number | undefined>();
   const { departments, error: deptError } = useDepartments();
 
-  const { data: officers, error } = useSWR(
-    `/api/departments/members?departmentId=${session?.user.dept}`,
-  ) as SWRResponse<DeptMember[], any>;
+  const {
+    data: officers,
+    error,
+    mutate,
+  } = useSWR(`/api/departments/members?departmentId=${session?.user.dept}`) as SWRResponse<
+    DeptMember[],
+    any
+  >;
 
   const { data: member, error: memberError } = useSWR(
     Boolean(officer) ? `/api/departments/members?characterId=${officer}` : '',
@@ -76,7 +82,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                     </Flex>
                     <Flex mt="1" alignItems="center" justifyContent="center">
                       <Text mr="2" color="gray.400" fontSize="xs">
-                        Rank: {o.mdt_department_ranks.rankName}
+                        {o.mdt_department_ranks.rankName}
                       </Text>
                       <Text color="gray.400" fontSize="xs">
                         Call Sign: {o.callSign}
@@ -115,10 +121,23 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                     </Heading>
                   </Flex>
                   <Formik
-                    onSubmit={() => {}}
+                    onSubmit={async (values, action) => {
+                      try {
+                        console.log(values);
+                        const _member = await patchMember({
+                          rankId: Number(values.rankId),
+                          departmentId: values.departmentId,
+                          memberId: member.memberId,
+                          callSign: values.callSign,
+                        });
+                        setOfficer(undefined);
+                        mutate();
+                      } catch (e) {}
+                    }}
                     initialValues={{
                       callSign: member.callSign,
-                      rank: member.rankId,
+                      rankId: member.rankId,
+                      departmentId: member.departmentId,
                     }}
                   >
                     {props => (
@@ -141,9 +160,9 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                               Member Rank:
                             </Text>
                             <Select
-                              value={props.values.rank}
+                              value={String(props.values.rankId)}
                               onChange={e => {
-                                props.setFieldValue('rank', e.target.value);
+                                props.setFieldValue('rankId', e.target.value);
                               }}
                             >
                               {departments
@@ -157,7 +176,14 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                           </Flex>
                         </Grid>
                         <Flex>
-                          <Button size="sm" mr="2.5" colorScheme="yellow" leftIcon={<BiSave />}>
+                          <Button
+                            size="sm"
+                            mr="2.5"
+                            type="submit"
+                            isLoading={props.isSubmitting}
+                            colorScheme="yellow"
+                            leftIcon={<BiSave />}
+                          >
                             Submit Changes
                           </Button>
                           <Button size="sm" colorScheme="red" leftIcon={<DeleteIcon />}>

@@ -5,9 +5,9 @@ import { z } from 'zod';
 import { stringToNumber } from '../../../utils/parse';
 
 const NewMemberRequest = z.object({
-  characterId: z.number(),
-  departmentId: z.number(),
-  rankId: z.number(),
+  characterId: z.onumber(),
+  departmentId: z.onumber(),
+  rankId: z.onumber(),
 });
 
 const GetMembersRequest = z.object({
@@ -15,9 +15,20 @@ const GetMembersRequest = z.object({
   characterId: z.ostring().transform(stringToNumber),
 });
 
+const MembersPatch = z.object({
+  memberId: z.onumber(),
+  rankId: z.onumber(),
+  departmentId: z.onumber(),
+  callSign: z.ostring(),
+});
+
 const prisma = new PrismaClient();
 type NextApiRequestWithQuery = NextApiRequest &
-  (z.infer<typeof NewMemberRequest> | z.infer<typeof GetMembersRequest>);
+  (
+    | z.infer<typeof NewMemberRequest>
+    | z.infer<typeof GetMembersRequest>
+    | z.infer<typeof MembersPatch>
+  );
 
 const Members = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const method = req.method;
@@ -27,6 +38,8 @@ const Members = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       return POST(req, res);
     case 'GET':
       return GET(req, res);
+    case 'PATCH':
+      return PATCH(req, res);
     default:
       return 'no clue how you got here.';
   }
@@ -70,9 +83,9 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   const isCop = session?.user.isCop;
   const isJudge = session?.user.isJudge;
 
-  if (!isJudge && !isCop) {
-    throw 'Not Cop or Judge';
-  }
+  // if (!isJudge && !isCop) {
+  //   throw 'Not Cop or Judge';
+  // }
 
   const select = {
     id: true,
@@ -85,7 +98,7 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   };
 
   if (characterId) {
-    const members = await prisma.mdt_department_members.findUnique({
+    const members = await prisma.mdt_department_members.findFirst({
       where: {
         characterId: characterId,
       },
@@ -110,6 +123,7 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         fivem_characters: {
           select,
         },
+        mdt_department_ranks: true,
       },
     });
 
@@ -119,6 +133,36 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 
   res.json([]);
   return [];
+};
+
+const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
+  const { memberId, rankId, callSign, departmentId } = MembersPatch.parse(JSON.parse(req.body));
+  const session = await getSession({ req });
+  const isCop = session?.user.isCop;
+  const isJudge = session?.user.isJudge;
+
+  if (!isJudge && !isCop) {
+    throw 'Not Cop or Judge';
+  }
+
+  console.log({ memberId, rankId, callSign, departmentId });
+
+  if (!memberId || !callSign || !rankId || !departmentId) {
+    throw 'Empty Values';
+  }
+
+  const newMember = await prisma.mdt_department_members.update({
+    where: {
+      memberId,
+    },
+    data: {
+      callSign,
+      rankId,
+      departmentId,
+    },
+  });
+
+  res.json(newMember);
 };
 
 export default Members;
