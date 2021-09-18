@@ -42,7 +42,11 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
     any
   >;
 
-  const { data: member, error: memberError } = useSWR(
+  const {
+    data: member,
+    error: memberError,
+    mutate: MutateMember,
+  } = useSWR(
     Boolean(officer) ? `/api/departments/members?characterId=${officer}` : '',
   ) as SWRResponse<DeptMember, any>;
 
@@ -132,6 +136,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                         });
                         setOfficer(undefined);
                         mutate();
+                        MutateMember();
                       } catch (e) {}
                     }}
                     initialValues={{
