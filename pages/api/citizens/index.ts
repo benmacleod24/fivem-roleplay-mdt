@@ -34,6 +34,7 @@ export default async function Citizen(
     first_name: true,
     last_name: true,
     gender: true,
+    image: true,
   };
   if (firstName) {
     where = { ...where, first_name: { contains: firstName } };

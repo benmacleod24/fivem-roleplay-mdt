@@ -41,6 +41,7 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     first_name: true,
     last_name: true,
     gender: true,
+    image: true,
   };
 
   const citizen = await prisma.fivem_characters.findFirst({

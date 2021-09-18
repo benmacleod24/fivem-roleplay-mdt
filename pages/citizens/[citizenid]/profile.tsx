@@ -29,9 +29,11 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
   const [session, loading] = useSession();
 
   // API Data
-  const { data: citizen, error: citizenError } = useSWR(
-    `/api/citizen/?citizenid=${citizenid}`,
-  ) as SWRResponse<SWRResponseType, any>;
+  const {
+    data: citizen,
+    error: citizenError,
+    mutate,
+  } = useSWR(`/api/citizen/?citizenid=${citizenid}`) as SWRResponse<SWRResponseType, any>;
 
   const [pageIndex, setPageIndex] = React.useState(0);
 
@@ -75,13 +77,13 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
                 width="16%"
                 border="1px solid #4A5568"
                 src={
-                  citizen.image
+                  citizen && citizen.image
                     ? citizen.image
                     : 'https://st3.depositphotos.com/4111759/13425/v/600/depositphotos_134255634-stock-illustration-avatar-icon-male-profile-gray.jpg'
                 }
                 alt="profile-pic"
               />
-              <ProfileData citizen={citizen} />
+              <ProfileData mutate={mutate} citizen={citizen} />
             </Flex>
             <Flex w="full">
               {session?.user.isCop ? <Associates id={citizen.id} /> : ''}
