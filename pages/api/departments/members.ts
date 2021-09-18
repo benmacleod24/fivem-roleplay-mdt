@@ -42,6 +42,15 @@ const POST = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     throw 'Not Cop or Judge';
   }
 
+  if (!characterId || !departmentId || !rankId) {
+    throw 'Empty Values';
+  }
+
+  const findMember = await prisma.mdt_department_members.findFirst({ where: { characterId } });
+  if (findMember) {
+    throw 'Member Found';
+  }
+
   const newMember = await prisma.mdt_department_members.create({
     data: {
       characterId,
@@ -101,7 +110,6 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         fivem_characters: {
           select,
         },
-        mdt_department_ranks: true,
       },
     });
 
@@ -110,6 +118,7 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
   }
 
   res.json([]);
+  return [];
 };
 
 export default Members;

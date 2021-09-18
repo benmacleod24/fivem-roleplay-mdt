@@ -6,7 +6,11 @@ const prisma = new PrismaClient();
 const Departments = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const departments = await prisma.mdt_departments.findMany({
     include: {
-      mdt_department_ranks: true,
+      mdt_department_ranks: {
+        orderBy: {
+          rankLevel: 'asc',
+        },
+      },
     },
   });
   res.json(departments);

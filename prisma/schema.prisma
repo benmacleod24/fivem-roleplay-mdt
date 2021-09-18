@@ -93,7 +93,7 @@ model fivem_characters {
   mdt_associates                                                       mdt_associates[]                  @relation("fivem_charactersTo_mdt_associates")
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_criminalId      mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_criminalId")
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_filingOfficerId mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId")
-  mdt_department_members                                               mdt_department_members?           @relation("fivem_charactersTo_mdt_department_members")
+  mdt_department_members                                               mdt_department_members[]          @relation("fivem_charactersTo_mdt_department_members")
   mdt_dispatch_new                                                     mdt_dispatch_new[]                @relation("fivem_charactersTo_mdt_dispatch_new")
   mdt_reports_involved_new                                             mdt_reports_involved_new[]        @relation("fivem_charactersTo_mdt_reports_involved_new")
   mdt_reports_new                                                      mdt_reports_new[]                 @relation("fivem_charactersTo_mdt_reports_new")
@@ -527,12 +527,13 @@ model mdt_department_members {
   memberId             Int                  @id @default(autoincrement())
   departmentId         Int
   rankId               Int
-  characterId          Int                  @unique
+  characterId          Int
   callSign             String               @db.Text
   fivem_characters     fivem_characters     @relation("fivem_charactersTo_mdt_department_members", fields: [characterId], references: [id])
   mdt_departments      mdt_departments      @relation("mdt_department_membersTo_mdt_departments", fields: [departmentId], references: [departmentId])
   mdt_department_ranks mdt_department_ranks @relation("mdt_department_membersTo_mdt_department_ranks", fields: [rankId], references: [rankId])
 
+  @@index([characterId], name: "_mdt_department_members.characterId_unique")
   @@index([departmentId], name: "departmentId")
   @@index([rankId], name: "rankId")
   @@map("_mdt_department_members")
