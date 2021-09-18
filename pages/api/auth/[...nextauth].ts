@@ -139,6 +139,7 @@ export default NextAuth({
       let copName;
       let copId;
       let rankLevel;
+      let dept;
       const isAdmin = ADMIN_DISCORD_IDS.indexOf(session.user.id.toString()) > -1;
       try {
         // const copList = await prisma.$queryRaw(`
@@ -152,7 +153,7 @@ export default NextAuth({
         //       `);
 
         const copList = await prisma.$queryRaw(`
-              SELECT u.id, u.discord, c.first_name, c.last_name, c.id as copId, wcj.job_id, wlj.name, depr.rankLevel FROM _fivem_users as u 
+              SELECT u.id, u.discord, c.first_name, c.last_name, c.id as copId, wcj.job_id, wlj.name, depr.rankLevel, depm.departmentId FROM _fivem_users as u 
                 LEFT JOIN _fivem_characters as c on u.id = c.uId
                 LEFT JOIN _fivem_whitelist_characters_jobs as wcj ON c.id = wcj.character_id
                 LEFT JOIN _fivem_whitelist_jobs as wlj ON wlj.jobid = wcj.job_id
@@ -174,6 +175,10 @@ export default NextAuth({
         if (copList && copList.length > 0 && String(copList[0].rankLevel)) {
           rankLevel = copList[0].rankLevel;
         }
+
+        if (copList && copList.length > 0 && String(copList[0].departmentId)) {
+          dept = copList[0].departmentId;
+        }
       } catch (e) {
         console.error('some shit blew up', e);
       }
@@ -183,6 +188,7 @@ export default NextAuth({
       session.user.copName = copName;
       session.user.copId = copId;
       session.user.rankLvl = rankLevel;
+      session.user.dept = dept;
       return Promise.resolve(session);
     },
   },
