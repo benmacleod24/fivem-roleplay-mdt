@@ -1,6 +1,7 @@
 import { Box, Code, Flex, Heading, Text } from '@chakra-ui/layout';
 import { Image } from '@chakra-ui/react';
 import { fivem_characters, mdt_associates } from '@prisma/client';
+import Link from 'next/link';
 import * as React from 'react';
 import useSWR, { SWRResponse } from 'swr';
 import { toQuery } from '../../utils/query';
@@ -135,9 +136,16 @@ const Associates: React.FunctionComponent<AssociatesProps> = ({ id }) => {
               flexGrow={1}
               alignItems="center"
             >
-              <Text fontSize="xs" fontWeight="semibold">
-                {a.fivem_characters.first_name} {a.fivem_characters.last_name}
-              </Text>
+              <Link href={`/citizens/${a.fivem_characters.cuid}/profile`}>
+                <Text
+                  fontSize="xs"
+                  _hover={{ textDecor: 'underline' }}
+                  cursor="pointer"
+                  fontWeight="semibold"
+                >
+                  {a.fivem_characters.first_name} {a.fivem_characters.last_name}
+                </Text>
+              </Link>
             </Flex>
           </Flex>
         ))}

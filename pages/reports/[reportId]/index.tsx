@@ -14,6 +14,7 @@ import {
   FormLabel,
   Text,
   Textarea,
+  Link,
 } from '@chakra-ui/react';
 import useSWR, { SWRResponse } from 'swr';
 import { CheckIcon } from '@chakra-ui/icons';
@@ -239,9 +240,11 @@ const Report: React.FunctionComponent<ReportProps> = ({ session }) => {
                           <Text mr="1" color="blue.300" fontWeight="medium">
                             Booked Criminal:
                           </Text>
-                          <Text>
-                            {criminal.first_name} {criminal.last_name}
-                          </Text>
+                          <Link href={`/citizens/${criminal.cuid}/profile`}>
+                            <Text cursor="pointer" _hover={{ textDecor: 'underline' }}>
+                              {criminal.first_name} {criminal.last_name}
+                            </Text>
+                          </Link>
                         </Flex>
                         <Flex mb="1">
                           <Text mr="1" color="blue.300" fontWeight="medium">
