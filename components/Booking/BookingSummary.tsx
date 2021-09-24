@@ -1,4 +1,13 @@
-import { Button, Flex, HStack, IconButton, Radio, RadioGroup, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Flex,
+  HStack,
+  IconButton,
+  Radio,
+  RadioGroup,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { Formik, FormikProps, Form as FForm } from 'formik';
 import * as React from 'react';
@@ -24,6 +33,7 @@ const schema = yup.object().shape({
 
 const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSummaryProps) => {
   const router = useRouter();
+  const toast = useToast();
 
   const initialValues = {
     bookingPlea: undefined,
@@ -79,10 +89,18 @@ const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSum
               bookingOverride: Math.floor(defaultTime),
             });
 
-            const res = await createBooking(submission);
-            const { reportId } = res;
-            router.push(`/reports/${reportId}`);
-            actions.setSubmitting(false);
+            try {
+              const res = await createBooking(submission);
+              const { reportId } = res;
+              router.push(`/reports/${reportId}`);
+              return res;
+            } catch (e) {
+              toast({
+                position: 'top-right',
+                description: 'An error occured while booking.',
+                status: 'error',
+              });
+            }
           }}
         >
           {(props: FormikProps<typeof initialValues>) => (
@@ -210,6 +228,7 @@ const BookingSummary = ({ character, selectedCharges, removeCharge }: BookingSum
                   size="md"
                   colorScheme="blue"
                   isLoading={props.isSubmitting}
+                  isDisabled={props.isSubmitting}
                   type="submit"
                 >
                   Complete Booking
