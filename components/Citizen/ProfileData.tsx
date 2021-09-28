@@ -2,6 +2,7 @@ import { IconButton } from '@chakra-ui/button';
 import { Input } from '@chakra-ui/input';
 import { Flex, Text } from '@chakra-ui/layout';
 import { fivem_characters } from '@prisma/client';
+import { useSession } from 'next-auth/client';
 import * as React from 'react';
 import { BiImage } from 'react-icons/bi';
 import { stringToNumber } from '../../utils/parse';
@@ -16,6 +17,7 @@ export interface ProfileDataProps {
 
 const ProfileData: React.FunctionComponent<ProfileDataProps> = ({ citizen, mutate }) => {
   const [image, setImage] = React.useState('');
+  const [session, loading] = useSession();
 
   React.useEffect(() => {
     if (!citizen.image) return;
@@ -63,7 +65,7 @@ const ProfileData: React.FunctionComponent<ProfileDataProps> = ({ citizen, mutat
           {citizen.id}
         </Flex>
       </Flex>
-      <Flex pos="absolute" right="5" top="5">
+      <Flex pos="absolute" right="5" top="5" display={session?.user.isCop ? 'inherit' : 'none'}>
         <Input
           placeholder="Citizen Image"
           _focus={{ boxShadow: 'none' }}

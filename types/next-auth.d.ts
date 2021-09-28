@@ -10,6 +10,7 @@ declare module 'next-auth' {
       id: number;
       isCop: boolean;
       isJudge: boolean;
+      isDA: boolean;
       image?: string;
       name?: string;
       copName?: string;

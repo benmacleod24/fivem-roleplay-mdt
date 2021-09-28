@@ -136,6 +136,7 @@ export default NextAuth({
       session.user.id = discord as number;
       let isCop = false;
       let isJudge = false;
+      let isDA = false;
       let copName;
       let copId;
       let rankLevel;
@@ -159,13 +160,15 @@ export default NextAuth({
                 LEFT JOIN _fivem_whitelist_jobs as wlj ON wlj.jobid = wcj.job_id
                 LEFT JOIN _mdt_department_members as depm ON c.id = depm.characterId
                 LEFT JOIN _mdt_department_ranks as depr on depm.rankId = depr.rankId
-                WHERE u.discord = ${discord} and c.deleted = 0 and (wlj.name = "cop" or wlj.name = "judge")
+                WHERE u.discord = ${discord} and c.deleted = 0 and (wlj.name = "cop" or wlj.name = "judge" or wlj.name = "DA")
         `);
 
         isCop = (isAdmin || (copList && copList.length > 0 && copList[0].name === 'cop')) ?? false;
 
         isJudge =
           (isAdmin || (copList && copList.length > 0 && copList[0].name === 'judge')) ?? false;
+
+        isDA = (isAdmin || (copList && copList.length > 0 && copList[0].name === 'DA')) ?? false;
 
         copName =
           (copList && copList.length > 0 && `${copList[0].first_name} ${copList[0].last_name}`) ??
@@ -185,6 +188,7 @@ export default NextAuth({
 
       session.user.isCop = isCop;
       session.user.isJudge = isJudge;
+      session.user.isDA = isDA;
       session.user.copName = copName;
       session.user.copId = copId;
       session.user.rankLvl = rankLevel;

@@ -174,7 +174,7 @@ export default function CopSelect({
         <Flex mr="1.5">
           {selectedCops.map((c: Item) => (
             <Tag mx="1" variant="subtle" colorScheme="blue" key={c.value}>
-              {c.label} <TagCloseButton onClick={() => onDelete(c)} />
+              {c.label} {isDraft ? <TagCloseButton onClick={() => onDelete(c)} /> : ''}
             </Tag>
           ))}
           {selectedCops.length <= 0 ? (

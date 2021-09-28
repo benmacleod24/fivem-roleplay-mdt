@@ -86,10 +86,14 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
               <ProfileData mutate={mutate} citizen={citizen} />
             </Flex>
             <Flex w="full">
-              {session?.user.isCop ? <Associates id={citizen.id} /> : ''}
+              {session?.user.isCop || session?.user.isDA ? <Associates id={citizen.id} /> : ''}
               <Flex flexGrow={1} borderRadius="md" flexDir="column">
-                {session?.user.isCop || session?.user.isJudge ? <Licenses id={citizen.id} /> : ''}
-                {session?.user.isCop || session?.user.isJudge ? (
+                {session?.user.isCop || session?.user.isJudge || session?.user.isDA ? (
+                  <Licenses id={citizen.id} />
+                ) : (
+                  ''
+                )}
+                {session?.user.isCop || session?.user.isJudge || session?.user.isDA ? (
                   <Vehicles citizenId={citizen.id} />
                 ) : (
                   ''
@@ -98,7 +102,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
               </Flex>
             </Flex>
 
-            {(session?.user.isCop || session?.user.isJudge) && (
+            {(session?.user.isCop || session?.user.isJudge || session?.user.isDA) && (
               <>
                 <ReportCard
                   hideReport={true}
