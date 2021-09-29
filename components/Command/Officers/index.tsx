@@ -209,9 +209,9 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                             Remove Officer
                           </Button>
                         </Flex>
-                        {member.fivem_characters.mdt_member_subdepartments.map(msd => (
+                        {/* {member.fivem_characters.mdt_member_subdepartments.map(msd => (
                           <p>{msd.mdt_department_subdepartments.subdepartmentName}</p>
-                        ))}
+                        ))} */}
                       </FForm>
                     )}
                   </Formik>
