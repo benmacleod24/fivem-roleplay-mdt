@@ -1,4 +1,10 @@
-import { fivem_characters, mdt_department_members, mdt_department_ranks } from '.prisma/client';
+import {
+  fivem_characters,
+  mdt_department_members,
+  mdt_department_ranks,
+  mdt_department_subdepartments,
+  mdt_member_subdepartments,
+} from '.prisma/client';
 import { Button, IconButton } from '@chakra-ui/button';
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { Flex, Grid, Heading, Text } from '@chakra-ui/layout';
@@ -24,8 +30,16 @@ import { patchMember } from '../../hooks/api/patchMember';
 interface OfficersProps {}
 
 export interface DeptMember extends mdt_department_members {
-  fivem_characters: fivem_characters;
+  fivem_characters: DeptFivemMember;
   mdt_department_ranks: mdt_department_ranks;
+}
+
+export interface DeptFivemMember extends fivem_characters {
+  mdt_member_subdepartments: Array<
+    mdt_member_subdepartments & {
+      mdt_department_subdepartments: mdt_department_subdepartments;
+    }
+  >;
 }
 
 const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
@@ -195,6 +209,9 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                             Remove Officer
                           </Button>
                         </Flex>
+                        {member.fivem_characters.mdt_member_subdepartments.map(msd => (
+                          <p>{msd.mdt_department_subdepartments.subdepartmentName}</p>
+                        ))}
                       </FForm>
                     )}
                   </Formik>

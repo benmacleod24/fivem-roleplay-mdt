@@ -95,6 +95,11 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
     first_name: true,
     last_name: true,
     gender: true,
+    mdt_member_subdepartments: {
+      include: {
+        mdt_department_subdepartments: true,
+      },
+    },
   };
 
   if (characterId) {
