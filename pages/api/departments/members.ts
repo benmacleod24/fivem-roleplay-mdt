@@ -20,6 +20,7 @@ const MembersPatch = z.object({
   rankId: z.onumber(),
   departmentId: z.onumber(),
   callSign: z.ostring(),
+  email: z.ostring(),
 });
 
 const prisma = new PrismaClient();
@@ -113,6 +114,9 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         },
         mdt_department_ranks: true,
       },
+      orderBy: {
+        rankId: 'asc',
+      },
     });
 
     res.json(members);
@@ -130,6 +134,9 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         },
         mdt_department_ranks: true,
       },
+      orderBy: {
+        rankId: 'desc',
+      },
     });
 
     res.json(members);
@@ -141,7 +148,9 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
 };
 
 const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
-  const { memberId, rankId, callSign, departmentId } = MembersPatch.parse(JSON.parse(req.body));
+  const { memberId, rankId, callSign, departmentId, email } = MembersPatch.parse(
+    JSON.parse(req.body),
+  );
   const session = await getSession({ req });
   const isCop = session?.user.isCop;
   const isJudge = session?.user.isJudge;
@@ -164,6 +173,7 @@ const PATCH = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
       callSign,
       rankId,
       departmentId,
+      email,
     },
   });
 

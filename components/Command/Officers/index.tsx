@@ -6,9 +6,9 @@ import {
   mdt_member_subdepartments,
 } from '.prisma/client';
 import { Button, IconButton } from '@chakra-ui/button';
-import { DeleteIcon, EditIcon, Search2Icon } from '@chakra-ui/icons';
+import { DeleteIcon, EditIcon, EmailIcon, Search2Icon } from '@chakra-ui/icons';
 import { Flex, Grid, Heading, Text } from '@chakra-ui/layout';
-import { Modal, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/modal';
+import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/modal';
 import {
   Checkbox,
   Input,
@@ -62,6 +62,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
     data: member,
     error: memberError,
     mutate: MutateMember,
+    revalidate,
   } = useSWR(
     Boolean(officer) ? `/api/departments/members?characterId=${officer}` : '',
   ) as SWRResponse<DeptMember, any>;
@@ -108,82 +109,84 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
         px="4"
         flexDir="column"
       >
-        <Flex w="full">
-          <InputGroup variant="filled" mb="5" w="40%">
-            <InputLeftElement children={<Search2Icon />} />
-            <Input
-              value={filter}
-              onChange={e => setFilter(e.target.value)}
-              placeholder="Search Officers"
-              _focus={{ boxShadow: 'none' }}
-            />
-          </InputGroup>
-        </Flex>
         <LoadableContentSafe data={{ officers }} errors={[error]}>
           {({ officers }) => {
             return (
-              <Grid
-                maxW="full"
-                w="full"
-                h="full"
-                alignContent="start"
-                templateColumns="repeat(3, 1fr)"
-                gap="3"
-              >
-                {officers
-                  .filter(
-                    o =>
-                      o.fivem_characters.first_name
-                        ?.toLocaleLowerCase()
-                        .includes(filter.toLocaleLowerCase()) ||
-                      o.fivem_characters.last_name
-                        ?.toLocaleLowerCase()
-                        .includes(filter.toLocaleLowerCase()) ||
-                      o.callSign.includes(filter),
-                  )
-                  .map(o => (
-                    <Flex
-                      w="full"
-                      h="fit-content"
-                      background="gray.700"
-                      py="4"
-                      px="3"
-                      borderRadius="lg"
-                      justifyContent="center"
-                      alignItems="center"
-                      flexDir="column"
-                      pos="relative"
-                      maxW="100%"
-                      boxSizing="border-box"
-                    >
-                      <Flex alignItems="center" justifyContent="center" pos="relative" w="100%">
-                        <Heading size="md" maxW="100%" isTruncated>
-                          {o.fivem_characters.first_name} {o.fivem_characters.last_name}
-                        </Heading>
+              <React.Fragment>
+                <Flex w="full">
+                  <InputGroup variant="filled" mb="5" w="40%">
+                    <InputLeftElement children={<Search2Icon />} />
+                    <Input
+                      value={filter}
+                      onChange={e => setFilter(e.target.value)}
+                      placeholder="Search Officers"
+                      _focus={{ boxShadow: 'none' }}
+                    />
+                  </InputGroup>
+                </Flex>
+                <Grid
+                  maxW="full"
+                  w="full"
+                  h="full"
+                  alignContent="start"
+                  templateColumns="repeat(3, 1fr)"
+                  gap="3"
+                >
+                  {officers
+                    .filter(
+                      o =>
+                        o.fivem_characters.first_name
+                          ?.toLocaleLowerCase()
+                          .includes(filter.toLocaleLowerCase()) ||
+                        o.fivem_characters.last_name
+                          ?.toLocaleLowerCase()
+                          .includes(filter.toLocaleLowerCase()) ||
+                        o.callSign.includes(filter),
+                    )
+                    .map(o => (
+                      <Flex
+                        w="full"
+                        h="fit-content"
+                        background="gray.700"
+                        py="4"
+                        px="3"
+                        borderRadius="lg"
+                        justifyContent="center"
+                        alignItems="center"
+                        flexDir="column"
+                        pos="relative"
+                        maxW="100%"
+                        boxSizing="border-box"
+                      >
+                        <Flex alignItems="center" justifyContent="center" pos="relative" w="100%">
+                          <Heading size="md" maxW="100%" isTruncated>
+                            {o.fivem_characters.first_name} {o.fivem_characters.last_name}
+                          </Heading>
+                        </Flex>
+                        <Flex mt="1" alignItems="center" justifyContent="center">
+                          <Text mr="2" color="gray.400" fontSize="xs">
+                            {o.mdt_department_ranks.rankName}
+                          </Text>
+                          <Text color="gray.400" fontSize="xs">
+                            Call Sign: {o.callSign}
+                          </Text>
+                        </Flex>
+                        <IconButton
+                          onClick={() => setOfficer(o.characterId)}
+                          aria-label="edit-officer"
+                          icon={<EditIcon />}
+                          colorScheme="yellow"
+                          variant="ghost"
+                          borderRadius="full"
+                          size="sm"
+                          pos="absolute"
+                          right="1.5"
+                          top="1.5"
+                        />
                       </Flex>
-                      <Flex mt="1" alignItems="center" justifyContent="center">
-                        <Text mr="2" color="gray.400" fontSize="xs">
-                          {o.mdt_department_ranks.rankName}
-                        </Text>
-                        <Text color="gray.400" fontSize="xs">
-                          Call Sign: {o.callSign}
-                        </Text>
-                      </Flex>
-                      <IconButton
-                        onClick={() => setOfficer(o.characterId)}
-                        aria-label="edit-officer"
-                        icon={<EditIcon />}
-                        colorScheme="yellow"
-                        variant="ghost"
-                        borderRadius="full"
-                        size="sm"
-                        pos="absolute"
-                        right="1.5"
-                        top="1.5"
-                      />
-                    </Flex>
-                  ))}
-              </Grid>
+                    ))}
+                </Grid>
+              </React.Fragment>
             );
           }}
         </LoadableContentSafe>
@@ -204,22 +207,23 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                   <Formik
                     onSubmit={async (values, action) => {
                       try {
-                        console.log(values);
                         const _member = await patchMember({
                           rankId: Number(values.rankId),
                           departmentId: values.departmentId,
                           memberId: member.memberId,
                           callSign: values.callSign,
+                          email: values.email ? values.email : '',
                         });
-                        setOfficer(undefined);
-                        mutate();
                         MutateMember();
+                        revalidate();
+                        setOfficer(undefined);
                       } catch (e) {}
                     }}
                     initialValues={{
                       callSign: member.callSign,
                       rankId: member.rankId,
                       departmentId: member.departmentId,
+                      email: member.email,
                     }}
                   >
                     {props => (
@@ -237,6 +241,22 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                               }}
                             />
                           </InputGroup>
+                          <Flex flexDir="column">
+                            <Text fontSize="sm" color="yellow.300" mb="0.5">
+                              Contact Info:
+                            </Text>
+                            <InputGroup variant="filled">
+                              <InputLeftAddon children={<EmailIcon />} />
+                              <Input
+                                placeholder="Email"
+                                _focus={{ boxShadow: 'none' }}
+                                value={props.values.email ? props.values.email : ''}
+                                onChange={e => {
+                                  props.setFieldValue('email', e.target.value);
+                                }}
+                              />
+                            </InputGroup>
+                          </Flex>
                           <Flex flexDir="column">
                             <Text fontSize="sm" color="yellow.300" mb="0.5">
                               Member Rank:
@@ -264,7 +284,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                             {subdepartments?.map(msb => {
                               const isChecks =
                                 member.fivem_characters.mdt_member_subdepartments.find(
-                                  msd => msd.memSubDeptId === msb.subdepartmentId,
+                                  msd => msd.subDepartmentName === msb.subdepartmentId,
                                 );
 
                               return (
