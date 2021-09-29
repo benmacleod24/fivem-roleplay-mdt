@@ -530,6 +530,7 @@ model mdt_department_members {
   rankId               Int
   characterId          Int
   callSign             String               @db.Text
+  email                String?              @db.VarChar(255)
   fivem_characters     fivem_characters     @relation("fivem_charactersTo_mdt_department_members", fields: [characterId], references: [id])
   mdt_departments      mdt_departments      @relation("mdt_department_membersTo_mdt_departments", fields: [departmentId], references: [departmentId])
   mdt_department_ranks mdt_department_ranks @relation("mdt_department_membersTo_mdt_department_ranks", fields: [rankId], references: [rankId])

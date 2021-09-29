@@ -28,7 +28,7 @@ const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const _delete = await prisma.mdt_member_subdepartments.deleteMany({
     where: {
-      memSubDeptId: id,
+      subDepartmentName: id,
       characterId: characterId,
     },
   });
@@ -42,7 +42,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
   const post = await prisma.mdt_member_subdepartments.create({
     data: {
       characterId,
-      memSubDeptId: id,
+      subDepartmentName: id,
     },
   });
 

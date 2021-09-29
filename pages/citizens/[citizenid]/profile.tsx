@@ -105,7 +105,7 @@ const CitizenProfile: React.SFC<CitizenProfileProps> = ({}) => {
             {(session?.user.isCop || session?.user.isJudge || session?.user.isDA) && (
               <>
                 <ReportCard
-                  hideReport={true}
+                  hideReport={false}
                   index={pageIndex}
                   searchValues={{ suspectStateId: citizen.id }}
                 />
