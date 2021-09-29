@@ -10,6 +10,7 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { Flex, Grid, Heading, Text } from '@chakra-ui/layout';
 import { Modal, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/modal';
 import {
+  Checkbox,
   Input,
   InputGroup,
   InputLeftAddon,
@@ -63,6 +64,37 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
   } = useSWR(
     Boolean(officer) ? `/api/departments/members?characterId=${officer}` : '',
   ) as SWRResponse<DeptMember, any>;
+
+  const {
+    data: subdepartments,
+    error: subdepartmentsError,
+    mutate: subdepartmentsMutate,
+  } = useSWR(Boolean(officer) ? `/api/departments/sub` : '') as SWRResponse<
+    mdt_department_subdepartments[],
+    any
+  >;
+
+  const onDeleteSub = async (id: number) => {
+    const _delete = await fetch(`/api/departments/sub`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        id,
+        characterId: member?.characterId,
+      }),
+    }).then(r => r.json());
+    MutateMember();
+  };
+
+  const onPostSub = async (id: number) => {
+    const post = await fetch(`/api/departments/sub`, {
+      method: 'POST',
+      body: JSON.stringify({
+        id,
+        characterId: member?.characterId,
+      }),
+    }).then(r => r.json());
+    MutateMember();
+  };
 
   return (
     <React.Fragment>
@@ -193,6 +225,31 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                                 ))}
                             </Select>
                           </Flex>
+                          <Flex flexDir="column">
+                            <Text fontSize="sm" mb="1" color="yellow.300">
+                              Sub Departments:
+                            </Text>
+
+                            {subdepartments?.map(msb => {
+                              const isChecks =
+                                member.fivem_characters.mdt_member_subdepartments.find(
+                                  msd => msd.memSubDeptId === msb.subdepartmentId,
+                                );
+
+                              return (
+                                <Checkbox
+                                  isChecked={Boolean(isChecks)}
+                                  onChange={e =>
+                                    Boolean(isChecks)
+                                      ? onDeleteSub(msb.subdepartmentId)
+                                      : onPostSub(msb.subdepartmentId)
+                                  }
+                                >
+                                  {msb.subdepartmentName}
+                                </Checkbox>
+                              );
+                            })}
+                          </Flex>
                         </Grid>
                         <Flex>
                           <Button
@@ -209,9 +266,6 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                             Remove Officer
                           </Button>
                         </Flex>
-                        {/* {member.fivem_characters.mdt_member_subdepartments.map(msd => (
-                          <p>{msd.mdt_department_subdepartments.subdepartmentName}</p>
-                        ))} */}
                       </FForm>
                     )}
                   </Formik>

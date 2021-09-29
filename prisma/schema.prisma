@@ -95,6 +95,7 @@ model fivem_characters {
   mdt_bookings_new_fivem_charactersTo_mdt_bookings_new_filingOfficerId mdt_bookings_new[]                @relation("fivem_charactersTo_mdt_bookings_new_filingOfficerId")
   mdt_department_members                                               mdt_department_members[]          @relation("fivem_charactersTo_mdt_department_members")
   mdt_dispatch_new                                                     mdt_dispatch_new[]                @relation("fivem_charactersTo_mdt_dispatch_new")
+  mdt_member_subdepartments                                            mdt_member_subdepartments[]       @relation("fivem_charactersTo_mdt_member_subdepartments")
   mdt_reports_involved_new                                             mdt_reports_involved_new[]        @relation("fivem_charactersTo_mdt_reports_involved_new")
   mdt_reports_new                                                      mdt_reports_new[]                 @relation("fivem_charactersTo_mdt_reports_new")
 
@@ -528,7 +529,7 @@ model mdt_department_members {
   departmentId         Int
   rankId               Int
   characterId          Int
-  callSign             String               @default("0") @db.Text
+  callSign             String               @db.Text
   fivem_characters     fivem_characters     @relation("fivem_charactersTo_mdt_department_members", fields: [characterId], references: [id])
   mdt_departments      mdt_departments      @relation("mdt_department_membersTo_mdt_departments", fields: [departmentId], references: [departmentId])
   mdt_department_ranks mdt_department_ranks @relation("mdt_department_membersTo_mdt_department_ranks", fields: [rankId], references: [rankId])
@@ -552,8 +553,9 @@ model mdt_department_ranks {
 }
 
 model mdt_department_subdepartments {
-  subdepartmentId   Int    @id @default(autoincrement())
-  subdepartmentName String @db.VarChar(255)
+  subdepartmentId           Int                         @id @default(autoincrement())
+  subdepartmentName         String                      @db.VarChar(255)
+  mdt_member_subdepartments mdt_member_subdepartments[] @relation("mdt_department_subdepartmentsTo_mdt_member_subdepartments")
 
   @@map("_mdt_department_subdepartments")
 }
@@ -669,4 +671,16 @@ model fivem_pdm_logs {
   time     String? @db.VarChar(255)
 
   @@map("_fivem_pdm_logs")
+}
+
+model mdt_member_subdepartments {
+  memSubDeptId                  Int                            @id @default(autoincrement())
+  characterId                   Int?
+  subDepartmentName             Int?
+  fivem_characters              fivem_characters?              @relation("fivem_charactersTo_mdt_member_subdepartments", fields: [characterId], references: [id])
+  mdt_department_subdepartments mdt_department_subdepartments? @relation("mdt_department_subdepartmentsTo_mdt_member_subdepartments", fields: [subDepartmentName], references: [subdepartmentId])
+
+  @@index([characterId], name: "characterId")
+  @@index([subDepartmentName], name: "subDepartmentName")
+  @@map("_mdt_member_subdepartments")
 }
