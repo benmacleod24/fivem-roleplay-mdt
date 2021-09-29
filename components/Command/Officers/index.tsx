@@ -6,7 +6,7 @@ import {
   mdt_member_subdepartments,
 } from '.prisma/client';
 import { Button, IconButton } from '@chakra-ui/button';
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { DeleteIcon, EditIcon, Search2Icon } from '@chakra-ui/icons';
 import { Flex, Grid, Heading, Text } from '@chakra-ui/layout';
 import { Modal, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/modal';
 import {
@@ -46,6 +46,7 @@ export interface DeptFivemMember extends fivem_characters {
 const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
   const [session, loading] = useSession();
   const [officer, setOfficer] = React.useState<number | undefined>();
+  const [filter, setFilter] = React.useState('');
   const { departments, error: deptError } = useDepartments();
 
   const {
@@ -98,7 +99,26 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
 
   return (
     <React.Fragment>
-      <Flex maxW="full" w="full" h="full" alignItems="center" justifyContent="center" px="4">
+      <Flex
+        maxW="full"
+        w="full"
+        h="full"
+        alignItems="center"
+        justifyContent="center"
+        px="4"
+        flexDir="column"
+      >
+        <Flex w="full">
+          <InputGroup variant="filled" mb="5" w="40%">
+            <InputLeftElement children={<Search2Icon />} />
+            <Input
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              placeholder="Search Officers"
+              _focus={{ boxShadow: 'none' }}
+            />
+          </InputGroup>
+        </Flex>
         <LoadableContentSafe data={{ officers }} errors={[error]}>
           {({ officers }) => {
             return (
@@ -110,48 +130,59 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                 templateColumns="repeat(3, 1fr)"
                 gap="3"
               >
-                {officers.map(o => (
-                  <Flex
-                    w="full"
-                    h="fit-content"
-                    background="gray.700"
-                    py="4"
-                    px="3"
-                    borderRadius="lg"
-                    justifyContent="center"
-                    alignItems="center"
-                    flexDir="column"
-                    pos="relative"
-                    maxW="100%"
-                    boxSizing="border-box"
-                  >
-                    <Flex alignItems="center" justifyContent="center" pos="relative" w="100%">
-                      <Heading size="md" maxW="100%" isTruncated>
-                        {o.fivem_characters.first_name} {o.fivem_characters.last_name}
-                      </Heading>
+                {officers
+                  .filter(
+                    o =>
+                      o.fivem_characters.first_name
+                        ?.toLocaleLowerCase()
+                        .includes(filter.toLocaleLowerCase()) ||
+                      o.fivem_characters.last_name
+                        ?.toLocaleLowerCase()
+                        .includes(filter.toLocaleLowerCase()) ||
+                      o.callSign.includes(filter),
+                  )
+                  .map(o => (
+                    <Flex
+                      w="full"
+                      h="fit-content"
+                      background="gray.700"
+                      py="4"
+                      px="3"
+                      borderRadius="lg"
+                      justifyContent="center"
+                      alignItems="center"
+                      flexDir="column"
+                      pos="relative"
+                      maxW="100%"
+                      boxSizing="border-box"
+                    >
+                      <Flex alignItems="center" justifyContent="center" pos="relative" w="100%">
+                        <Heading size="md" maxW="100%" isTruncated>
+                          {o.fivem_characters.first_name} {o.fivem_characters.last_name}
+                        </Heading>
+                      </Flex>
+                      <Flex mt="1" alignItems="center" justifyContent="center">
+                        <Text mr="2" color="gray.400" fontSize="xs">
+                          {o.mdt_department_ranks.rankName}
+                        </Text>
+                        <Text color="gray.400" fontSize="xs">
+                          Call Sign: {o.callSign}
+                        </Text>
+                      </Flex>
+                      <IconButton
+                        onClick={() => setOfficer(o.characterId)}
+                        aria-label="edit-officer"
+                        icon={<EditIcon />}
+                        colorScheme="yellow"
+                        variant="ghost"
+                        borderRadius="full"
+                        size="sm"
+                        pos="absolute"
+                        right="1.5"
+                        top="1.5"
+                      />
                     </Flex>
-                    <Flex mt="1" alignItems="center" justifyContent="center">
-                      <Text mr="2" color="gray.400" fontSize="xs">
-                        {o.mdt_department_ranks.rankName}
-                      </Text>
-                      <Text color="gray.400" fontSize="xs">
-                        Call Sign: {o.callSign}
-                      </Text>
-                    </Flex>
-                    <IconButton
-                      onClick={() => setOfficer(o.characterId)}
-                      aria-label="edit-officer"
-                      icon={<EditIcon />}
-                      colorScheme="yellow"
-                      variant="ghost"
-                      borderRadius="full"
-                      size="sm"
-                      pos="absolute"
-                      right="1.5"
-                      top="1.5"
-                    />
-                  </Flex>
-                ))}
+                  ))}
               </Grid>
             );
           }}
