@@ -160,7 +160,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                         o.callSign.includes(filter),
                     )
                     .sort(
-                      (a, b) => a.mdt_department_ranks.rankLevel + b.mdt_department_ranks.rankLevel,
+                      (a, b) => b.mdt_department_ranks.rankLevel - a.mdt_department_ranks.rankLevel,
                     )
                     .map(o => (
                       <Flex
