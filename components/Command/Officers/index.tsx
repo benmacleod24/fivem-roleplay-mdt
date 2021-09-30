@@ -48,12 +48,13 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
   const [officer, setOfficer] = React.useState<number | undefined>();
   const [filter, setFilter] = React.useState('');
   const { departments, error: deptError } = useDepartments();
+  const [department, setDepartment] = React.useState(session?.user.dept);
 
   const {
     data: officers,
     error,
     mutate,
-  } = useSWR(`/api/departments/members?departmentId=${session?.user.dept}`) as SWRResponse<
+  } = useSWR(`/api/departments/members?departmentId=${department}`) as SWRResponse<
     DeptMember[],
     any
   >;
@@ -113,7 +114,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
           {({ officers }) => {
             return (
               <React.Fragment>
-                <Flex w="full">
+                <Flex w="full" alignItems="flex-start" justifyContent="space-between">
                   <InputGroup variant="filled" mb="5" w="40%">
                     <InputLeftElement children={<Search2Icon />} />
                     <Input
@@ -123,6 +124,21 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                       _focus={{ boxShadow: 'none' }}
                     />
                   </InputGroup>
+                  {session!.user.rankLvl! >= 5 && (
+                    <Select
+                      variant="filled"
+                      w="20%"
+                      value={department}
+                      _focus={{ boxShadow: 'none' }}
+                      onChange={e => setDepartment(Number(e.target.value))}
+                    >
+                      {departments?.map(d => (
+                        <option value={d.departmentId}>
+                          {d.departmentName.toLocaleUpperCase()}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
                 </Flex>
                 <Grid
                   maxW="full"
