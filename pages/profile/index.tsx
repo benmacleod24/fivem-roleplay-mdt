@@ -63,7 +63,9 @@ const Profile: React.FunctionComponent<ProfileProps> = ({}) => {
             <Heading size="sm">Call Sign</Heading>
           </Flex>
           <InputGroup variant="filled" size="md">
-            <InputLeftElement children={<FiHash />} />
+            <InputLeftElement>
+              <FiHash />
+            </InputLeftElement>
             <Input
               value={callSign}
               onChange={e => setCallSign(e.target.value)}
