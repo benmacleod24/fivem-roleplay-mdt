@@ -114,9 +114,6 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
         },
         mdt_department_ranks: true,
       },
-      orderBy: {
-        rankId: 'asc',
-      },
     });
 
     res.json(members);
@@ -133,9 +130,6 @@ const GET = async (req: NextApiRequestWithQuery, res: NextApiResponse) => {
           select,
         },
         mdt_department_ranks: true,
-      },
-      orderBy: {
-        rankId: 'desc',
       },
     });
 

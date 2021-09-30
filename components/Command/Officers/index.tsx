@@ -159,6 +159,9 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                           .includes(filter.toLocaleLowerCase()) ||
                         o.callSign.includes(filter),
                     )
+                    .sort(
+                      (a, b) => a.mdt_department_ranks.rankLevel + b.mdt_department_ranks.rankLevel,
+                    )
                     .map(o => (
                       <Flex
                         w="full"
