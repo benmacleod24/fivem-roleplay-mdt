@@ -17,6 +17,7 @@ import {
   InputLeftElement,
   ModalBody,
   Select,
+  Tag,
 } from '@chakra-ui/react';
 import { useSession } from 'next-auth/client';
 import * as React from 'react';
@@ -165,7 +166,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                     .map(o => (
                       <Flex
                         w="full"
-                        h="fit-content"
+                        h="full"
                         background="gray.700"
                         py="4"
                         px="3"
@@ -287,7 +288,7 @@ const Officers: React.FunctionComponent<OfficersProps> = ({}) => {
                               }}
                             >
                               {departments
-                                ?.find(d => d.departmentId === session?.user.dept)
+                                ?.find(d => d.departmentId === department)
                                 ?.mdt_department_ranks.map(r => (
                                   <option value={r.rankId} key={r.rankId}>
                                     {r.rankName}
